@@ -35,15 +35,19 @@ const Index = () => {
               }}
               className="relative w-64 h-64 flex items-center justify-center"
             >
-              <motion.img
-                src="/drone.gif"
-                alt="Dron volando"
+              <motion.video
+                autoPlay
+                muted
+                playsInline
                 className="w-full h-full object-contain"
-                onLoad={() => setLoading(false)}
+                onLoadedData={() => setLoading(false)}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: loading ? 0 : 1 }}
                 transition={{ duration: 0.5 }}
-              />
+              >
+                <source src="/animacion dron pantalla  carga.mp4" type="video/mp4" />
+                Tu navegador no soporta el tag de video.
+              </motion.video>
               {loading && (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
