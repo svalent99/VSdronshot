@@ -7,12 +7,21 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simular el tiempo de la animación del dron
-    const timer = setTimeout(() => {
-      setShowWelcome(false);
-    }, 4000);
+    const videoElement = document.querySelector('video');
+    
+    if (videoElement) {
+      videoElement.addEventListener('ended', () => {
+        setShowWelcome(false);
+      });
+    }
 
-    return () => clearTimeout(timer);
+    return () => {
+      if (videoElement) {
+        videoElement.removeEventListener('ended', () => {
+          setShowWelcome(false);
+        });
+      }
+    };
   }, []);
 
   return (
@@ -27,13 +36,9 @@ const Index = () => {
             className="min-h-screen flex items-center justify-center"
           >
             <motion.div
-              initial={{ scale: 0.5, y: 100 }}
-              animate={{ scale: 1, y: 0 }}
-              transition={{
-                duration: 2,
-                ease: "easeOut"
-              }}
-              className="relative w-64 h-64 flex items-center justify-center"
+              initial={{ scale: 1 }}
+              animate={{ scale: 1 }}
+              className="relative w-screen h-screen flex items-center justify-center"
             >
               <motion.video
                 autoPlay
