@@ -5,46 +5,24 @@ import { motion, AnimatePresence } from 'framer-motion';
 const Index = () => {
   const [showWelcome, setShowWelcome] = useState(true);
   const [loading, setLoading] = useState(true);
-  const [videoError, setVideoError] = useState(false);
 
   useEffect(() => {
     const videoElement = document.querySelector('video');
     
     if (videoElement) {
-      const handleVideoEnd = () => {
+      videoElement.addEventListener('ended', () => {
         setShowWelcome(false);
-      };
-
-      const handleLoadedData = () => {
-        setLoading(false);
-      };
-
-      const handleError = () => {
-        console.error('Error loading video');
-        setVideoError(true);
-        setLoading(false);
-        setShowWelcome(false);
-      };
-
-      videoElement.addEventListener('ended', handleVideoEnd);
-      videoElement.addEventListener('loadeddata', handleLoadedData);
-      videoElement.addEventListener('error', handleError);
-
-      // Fallback timeout
-      const timeout = setTimeout(() => {
-        if (loading) {
-          handleError();
-        }
-      }, 5000);
-
-      return () => {
-        videoElement.removeEventListener('ended', handleVideoEnd);
-        videoElement.removeEventListener('loadeddata', handleLoadedData);
-        videoElement.removeEventListener('error', handleError);
-        clearTimeout(timeout);
-      };
+      });
     }
-  }, [loading]);
+
+    return () => {
+      if (videoElement) {
+        videoElement.removeEventListener('ended', () => {
+          setShowWelcome(false);
+        });
+      }
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -68,11 +46,6 @@ const Index = () => {
                 playsInline
                 className="w-full h-full object-contain"
                 onLoadedData={() => setLoading(false)}
-                onError={() => {
-                  setVideoError(true);
-                  setLoading(false);
-                  setShowWelcome(false);
-                }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: loading ? 0 : 1 }}
                 transition={{ duration: 0.5 }}
@@ -80,7 +53,7 @@ const Index = () => {
                 <source src="/animacion dron pantalla  carga.mp4" type="video/mp4" />
                 Tu navegador no soporta el tag de video.
               </motion.video>
-              {loading && !videoError && (
+              {loading && (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
                 </div>
