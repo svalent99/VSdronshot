@@ -8,20 +8,38 @@ const Index = () => {
 
   useEffect(() => {
     const videoElement = document.querySelector('video');
+    console.log('Video element found:', videoElement);
     
     if (videoElement) {
-      videoElement.addEventListener('ended', () => {
+      const handleVideoEnd = () => {
+        console.log('Video ended');
         setShowWelcome(false);
-      });
-    }
+      };
 
-    return () => {
-      if (videoElement) {
-        videoElement.removeEventListener('ended', () => {
-          setShowWelcome(false);
-        });
-      }
-    };
+      const handleVideoError = (e: Event) => {
+        console.log('Video error:', e);
+        setShowWelcome(false); // Fallback en caso de error
+      };
+
+      videoElement.addEventListener('ended', handleVideoEnd);
+      videoElement.addEventListener('error', handleVideoError);
+
+      // Fallback por si el video no carga después de 5 segundos
+      const timeoutId = setTimeout(() => {
+        console.log('Timeout reached, forcing content display');
+        setShowWelcome(false);
+      }, 5000);
+
+      return () => {
+        videoElement.removeEventListener('ended', handleVideoEnd);
+        videoElement.removeEventListener('error', handleVideoError);
+        clearTimeout(timeoutId);
+      };
+    } else {
+      // Si no se encuentra el elemento de video, mostrar el contenido
+      console.log('No video element found, showing content');
+      setShowWelcome(false);
+    }
   }, []);
 
   return (
@@ -45,7 +63,10 @@ const Index = () => {
                 muted
                 playsInline
                 className="w-full h-full object-contain"
-                onLoadedData={() => setLoading(false)}
+                onLoadedData={() => {
+                  console.log('Video loaded');
+                  setLoading(false);
+                }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: loading ? 0 : 1 }}
                 transition={{ duration: 0.5 }}
