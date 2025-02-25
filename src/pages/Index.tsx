@@ -82,7 +82,7 @@ const Index = () => {
               transition={{ delay: 0.7, duration: 0.8 }}
               className="text-5xl md:text-7xl font-bold text-center"
             >
-              Tu Experiencia con Drones
+              VS Dron Shot
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -98,7 +98,7 @@ const Index = () => {
               transition={{ delay: 1.1, duration: 0.8 }}
               className="mt-8 px-8 py-3 bg-[#0EA5E9] text-white rounded-md font-semibold text-lg hover:bg-[#0284C7] transition-colors duration-300 transform hover:scale-105"
             >
-              Conócenos
+              Conocenos
             </motion.button>
           </motion.div>
         )}
