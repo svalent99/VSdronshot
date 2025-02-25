@@ -92,14 +92,6 @@ const Index = () => {
             >
               Descubre un nuevo mundo desde las alturas
             </motion.p>
-            <motion.button
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.1, duration: 0.8 }}
-              className="mt-8 px-8 py-3 bg-[#0EA5E9] text-white rounded-md font-semibold text-lg hover:bg-[#0284C7] transition-colors duration-300 transform hover:scale-105"
-            >
-              Conócenos
-            </motion.button>
           </motion.div>
         )}
       </AnimatePresence>
