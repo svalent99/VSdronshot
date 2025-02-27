@@ -5,29 +5,37 @@ import { motion, AnimatePresence } from 'framer-motion';
 const Index = () => {
   const [showWelcome, setShowWelcome] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [videoError, setVideoError] = useState(false);
 
   useEffect(() => {
     const videoElement = document.querySelector('video');
     
     if (videoElement) {
-      videoElement.addEventListener('ended', () => {
+      const handleVideoEnd = () => {
         setShowWelcome(false);
-      });
-    }
+      };
 
-    return () => {
-      if (videoElement) {
-        videoElement.removeEventListener('ended', () => {
-          setShowWelcome(false);
-        });
-      }
-    };
+      const handleError = () => {
+        console.error('Error loading video');
+        setVideoError(true);
+        // Si hay un error en el video, mostramos directamente el contenido principal
+        setShowWelcome(false);
+      };
+
+      videoElement.addEventListener('ended', handleVideoEnd);
+      videoElement.addEventListener('error', handleError);
+
+      return () => {
+        videoElement.removeEventListener('ended', handleVideoEnd);
+        videoElement.removeEventListener('error', handleError);
+      };
+    }
   }, []);
 
   return (
     <div className="min-h-screen bg-black text-white">
       <AnimatePresence mode="wait">
-        {showWelcome ? (
+        {showWelcome && !videoError ? (
           <motion.div
             key="welcome"
             initial={{ opacity: 1 }}
@@ -46,14 +54,17 @@ const Index = () => {
                 playsInline
                 className="w-full h-full object-contain"
                 onLoadedData={() => setLoading(false)}
+                onError={() => setVideoError(true)}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: loading ? 0 : 1 }}
                 transition={{ duration: 0.5 }}
               >
+                {/* Usamos ./assets/ para asegurarnos que el video sea incluido en el build */}
+                <source src="./animacion dron pantalla  carga.mp4" type="video/mp4" />
                 <source src="/animacion dron pantalla  carga.mp4" type="video/mp4" />
                 Tu navegador no soporta el tag de video.
               </motion.video>
-              {loading && (
+              {loading && !videoError && (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
                 </div>
