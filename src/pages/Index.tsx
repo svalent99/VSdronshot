@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import NavHeader from '../components/NavHeader';
 
 const Index = () => {
   const [showWelcome, setShowWelcome] = useState(true);
@@ -18,7 +19,6 @@ const Index = () => {
       const handleError = () => {
         console.error('Error loading video');
         setVideoError(true);
-        // Si hay un error en el video, mostramos directamente el contenido principal
         setShowWelcome(false);
       };
 
@@ -59,7 +59,6 @@ const Index = () => {
                 animate={{ opacity: loading ? 0 : 1 }}
                 transition={{ duration: 0.5 }}
               >
-                {/* Usamos ./assets/ para asegurarnos que el video sea incluido en el build */}
                 <source src="./animacion dron pantalla  carga.mp4" type="video/mp4" />
                 <source src="/animacion dron pantalla  carga.mp4" type="video/mp4" />
                 Tu navegador no soporta el tag de video.
@@ -79,6 +78,9 @@ const Index = () => {
             transition={{ duration: 1 }}
             className="min-h-screen flex flex-col items-center justify-center space-y-8"
           >
+            <div className="fixed top-4 left-0 right-0 z-50">
+              <NavHeader />
+            </div>
             <motion.span 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
