@@ -192,14 +192,6 @@ const Index = () => {
           </motion.div>
         )}
       </AnimatePresence>
-      
-      <style jsx global>{`
-        .video-fallback {
-          background-image: url('https://images.unsplash.com/photo-1487887235947-a955ef187fcc');
-          background-size: cover;
-          background-position: center;
-        }
-      `}</style>
     </div>
   );
 };
