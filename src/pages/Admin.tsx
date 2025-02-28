@@ -65,7 +65,7 @@ const Admin = () => {
     e.preventDefault();
     
     // Verificar las credenciales (simplificado para el ejemplo)
-    if (email === 'valen.sotelo.123@gmail.com' && password === 'admin123') {
+    if (email === 'valen.sotelo.123@gmail.com' && password === 'svolando9') {
       setIsLoggedIn(true);
     } else {
       alert('Credenciales incorrectas. Por favor, intenta de nuevo.');
