@@ -3,6 +3,9 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import NavHeader from '../components/NavHeader';
 import ServicesCarousel from '../components/ServicesCarousel';
+import DroneSection from '../components/DroneSection';
+import ImageGallery from '../components/ImageGallery';
+import ReviewsSection from '../components/ReviewsSection';
 
 const Index = () => {
   const [showWelcome, setShowWelcome] = useState(true);
@@ -138,6 +141,25 @@ const Index = () => {
             {/* Services Section with Solid Background */}
             <div className="w-full bg-black py-16">
               <ServicesCarousel />
+            </div>
+            
+            {/* Drone Section */}
+            <DroneSection />
+            
+            {/* Gallery Section */}
+            <div className="w-full bg-black py-16">
+              <div className="max-w-7xl mx-auto px-4">
+                <h2 className="text-3xl md:text-4xl font-bold text-center mb-10">Galería de Imágenes</h2>
+                <ImageGallery />
+              </div>
+            </div>
+            
+            {/* Reviews Section */}
+            <div className="w-full bg-gradient-to-b from-black to-zinc-900 py-16">
+              <div className="max-w-7xl mx-auto px-4">
+                <h2 className="text-3xl md:text-4xl font-bold text-center mb-10">Lo que dicen nuestros clientes</h2>
+                <ReviewsSection />
+              </div>
             </div>
           </motion.div>
         )}
