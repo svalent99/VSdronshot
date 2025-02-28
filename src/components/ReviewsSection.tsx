@@ -99,33 +99,24 @@ const Marquee = ({
   className?: string;
   pauseOnHover?: boolean;
 }) => {
-  const containerRef = React.useRef<HTMLDivElement>(null);
+  // Utilizamos clases CSS en lugar de <style jsx>
+  const marqueeClass = direction === "left" ? "animate-marquee" : "animate-marquee-reverse";
+  const hoverClass = pauseOnHover ? "hover:pause-animation" : "";
   
   return (
     <div 
-      ref={containerRef} 
       className={`overflow-hidden whitespace-nowrap ${className}`}
       style={{ position: 'relative' }}
     >
       <div 
-        className={`inline-block whitespace-nowrap ${pauseOnHover ? "hover:animate-none" : ""}`}
+        className={`inline-block whitespace-nowrap ${marqueeClass} ${hoverClass}`}
         style={{
-          animation: `scroll-${direction} ${speed}s linear infinite`,
+          animationDuration: `${speed}s`,
           paddingRight: '2rem'
         }}
       >
         {children}
       </div>
-      <style jsx>{`
-        @keyframes scroll-left {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-100%); }
-        }
-        @keyframes scroll-right {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(0); }
-        }
-      `}</style>
     </div>
   );
 };
