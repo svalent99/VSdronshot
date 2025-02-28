@@ -34,7 +34,7 @@ const Index = () => {
     };
 
     // Intentar obtener el elemento de video después de que el componente esté montado
-    const videoElement = document.querySelector('video.welcome-video');
+    const videoElement = document.querySelector('video.welcome-video') as HTMLVideoElement;
     
     if (videoElement) {
       console.log('Video de animación encontrado');
@@ -42,11 +42,13 @@ const Index = () => {
       videoElement.addEventListener('error', handleVideoError);
       
       // Intentar reproducir el video manualmente
-      videoElement.play().catch(error => {
-        console.error('Error intentando reproducir el video de bienvenida:', error);
-        setVideoError(true);
-        setShowWelcome(false);
-      });
+      if (videoElement.play) {
+        videoElement.play().catch(error => {
+          console.error('Error intentando reproducir el video de bienvenida:', error);
+          setVideoError(true);
+          setShowWelcome(false);
+        });
+      }
     } else {
       console.warn('Video de animación no encontrado');
     }
