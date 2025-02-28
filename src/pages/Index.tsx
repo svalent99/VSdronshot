@@ -6,6 +6,7 @@ import ServicesCarousel from '../components/ServicesCarousel';
 import DroneSection from '../components/DroneSection';
 import ImageGallery from '../components/ImageGallery';
 import ReviewsSection from '../components/ReviewsSection';
+import Footer from '../components/Footer';
 import '../App.css'; // Importamos explícitamente los estilos para asegurarnos de que se apliquen
 
 const Index = () => {
@@ -199,6 +200,9 @@ const Index = () => {
                 <ReviewsSection />
               </div>
             </div>
+            
+            {/* Footer */}
+            <Footer />
           </motion.div>
         )}
       </AnimatePresence>
