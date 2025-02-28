@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '../lib/utils';
 
@@ -121,7 +121,113 @@ const Marquee = ({
   );
 };
 
+// Formulario modal para dejar reseñas
+const ReviewForm = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
+  const [body, setBody] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Aquí iría la lógica para enviar a Supabase
+    console.log('Enviando reseña:', { name, username, body });
+    
+    // Simular envío exitoso
+    setSubmitted(true);
+    
+    // Resetear formulario después de 2 segundos
+    setTimeout(() => {
+      setName('');
+      setUsername('');
+      setBody('');
+      setSubmitted(false);
+      onClose();
+    }, 2000);
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div 
+        className="absolute inset-0 bg-black/70" 
+        onClick={onClose}
+      ></div>
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        className="relative bg-zinc-900 rounded-lg p-6 w-full max-w-md mx-4 z-10 border border-zinc-700"
+      >
+        <button 
+          onClick={onClose}
+          className="absolute top-3 right-3 text-gray-400 hover:text-white"
+        >
+          ✕
+        </button>
+        <h3 className="text-xl font-bold text-white mb-4">Deja tu reseña</h3>
+        
+        {submitted ? (
+          <div className="text-center py-8">
+            <div className="mb-4 text-green-400 text-5xl">✓</div>
+            <p className="text-white">¡Gracias por tu reseña! Será revisada y publicada pronto.</p>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">Nombre</label>
+              <input
+                type="text"
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                className="w-full p-2 bg-zinc-800 border border-zinc-700 rounded text-white"
+              />
+            </div>
+            <div>
+              <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-1">Nombre de usuario</label>
+              <div className="flex">
+                <span className="inline-flex items-center px-3 bg-zinc-700 border border-r-0 border-zinc-600 rounded-l-md text-gray-300">@</span>
+                <input
+                  type="text"
+                  id="username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                  className="w-full p-2 bg-zinc-800 border border-zinc-700 rounded-r-md text-white"
+                />
+              </div>
+            </div>
+            <div>
+              <label htmlFor="review" className="block text-sm font-medium text-gray-300 mb-1">Tu reseña</label>
+              <textarea
+                id="review"
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                required
+                rows={4}
+                className="w-full p-2 bg-zinc-800 border border-zinc-700 rounded text-white"
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full mt-6 px-4 py-2 bg-sky-500 text-white rounded font-medium hover:bg-sky-600 transition-colors"
+            >
+              Enviar reseña
+            </button>
+          </form>
+        )}
+      </motion.div>
+    </div>
+  );
+};
+
 const ReviewsSection = () => {
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+
   return (
     <div className="relative flex w-full flex-col items-center justify-center overflow-hidden py-10">
       <div className="mb-4 w-full">
@@ -150,6 +256,7 @@ const ReviewsSection = () => {
       
       <div className="mt-10 flex justify-center">
         <motion.button
+          onClick={() => setReviewModalOpen(true)}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           className="px-6 py-3 bg-transparent border border-white/20 hover:border-white/50 text-white rounded-md font-medium transition-colors duration-300"
@@ -157,6 +264,11 @@ const ReviewsSection = () => {
           Deja tu reseña
         </motion.button>
       </div>
+      
+      <ReviewForm 
+        isOpen={reviewModalOpen} 
+        onClose={() => setReviewModalOpen(false)}
+      />
       
       <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-black to-transparent"></div>
       <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-black to-transparent"></div>

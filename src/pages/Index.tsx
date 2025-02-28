@@ -13,28 +13,44 @@ const Index = () => {
   const [videoError, setVideoError] = useState(false);
 
   useEffect(() => {
-    const videoElement = document.querySelector('video');
+    // Simular carga completa después de 5 segundos si el video no termina
+    const timeoutId = setTimeout(() => {
+      if (showWelcome) {
+        console.log('Forzando finalización de animación de carga después de tiempo de espera');
+        setShowWelcome(false);
+      }
+    }, 5000);
+
+    const handleVideoEnd = () => {
+      console.log('Video de animación terminó');
+      setShowWelcome(false);
+    };
+
+    const handleVideoError = () => {
+      console.error('Error loading animation video');
+      setVideoError(true);
+      setShowWelcome(false);
+    };
+
+    // Intentar obtener el elemento de video después de que el componente esté montado
+    const videoElement = document.querySelector('video.welcome-video');
     
     if (videoElement) {
-      const handleVideoEnd = () => {
-        setShowWelcome(false);
-      };
-
-      const handleError = () => {
-        console.error('Error loading video');
-        setVideoError(true);
-        setShowWelcome(false);
-      };
-
+      console.log('Video de animación encontrado');
       videoElement.addEventListener('ended', handleVideoEnd);
-      videoElement.addEventListener('error', handleError);
-
-      return () => {
-        videoElement.removeEventListener('ended', handleVideoEnd);
-        videoElement.removeEventListener('error', handleError);
-      };
+      videoElement.addEventListener('error', handleVideoError);
+    } else {
+      console.warn('Video de animación no encontrado');
     }
-  }, []);
+
+    return () => {
+      clearTimeout(timeoutId);
+      if (videoElement) {
+        videoElement.removeEventListener('ended', handleVideoEnd);
+        videoElement.removeEventListener('error', handleVideoError);
+      }
+    };
+  }, [showWelcome]);
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -56,14 +72,20 @@ const Index = () => {
                 autoPlay
                 muted
                 playsInline
-                className="w-full h-full object-contain"
-                onLoadedData={() => setLoading(false)}
-                onError={() => setVideoError(true)}
+                className="w-full h-full object-contain welcome-video"
+                onLoadedData={() => {
+                  console.log('Video de animación cargado');
+                  setLoading(false);
+                }}
+                onError={() => {
+                  console.error('Error cargando video de animación');
+                  setVideoError(true);
+                  setShowWelcome(false);
+                }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: loading ? 0 : 1 }}
                 transition={{ duration: 0.5 }}
               >
-                <source src="./animacion dron pantalla  carga.mp4" type="video/mp4" />
                 <source src="/animacion dron pantalla  carga.mp4" type="video/mp4" />
                 Tu navegador no soporta el tag de video.
               </motion.video>
@@ -91,11 +113,17 @@ const Index = () => {
               {/* Background Video */}
               <div className="absolute inset-0 z-0 w-full h-full overflow-hidden">
                 <video 
+                  key="hero-video"
                   autoPlay 
                   muted 
                   loop 
                   playsInline 
                   className="absolute inset-0 w-full h-full object-cover"
+                  onError={(e) => {
+                    console.error('Error loading hero video', e);
+                    // Añadir una clase al elemento para aplicar un fondo alternativo
+                    e.currentTarget.parentElement?.classList.add('video-fallback');
+                  }}
                 >
                   <source src="/video hero.mp4" type="video/mp4" />
                 </video>
@@ -164,6 +192,14 @@ const Index = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      
+      <style jsx global>{`
+        .video-fallback {
+          background-image: url('https://images.unsplash.com/photo-1487887235947-a955ef187fcc');
+          background-size: cover;
+          background-position: center;
+        }
+      `}</style>
     </div>
   );
 };

@@ -1,0 +1,299 @@
+
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+
+// Datos de prueba para reseñas pendientes
+const pendingReviews = [
+  {
+    id: 101,
+    name: "Roberto González",
+    username: "@robertogonzalez",
+    body: "Excelente servicio, las imágenes capturadas con el dron han ayudado mucho a promocionar mi propiedad.",
+    img: "https://i.pravatar.cc/150?img=10",
+    pending: true
+  },
+  {
+    id: 102,
+    name: "Mariana López",
+    username: "@marianalopez",
+    body: "Impresionante la calidad de las tomas aéreas. Definitivamente recomendaré sus servicios.",
+    img: "https://i.pravatar.cc/150?img=11",
+    pending: true
+  },
+  {
+    id: 103,
+    name: "Eduardo Ramírez",
+    username: "@eduardoramirez",
+    body: "Muy profesionales y puntuales. Las fotografías son de gran calidad.",
+    img: "https://i.pravatar.cc/150?img=12",
+    pending: true
+  }
+];
+
+// Datos de prueba para imágenes de la galería
+const galleryImages = [
+  {
+    id: 1,
+    title: "Vista panorámica de campo",
+    thumbnail: "https://images.unsplash.com/photo-1473968512647-3e447244af8f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZHJvbmV8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=60",
+  },
+  {
+    id: 2,
+    title: "Propiedad residencial",
+    thumbnail: "https://images.unsplash.com/photo-1577724862607-83214b7d0e89?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8ZHJvbmUlMjB2aWV3fGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60",
+  },
+  {
+    id: 3,
+    title: "Complejo turístico",
+    thumbnail: "https://images.unsplash.com/photo-1534372860894-9476556ea6c7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fGRyb25lJTIwdmlld3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60",
+  }
+];
+
+const Admin = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [activeTab, setActiveTab] = useState('reviews');
+  const [reviews, setReviews] = useState(pendingReviews);
+  const [images, setImages] = useState(galleryImages);
+  const [uploading, setUploading] = useState(false);
+  const navigate = useNavigate();
+
+  // Función para manejar el inicio de sesión
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Verificar las credenciales (simplificado para el ejemplo)
+    if (email === 'valen.sotelo.123@gmail.com' && password === 'admin123') {
+      setIsLoggedIn(true);
+    } else {
+      alert('Credenciales incorrectas. Por favor, intenta de nuevo.');
+    }
+  };
+
+  // Función para aprobar o rechazar una reseña
+  const handleReviewAction = (id: number, approve: boolean) => {
+    if (approve) {
+      // En una implementación real, aquí actualizaríamos el estado en Supabase
+      console.log(`Reseña ${id} aprobada`);
+    } else {
+      console.log(`Reseña ${id} rechazada`);
+    }
+    
+    // Eliminar la reseña de la lista de pendientes
+    setReviews(reviews.filter(review => review.id !== id));
+  };
+
+  // Función para subir una nueva imagen
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    
+    setUploading(true);
+    
+    // Simular carga de imagen
+    setTimeout(() => {
+      const newImage = {
+        id: images.length + 1,
+        title: "Nueva imagen",
+        thumbnail: URL.createObjectURL(files[0]), // Crear URL temporal para la vista previa
+      };
+      
+      setImages([...images, newImage]);
+      setUploading(false);
+    }, 1500);
+  };
+
+  // Función para eliminar una imagen
+  const handleDeleteImage = (id: number) => {
+    setImages(images.filter(img => img.id !== id));
+  };
+
+  return (
+    <div className="min-h-screen bg-zinc-900 text-white">
+      <header className="bg-black py-4 px-6 flex justify-between items-center">
+        <h1 className="text-2xl font-bold">VS Dron Shot - Panel de Administración</h1>
+        {isLoggedIn && (
+          <button 
+            onClick={() => navigate('/')}
+            className="px-4 py-2 border border-white/20 rounded hover:bg-white/10 transition"
+          >
+            Volver al sitio
+          </button>
+        )}
+      </header>
+      
+      <main className="max-w-6xl mx-auto p-6">
+        {!isLoggedIn ? (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-md mx-auto mt-16 p-8 bg-zinc-800 rounded-lg border border-zinc-700"
+          >
+            <h2 className="text-2xl font-bold mb-6 text-center">Iniciar Sesión</h2>
+            <form onSubmit={handleLogin} className="space-y-6">
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
+                  Correo Electrónico
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="w-full p-2 bg-zinc-700 border border-zinc-600 rounded text-white"
+                  placeholder="ejemplo@correo.com"
+                />
+              </div>
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
+                  Contraseña
+                </label>
+                <input
+                  type="password"
+                  id="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="w-full p-2 bg-zinc-700 border border-zinc-600 rounded text-white"
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full px-4 py-3 bg-sky-600 hover:bg-sky-700 rounded font-semibold transition"
+              >
+                Iniciar Sesión
+              </button>
+            </form>
+          </motion.div>
+        ) : (
+          <div className="mt-8">
+            <div className="border-b border-zinc-700 mb-8">
+              <nav className="flex space-x-8">
+                <button
+                  onClick={() => setActiveTab('reviews')}
+                  className={`py-4 px-1 font-medium text-sm border-b-2 ${
+                    activeTab === 'reviews' 
+                      ? 'border-sky-500 text-sky-500' 
+                      : 'border-transparent text-gray-400 hover:text-gray-200'
+                  }`}
+                >
+                  Reseñas Pendientes ({reviews.length})
+                </button>
+                <button
+                  onClick={() => setActiveTab('gallery')}
+                  className={`py-4 px-1 font-medium text-sm border-b-2 ${
+                    activeTab === 'gallery' 
+                      ? 'border-sky-500 text-sky-500' 
+                      : 'border-transparent text-gray-400 hover:text-gray-200'
+                  }`}
+                >
+                  Gestionar Galería
+                </button>
+              </nav>
+            </div>
+            
+            {activeTab === 'reviews' && (
+              <div>
+                <h2 className="text-xl font-bold mb-6">Reseñas Pendientes de Aprobación</h2>
+                {reviews.length === 0 ? (
+                  <div className="text-center py-12 bg-zinc-800/50 rounded-lg">
+                    <p className="text-gray-400">No hay reseñas pendientes de aprobación.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {reviews.map((review) => (
+                      <div key={review.id} className="bg-zinc-800 rounded-lg p-6 border border-zinc-700">
+                        <div className="flex items-start">
+                          <img src={review.img} alt={review.name} className="w-12 h-12 rounded-full mr-4" />
+                          <div className="flex-1">
+                            <div className="flex justify-between">
+                              <div>
+                                <h3 className="font-bold">{review.name}</h3>
+                                <p className="text-gray-400 text-sm">{review.username}</p>
+                              </div>
+                              <div className="flex space-x-2">
+                                <button
+                                  onClick={() => handleReviewAction(review.id, true)}
+                                  className="px-3 py-1 bg-green-600 hover:bg-green-700 rounded text-sm"
+                                >
+                                  Aprobar
+                                </button>
+                                <button
+                                  onClick={() => handleReviewAction(review.id, false)}
+                                  className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-sm"
+                                >
+                                  Rechazar
+                                </button>
+                              </div>
+                            </div>
+                            <p className="mt-3">{review.body}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            
+            {activeTab === 'gallery' && (
+              <div>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl font-bold">Gestionar Galería de Imágenes</h2>
+                  <label className="px-4 py-2 bg-sky-600 hover:bg-sky-700 rounded font-semibold cursor-pointer transition">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleImageUpload}
+                      disabled={uploading}
+                    />
+                    {uploading ? 'Subiendo...' : 'Subir Nueva Imagen'}
+                  </label>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {images.map((image) => (
+                    <div key={image.id} className="bg-zinc-800 rounded-lg overflow-hidden border border-zinc-700">
+                      <div className="aspect-w-16 aspect-h-9 relative">
+                        <img 
+                          src={image.thumbnail} 
+                          alt={image.title} 
+                          className="w-full h-64 object-cover"
+                        />
+                        <button
+                          onClick={() => handleDeleteImage(image.id)}
+                          className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center bg-red-600 rounded-full hover:bg-red-700 transition"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                      <div className="p-4">
+                        <input
+                          type="text"
+                          value={image.title}
+                          onChange={(e) => {
+                            const newImages = [...images];
+                            const idx = newImages.findIndex(img => img.id === image.id);
+                            newImages[idx] = { ...newImages[idx], title: e.target.value };
+                            setImages(newImages);
+                          }}
+                          className="w-full p-2 bg-zinc-700 border border-zinc-600 rounded text-white"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </main>
+    </div>
+  );
+};
+
+export default Admin;

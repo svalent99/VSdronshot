@@ -1,84 +1,75 @@
 
-import React, { useRef, useState } from "react";
+import React from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
-function NavHeader() {
-  const [position, setPosition] = useState({
-    left: 0,
-    width: 0,
-    opacity: 0,
-  });
-
+const NavHeader = () => {
   return (
-    <ul
-      className="relative mx-auto flex w-fit rounded-full border-2 border-white bg-black/50 p-1 backdrop-blur-sm"
-      onMouseLeave={() => setPosition((pv) => ({ ...pv, opacity: 0 }))}
+    <motion.nav
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.8 }}
+      className="mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center"
     >
-      <Tab setPosition={setPosition}>
-        <Link to="/">Home</Link>
-      </Tab>
-      <Tab setPosition={setPosition}>
-        <Link to="/servicios">Servicios</Link>
-      </Tab>
-      <Tab setPosition={setPosition}>
-        <Link to="/about">About</Link>
-      </Tab>
-      <Tab setPosition={setPosition}>
-        <Link to="/contacto">Contacto</Link>
-      </Tab>
-      <Tab setPosition={setPosition}>
-        <Link to="/admin">Admin</Link>
-      </Tab>
-
-      <Cursor position={position} />
-    </ul>
-  );
-}
-
-const Tab = ({
-  children,
-  setPosition,
-}: {
-  children: React.ReactNode;
-  setPosition: React.Dispatch<React.SetStateAction<{
-    left: number;
-    width: number;
-    opacity: number;
-  }>>;
-}) => {
-  const ref = useRef<HTMLLIElement>(null);
-  return (
-    <li
-      ref={ref}
-      onMouseEnter={() => {
-        if (!ref.current) return;
-        const { width } = ref.current.getBoundingClientRect();
-        setPosition({
-          width,
-          opacity: 1,
-          left: ref.current.offsetLeft,
-        });
-      }}
-      className="relative z-10 block cursor-pointer px-3 py-1.5 text-xs uppercase text-white mix-blend-difference md:px-5 md:py-3 md:text-base"
-    >
-      {children}
-    </li>
-  );
-};
-
-const Cursor = ({ position }: { 
-  position: {
-    left: number;
-    width: number;
-    opacity: number;
-  }; 
-}) => {
-  return (
-    <motion.li
-      animate={position}
-      className="absolute z-0 h-7 rounded-full bg-white md:h-12"
-    />
+      <div className="flex items-center flex-1">
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-center">
+            <span className="text-xl font-bold text-white">VS Dron Shot</span>
+          </div>
+          <div className="hidden md:block">
+            <div className="ml-10 flex items-center space-x-4">
+              <Link
+                to="/"
+                className="px-3 py-2 text-sm font-medium text-white hover:text-sky-400 transition-colors duration-200"
+              >
+                Inicio
+              </Link>
+              <Link
+                to="/servicios"
+                className="px-3 py-2 text-sm font-medium text-white hover:text-sky-400 transition-colors duration-200"
+              >
+                Servicios
+              </Link>
+              <Link
+                to="/about"
+                className="px-3 py-2 text-sm font-medium text-white hover:text-sky-400 transition-colors duration-200"
+              >
+                Nosotros
+              </Link>
+              <Link
+                to="/contacto"
+                className="px-3 py-2 text-sm font-medium text-white hover:text-sky-400 transition-colors duration-200"
+              >
+                Contacto
+              </Link>
+              <Link
+                to="/admin"
+                className="px-3 py-2 text-sm font-medium text-white bg-sky-600 hover:bg-sky-700 rounded-md transition-colors duration-200"
+              >
+                Admin
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="md:hidden flex items-center">
+        <button className="text-white hover:text-sky-400 focus:outline-none">
+          <svg
+            className="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          </svg>
+        </button>
+      </div>
+    </motion.nav>
   );
 };
 
