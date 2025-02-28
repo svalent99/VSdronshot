@@ -6,6 +6,7 @@ import ServicesCarousel from '../components/ServicesCarousel';
 import DroneSection from '../components/DroneSection';
 import ImageGallery from '../components/ImageGallery';
 import ReviewsSection from '../components/ReviewsSection';
+import '../App.css'; // Importamos explícitamente los estilos para asegurarnos de que se apliquen
 
 const Index = () => {
   const [showWelcome, setShowWelcome] = useState(true);
@@ -13,7 +14,7 @@ const Index = () => {
   const [videoError, setVideoError] = useState(false);
 
   useEffect(() => {
-    // Simular carga completa después de 5 segundos si el video no termina
+    // Forzar finalización de la animación después de 5 segundos
     const timeoutId = setTimeout(() => {
       if (showWelcome) {
         console.log('Forzando finalización de animación de carga después de tiempo de espera');
@@ -39,6 +40,13 @@ const Index = () => {
       console.log('Video de animación encontrado');
       videoElement.addEventListener('ended', handleVideoEnd);
       videoElement.addEventListener('error', handleVideoError);
+      
+      // Intentar reproducir el video manualmente
+      videoElement.play().catch(error => {
+        console.error('Error intentando reproducir el video de bienvenida:', error);
+        setVideoError(true);
+        setShowWelcome(false);
+      });
     } else {
       console.warn('Video de animación no encontrado');
     }
@@ -53,7 +61,7 @@ const Index = () => {
   }, [showWelcome]);
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-white overflow-x-hidden">
       <AnimatePresence mode="wait">
         {showWelcome && !videoError ? (
           <motion.div
@@ -72,7 +80,7 @@ const Index = () => {
                 autoPlay
                 muted
                 playsInline
-                className="w-full h-full object-contain welcome-video"
+                className="w-full h-full object-cover welcome-video"
                 onLoadedData={() => {
                   console.log('Video de animación cargado');
                   setLoading(false);
