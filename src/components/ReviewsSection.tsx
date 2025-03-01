@@ -79,7 +79,7 @@ const ReviewCard = ({
           <p className="text-xs font-medium text-white/40">{username}</p>
         </div>
       </div>
-      <blockquote className="mt-2 text-sm text-gray-300">{body}</blockquote>
+      <blockquote className="mt-2 text-sm text-gray-300 line-clamp-4">{body}</blockquote>
     </motion.figure>
   );
 };
@@ -228,8 +228,8 @@ const ReviewsSection = () => {
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
 
   return (
-    <div className="relative flex w-full flex-col items-center justify-center overflow-hidden py-10">
-      <div className="w-full mt-4">
+    <div className="relative flex w-full flex-col items-center justify-center overflow-hidden py-6">
+      <div className="w-full">
         <div className="flex overflow-hidden space-x-4 animate-[marquee_20s_linear_infinite_reverse]">
           {allReviews.map((review) => (
             <ReviewCard key={review.id} {...review} />
@@ -241,7 +241,7 @@ const ReviewsSection = () => {
         </div>
       </div>
       
-      <div className="mt-10 flex justify-center">
+      <div className="mt-8 flex justify-center">
         <motion.button
           onClick={() => setReviewModalOpen(true)}
           whileHover={{ scale: 1.05 }}
