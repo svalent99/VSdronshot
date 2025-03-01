@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import NavHeader from '../components/NavHeader';
@@ -16,7 +15,6 @@ const Index = () => {
   const [videoError, setVideoError] = useState(false);
 
   useEffect(() => {
-    // Forzar finalización de la animación después de 5 segundos
     const timeoutId = setTimeout(() => {
       if (showWelcome) {
         console.log('Forzando finalización de animación de carga después de tiempo de espera');
@@ -35,7 +33,6 @@ const Index = () => {
       setShowWelcome(false);
     };
 
-    // Intentar obtener el elemento de video después de que el componente esté montado
     const videoElement = document.querySelector('video.welcome-video') as HTMLVideoElement;
     
     if (videoElement) {
@@ -43,7 +40,6 @@ const Index = () => {
       videoElement.addEventListener('ended', handleVideoEnd);
       videoElement.addEventListener('error', handleVideoError);
       
-      // Intentar reproducir el video manualmente
       if (videoElement.play) {
         videoElement.play().catch(error => {
           console.error('Error intentando reproducir el video de bienvenida:', error);
@@ -120,9 +116,7 @@ const Index = () => {
               <NavHeader />
             </div>
             
-            {/* Hero Section with Background Video */}
             <div className="relative min-h-screen flex flex-col items-center justify-center">
-              {/* Background Video */}
               <div className="absolute inset-0 z-0 w-full h-full overflow-hidden">
                 <video 
                   key="hero-video"
@@ -133,7 +127,6 @@ const Index = () => {
                   className="absolute inset-0 w-full h-full object-cover"
                   onError={(e) => {
                     console.error('Error loading hero video', e);
-                    // Añadir una clase al elemento para aplicar un fondo alternativo
                     e.currentTarget.parentElement?.classList.add('video-fallback');
                   }}
                 >
@@ -178,15 +171,12 @@ const Index = () => {
               </div>
             </div>
             
-            {/* Services Section with Solid Background */}
             <div className="w-full bg-black py-16">
               <ServicesCarousel />
             </div>
             
-            {/* Drone Section */}
             <DroneSection />
             
-            {/* Gallery Section */}
             <div className="w-full bg-black py-16">
               <div className="max-w-7xl mx-auto px-4">
                 <h2 className="text-3xl md:text-4xl font-bold text-center mb-10">Galería de Imágenes</h2>
@@ -194,7 +184,6 @@ const Index = () => {
               </div>
             </div>
             
-            {/* Reviews Section */}
             <div className="w-full bg-gradient-to-b from-black to-zinc-900 py-16">
               <div className="max-w-7xl mx-auto px-4">
                 <h2 className="text-3xl md:text-4xl font-bold text-center mb-10">Lo que dicen nuestros clientes</h2>
@@ -202,10 +191,8 @@ const Index = () => {
               </div>
             </div>
             
-            {/* FAQ Section - New */}
             <FaqSection />
             
-            {/* Footer */}
             <Footer />
           </motion.div>
         )}
