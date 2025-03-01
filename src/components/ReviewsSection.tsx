@@ -66,7 +66,7 @@ const ReviewCard = ({
     <motion.figure
       whileHover={{ y: -5 }}
       className={cn(
-        "relative h-full w-64 cursor-pointer overflow-hidden rounded-xl border p-4 mx-4 mb-4",
+        "relative h-48 w-64 flex flex-col cursor-pointer overflow-hidden rounded-xl border p-4 mx-4 mb-4",
         "border-gray-800 bg-gray-950/[0.3] hover:bg-gray-950/[0.5]",
       )}
     >
@@ -79,7 +79,7 @@ const ReviewCard = ({
           <p className="text-xs font-medium text-white/40">{username}</p>
         </div>
       </div>
-      <blockquote className="mt-2 text-sm text-gray-300 line-clamp-4">{body}</blockquote>
+      <blockquote className="mt-2 text-sm text-gray-300 line-clamp-4 flex-grow overflow-hidden">{body}</blockquote>
     </motion.figure>
   );
 };
