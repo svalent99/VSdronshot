@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '../lib/utils';
@@ -49,8 +48,8 @@ const reviews = [
   },
 ];
 
-const firstRow = reviews.slice(0, reviews.length / 2);
-const secondRow = reviews.slice(reviews.length / 2);
+// Usar todos los reviews en una sola fila (la segunda)
+const allReviews = reviews;
 
 const ReviewCard = ({
   img,
@@ -230,25 +229,13 @@ const ReviewsSection = () => {
 
   return (
     <div className="relative flex w-full flex-col items-center justify-center overflow-hidden py-10">
-      <div className="mb-4 w-full">
-        <div className="flex overflow-hidden space-x-4">
-          {firstRow.map((review) => (
-            <ReviewCard key={review.id} {...review} />
-          ))}
-          {/* Repetir para dar efecto continuo */}
-          {firstRow.map((review) => (
-            <ReviewCard key={`repeat-${review.id}`} {...review} />
-          ))}
-        </div>
-      </div>
-      
       <div className="w-full mt-4">
         <div className="flex overflow-hidden space-x-4 animate-[marquee_20s_linear_infinite_reverse]">
-          {secondRow.map((review) => (
+          {allReviews.map((review) => (
             <ReviewCard key={review.id} {...review} />
           ))}
           {/* Repetir para dar efecto continuo */}
-          {secondRow.map((review) => (
+          {allReviews.map((review) => (
             <ReviewCard key={`repeat-${review.id}`} {...review} />
           ))}
         </div>
