@@ -1,7 +1,7 @@
+
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '../lib/utils';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 
 // Datos de muestra - estos podrían cargarse desde Supabase en el futuro
 const reviews = [
@@ -49,8 +49,8 @@ const reviews = [
   },
 ];
 
-// Usar todos los reviews en una sola fila (la segunda)
-const allReviews = reviews;
+const firstRow = reviews.slice(0, reviews.length / 2);
+const secondRow = reviews.slice(reviews.length / 2);
 
 const ReviewCard = ({
   img,
@@ -67,7 +67,7 @@ const ReviewCard = ({
     <motion.figure
       whileHover={{ y: -5 }}
       className={cn(
-        "relative flex flex-col w-72 h-48 cursor-pointer rounded-xl border p-4 mx-4 mb-4",
+        "relative h-full w-64 cursor-pointer overflow-hidden rounded-xl border p-4 mx-4 mb-4",
         "border-gray-800 bg-gray-950/[0.3] hover:bg-gray-950/[0.5]",
       )}
     >
@@ -80,7 +80,7 @@ const ReviewCard = ({
           <p className="text-xs font-medium text-white/40">{username}</p>
         </div>
       </div>
-      <blockquote className="mt-2 text-sm text-gray-300 line-clamp-4 flex-grow overflow-hidden">{body}</blockquote>
+      <blockquote className="mt-2 text-sm text-gray-300">{body}</blockquote>
     </motion.figure>
   );
 };
@@ -229,20 +229,32 @@ const ReviewsSection = () => {
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
 
   return (
-    <div className="relative flex flex-col items-center justify-center overflow-hidden py-6">
-      <div className="w-full">
-        <div className="flex overflow-hidden space-x-4 animate-[marquee_20s_linear_infinite_reverse]">
-          {allReviews.map((review) => (
+    <div className="relative flex w-full flex-col items-center justify-center overflow-hidden py-10">
+      <div className="mb-4 w-full">
+        <div className="flex overflow-hidden space-x-4">
+          {firstRow.map((review) => (
             <ReviewCard key={review.id} {...review} />
           ))}
           {/* Repetir para dar efecto continuo */}
-          {allReviews.map((review) => (
+          {firstRow.map((review) => (
             <ReviewCard key={`repeat-${review.id}`} {...review} />
           ))}
         </div>
       </div>
       
-      <div className="mt-8 flex justify-center">
+      <div className="w-full mt-4">
+        <div className="flex overflow-hidden space-x-4 animate-[marquee_20s_linear_infinite_reverse]">
+          {secondRow.map((review) => (
+            <ReviewCard key={review.id} {...review} />
+          ))}
+          {/* Repetir para dar efecto continuo */}
+          {secondRow.map((review) => (
+            <ReviewCard key={`repeat-${review.id}`} {...review} />
+          ))}
+        </div>
+      </div>
+      
+      <div className="mt-10 flex justify-center">
         <motion.button
           onClick={() => setReviewModalOpen(true)}
           whileHover={{ scale: 1.05 }}
@@ -257,38 +269,6 @@ const ReviewsSection = () => {
         isOpen={reviewModalOpen} 
         onClose={() => setReviewModalOpen(false)}
       />
-      
-      <div className="mt-16">
-        <h3 className="text-2xl font-semibold text-white text-center mb-8">Preguntas Frecuentes</h3>
-        <div className="max-w-2xl mx-auto">
-          <Accordion type="single" collapsible className="bg-zinc-900/50 rounded-lg p-4">
-            <AccordionItem value="item-1" className="border-zinc-700">
-              <AccordionTrigger className="text-white">¿Dónde operamos?</AccordionTrigger>
-              <AccordionContent className="text-gray-300">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-2" className="border-zinc-700">
-              <AccordionTrigger className="text-white">Costo de nuestros servicios</AccordionTrigger>
-              <AccordionContent className="text-gray-300">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-3" className="border-zinc-700">
-              <AccordionTrigger className="text-white">Tipo de servicios</AccordionTrigger>
-              <AccordionContent className="text-gray-300">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-4" className="border-zinc-700">
-              <AccordionTrigger className="text-white">Tiempo de entrega del contenido</AccordionTrigger>
-              <AccordionContent className="text-gray-300">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        </div>
-      </div>
       
       <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-black to-transparent"></div>
       <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-black to-transparent"></div>

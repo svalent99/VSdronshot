@@ -6,9 +6,8 @@ import ServicesCarousel from '../components/ServicesCarousel';
 import DroneSection from '../components/DroneSection';
 import ImageGallery from '../components/ImageGallery';
 import ReviewsSection from '../components/ReviewsSection';
-import FaqSection from '../components/FaqSection';
 import Footer from '../components/Footer';
-import '../App.css';
+import '../App.css'; // Importamos explícitamente los estilos para asegurarnos de que se apliquen
 
 const Index = () => {
   const [showWelcome, setShowWelcome] = useState(true);
@@ -201,9 +200,6 @@ const Index = () => {
                 <ReviewsSection />
               </div>
             </div>
-            
-            {/* FAQ Section - New */}
-            <FaqSection />
             
             {/* Footer */}
             <Footer />
