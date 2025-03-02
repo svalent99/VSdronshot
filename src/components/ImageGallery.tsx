@@ -8,6 +8,7 @@ type Card = {
   content: React.ReactNode;
   className: string;
   thumbnail: string;
+  description?: string; // Add description field
 };
 
 // Datos predeterminados - estos se pueden reemplazar con los aprobados del admin
@@ -17,36 +18,42 @@ const defaultCards: Card[] = [
     content: <h3 className="text-xl font-bold text-white">Vista panorámica de campo</h3>,
     className: "col-span-1 row-span-1",
     thumbnail: "https://images.unsplash.com/photo-1473968512647-3e447244af8f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZHJvbmV8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=60",
+    description: "Hermosa vista panorámica de campo abierto",
   },
   {
     id: 2,
     content: <h3 className="text-xl font-bold text-white">Propiedad residencial</h3>,
     className: "col-span-1 row-span-1",
     thumbnail: "https://images.unsplash.com/photo-1577724862607-83214b7d0e89?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8ZHJvbmUlMjB2aWV3fGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60",
+    description: "Vista aérea de propiedad residencial de lujo",
   },
   {
     id: 3,
     content: <h3 className="text-xl font-bold text-white">Complejo turístico</h3>,
     className: "col-span-1 row-span-1",
     thumbnail: "https://images.unsplash.com/photo-1534372860894-9476556ea6c7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fGRyb25lJTIwdmlld3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60",
+    description: "Complejo turístico frente al mar con vista aérea",
   },
   {
     id: 4,
     content: <h3 className="text-xl font-bold text-white">Costa mediterránea</h3>,
     className: "col-span-1 row-span-1",
     thumbnail: "https://images.unsplash.com/photo-1582968819890-e7fb0b93cda4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fGRyb25lJTIwdmlld3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60",
+    description: "Impresionante vista de la costa mediterránea",
   },
   {
     id: 5,
     content: <h3 className="text-xl font-bold text-white">Mansión de lujo</h3>,
     className: "col-span-1 row-span-1",
     thumbnail: "https://images.unsplash.com/photo-1513486490664-9173ae868f41?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fGRyb25lJTIwdmlld3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60",
+    description: "Mansión de lujo con amplio jardín y piscina",
   },
   {
     id: 6,
     content: <h3 className="text-xl font-bold text-white">Zona de golf</h3>,
     className: "col-span-1 row-span-1",
     thumbnail: "https://images.unsplash.com/photo-1523978591478-c753949ff840?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTd8fGRyb25lJTIwdmlld3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60",
+    description: "Campo de golf con diseño paisajístico excepcional",
   },
 ];
 
@@ -57,6 +64,7 @@ const convertToCards = (adminImages: any[]): Card[] => {
     content: <h3 className="text-xl font-bold text-white">{img.title}</h3>,
     className: "col-span-1 row-span-1",
     thumbnail: img.thumbnail,
+    description: img.description || "", // Add description from admin images
   }));
 };
 
@@ -140,6 +148,9 @@ const SelectedCard = ({ selected }: { selected: Card | null }) => {
         className="relative px-8 pb-4 z-[70]"
       >
         {selected?.content}
+        {selected?.description && (
+          <p className="text-sm text-gray-300 mt-2">{selected.description}</p>
+        )}
       </motion.div>
     </div>
   );

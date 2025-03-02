@@ -1,8 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '../lib/utils';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Star } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -13,7 +11,6 @@ const defaultReviews = [
     name: "Carlos Mendoza",
     username: "@carlosmendoza",
     body: "Las imágenes que VS Dron Shot capturó de mi propiedad son impresionantes. Superaron mis expectativas por completo.",
-    img: "https://i.pravatar.cc/150?img=1",
     rating: 5,
   },
   {
@@ -21,7 +18,6 @@ const defaultReviews = [
     name: "Laura Gómez",
     username: "@lauragomez",
     body: "Profesionalismo de principio a fin. Las tomas aéreas resaltaron perfectamente el entorno de nuestra casa.",
-    img: "https://i.pravatar.cc/150?img=5",
     rating: 5,
   },
   {
@@ -29,7 +25,6 @@ const defaultReviews = [
     name: "Miguel Ángel",
     username: "@miguelangel",
     body: "Gracias al equipo de VS Dron Shot, pudimos vender nuestra propiedad en tiempo récord. Las fotos aéreas hicieron toda la diferencia.",
-    img: "https://i.pravatar.cc/150?img=3",
     rating: 4,
   },
   {
@@ -37,7 +32,6 @@ const defaultReviews = [
     name: "Sofía Martínez",
     username: "@sofiamartinez",
     body: "Contratamos sus servicios para un evento corporativo y quedamos maravillados con los resultados. Totalmente recomendable.",
-    img: "https://i.pravatar.cc/150?img=8",
     rating: 5,
   },
   {
@@ -45,7 +39,6 @@ const defaultReviews = [
     name: "Alejandro Ruiz",
     username: "@aleruiz",
     body: "Excelente servicio, puntualidad y resultados extraordinarios. Sin duda volveré a contratarlos para futuros proyectos.",
-    img: "https://i.pravatar.cc/150?img=4",
     rating: 4,
   },
   {
@@ -53,19 +46,16 @@ const defaultReviews = [
     name: "Patricia Vega",
     username: "@patriciavega",
     body: "La calidad de los videos es impresionante. Han dado vida a nuestro proyecto inmobiliario con estas tomas aéreas.",
-    img: "https://i.pravatar.cc/150?img=9",
     rating: 5,
   },
 ];
 
 const ReviewCard = ({
-  img,
   name,
   username,
   body,
   rating,
 }: {
-  img: string;
   name: string;
   username: string;
   body: string;
@@ -85,15 +75,9 @@ const ReviewCard = ({
       )}
     >
       <div className="flex justify-between items-start mb-4">
-        <div className="flex items-center gap-3">
-          <Avatar className="h-10 w-10 border border-zinc-700">
-            <AvatarImage src={img} alt={name} />
-            <AvatarFallback>{name.slice(0, 2)}</AvatarFallback>
-          </Avatar>
-          <div className="flex flex-col">
-            <p className="font-medium text-white">{name}</p>
-            <p className="text-sm text-zinc-400">{username}</p>
-          </div>
+        <div className="flex flex-col">
+          <p className="font-medium text-white">{name}</p>
+          <p className="text-sm text-zinc-400">{username}</p>
         </div>
         <div className="flex">
           {Array.from({ length: 5 }).map((_, i) => (
