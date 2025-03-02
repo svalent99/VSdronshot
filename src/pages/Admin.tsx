@@ -89,9 +89,10 @@ const Admin = () => {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Verificar las credenciales (simplificado para el ejemplo)
-    if (email === 'valen.sotelo.123@gmail.com' && password === 'svolando9') {
+    // Verificar las credenciales con los valores correctos
+    if (email === 'valen.sotelo.123@gmail.com' && password === 'vsdronshot9') {
       setIsLoggedIn(true);
+      toast.success('Inicio de sesión exitoso');
     } else {
       toast.error('Credenciales incorrectas. Por favor, intenta de nuevo.');
     }
