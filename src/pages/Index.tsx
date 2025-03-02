@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import NavHeader from '../components/NavHeader';
@@ -10,27 +11,40 @@ import Footer from '../components/Footer';
 import '../App.css';
 
 const Index = () => {
-  const [showWelcome, setShowWelcome] = useState(true);
+  // Use localStorage to check if this is the first visit
+  const [showWelcome, setShowWelcome] = useState(() => {
+    const hasVisited = localStorage.getItem('hasVisitedBefore');
+    return !hasVisited;
+  });
+  
   const [loading, setLoading] = useState(true);
   const [videoError, setVideoError] = useState(false);
 
   useEffect(() => {
+    // After showing the welcome animation, set the flag in localStorage
+    if (!showWelcome) {
+      localStorage.setItem('hasVisitedBefore', 'true');
+    }
+    
     const timeoutId = setTimeout(() => {
       if (showWelcome) {
         console.log('Forzando finalización de animación de carga después de tiempo de espera');
         setShowWelcome(false);
+        localStorage.setItem('hasVisitedBefore', 'true');
       }
     }, 5000);
 
     const handleVideoEnd = () => {
       console.log('Video de animación terminó');
       setShowWelcome(false);
+      localStorage.setItem('hasVisitedBefore', 'true');
     };
 
     const handleVideoError = () => {
       console.error('Error loading animation video');
       setVideoError(true);
       setShowWelcome(false);
+      localStorage.setItem('hasVisitedBefore', 'true');
     };
 
     const videoElement = document.querySelector('video.welcome-video') as HTMLVideoElement;
@@ -45,6 +59,7 @@ const Index = () => {
           console.error('Error intentando reproducir el video de bienvenida:', error);
           setVideoError(true);
           setShowWelcome(false);
+          localStorage.setItem('hasVisitedBefore', 'true');
         });
       }
     } else {
@@ -186,7 +201,6 @@ const Index = () => {
             
             <div className="w-full bg-gradient-to-b from-black to-zinc-900 py-16">
               <div className="max-w-7xl mx-auto px-4">
-                <h2 className="text-3xl md:text-4xl font-bold text-center mb-10">Lo que dicen nuestros clientes</h2>
                 <ReviewsSection />
               </div>
             </div>
