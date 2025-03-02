@@ -1,7 +1,8 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { toast } from "sonner";
 
 // Datos de prueba para reseñas pendientes
 const pendingReviews = [
@@ -11,6 +12,7 @@ const pendingReviews = [
     username: "@robertogonzalez",
     body: "Excelente servicio, las imágenes capturadas con el dron han ayudado mucho a promocionar mi propiedad.",
     img: "https://i.pravatar.cc/150?img=10",
+    rating: 5,
     pending: true
   },
   {
@@ -19,6 +21,7 @@ const pendingReviews = [
     username: "@marianalopez",
     body: "Impresionante la calidad de las tomas aéreas. Definitivamente recomendaré sus servicios.",
     img: "https://i.pravatar.cc/150?img=11",
+    rating: 4,
     pending: true
   },
   {
@@ -27,6 +30,7 @@ const pendingReviews = [
     username: "@eduardoramirez",
     body: "Muy profesionales y puntuales. Las fotografías son de gran calidad.",
     img: "https://i.pravatar.cc/150?img=12",
+    rating: 5,
     pending: true
   }
 ];
@@ -50,15 +54,36 @@ const galleryImages = [
   }
 ];
 
+// Obtener los datos almacenados de localStorage o usar los valores predeterminados
+const getStoredData = (key, defaultValue) => {
+  const storedData = localStorage.getItem(key);
+  return storedData ? JSON.parse(storedData) : defaultValue;
+};
+
 const Admin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState('reviews');
-  const [reviews, setReviews] = useState(pendingReviews);
-  const [images, setImages] = useState(galleryImages);
+  const [reviews, setReviews] = useState(() => getStoredData('pendingReviews', pendingReviews));
+  const [approvedReviews, setApprovedReviews] = useState(() => getStoredData('approvedReviews', []));
+  const [images, setImages] = useState(() => getStoredData('galleryImages', galleryImages));
+  const [newImages, setNewImages] = useState([]);
   const [uploading, setUploading] = useState(false);
   const navigate = useNavigate();
+
+  // Guardar datos en localStorage cuando cambian
+  useEffect(() => {
+    localStorage.setItem('pendingReviews', JSON.stringify(reviews));
+  }, [reviews]);
+
+  useEffect(() => {
+    localStorage.setItem('approvedReviews', JSON.stringify(approvedReviews));
+  }, [approvedReviews]);
+
+  useEffect(() => {
+    localStorage.setItem('galleryImages', JSON.stringify(images));
+  }, [images]);
 
   // Función para manejar el inicio de sesión
   const handleLogin = (e: React.FormEvent) => {
@@ -68,17 +93,22 @@ const Admin = () => {
     if (email === 'valen.sotelo.123@gmail.com' && password === 'svolando9') {
       setIsLoggedIn(true);
     } else {
-      alert('Credenciales incorrectas. Por favor, intenta de nuevo.');
+      toast.error('Credenciales incorrectas. Por favor, intenta de nuevo.');
     }
   };
 
   // Función para aprobar o rechazar una reseña
   const handleReviewAction = (id: number, approve: boolean) => {
     if (approve) {
-      // En una implementación real, aquí actualizaríamos el estado en Supabase
-      console.log(`Reseña ${id} aprobada`);
+      // Buscar la reseña en la lista de pendientes
+      const reviewToApprove = reviews.find(review => review.id === id);
+      if (reviewToApprove) {
+        // Agregar a la lista de aprobadas
+        setApprovedReviews([...approvedReviews, reviewToApprove]);
+        toast.success('Reseña aprobada y publicada');
+      }
     } else {
-      console.log(`Reseña ${id} rechazada`);
+      toast.error('Reseña rechazada');
     }
     
     // Eliminar la reseña de la lista de pendientes
@@ -92,22 +122,45 @@ const Admin = () => {
     
     setUploading(true);
     
-    // Simular carga de imagen
-    setTimeout(() => {
-      const newImage = {
+    // Crear nueva imagen con URL temporal
+    const newImage = {
+      id: Date.now(),
+      title: "Nueva imagen",
+      thumbnail: URL.createObjectURL(files[0]), // Crear URL temporal para la vista previa
+      file: files[0]
+    };
+    
+    setNewImages([...newImages, newImage]);
+    setUploading(false);
+    toast.success('Imagen subida correctamente');
+  };
+
+  // Función para subir imagen a la galería
+  const handleAddToGallery = (id: number) => {
+    const imageToAdd = newImages.find(img => img.id === id);
+    if (imageToAdd) {
+      const newGalleryImage = {
         id: images.length + 1,
-        title: "Nueva imagen",
-        thumbnail: URL.createObjectURL(files[0]), // Crear URL temporal para la vista previa
+        title: imageToAdd.title,
+        thumbnail: imageToAdd.thumbnail
       };
       
-      setImages([...images, newImage]);
-      setUploading(false);
-    }, 1500);
+      setImages([...images, newGalleryImage]);
+      setNewImages(newImages.filter(img => img.id !== id));
+      toast.success('Imagen añadida a la galería');
+    }
   };
 
   // Función para eliminar una imagen
   const handleDeleteImage = (id: number) => {
     setImages(images.filter(img => img.id !== id));
+    toast.success('Imagen eliminada de la galería');
+  };
+
+  // Función para eliminar una imagen nueva
+  const handleDeleteNewImage = (id: number) => {
+    setNewImages(newImages.filter(img => img.id !== id));
+    toast.success('Imagen eliminada');
   };
 
   return (
@@ -183,6 +236,16 @@ const Admin = () => {
                   Reseñas Pendientes ({reviews.length})
                 </button>
                 <button
+                  onClick={() => setActiveTab('approved')}
+                  className={`py-4 px-1 font-medium text-sm border-b-2 ${
+                    activeTab === 'approved' 
+                      ? 'border-sky-500 text-sky-500' 
+                      : 'border-transparent text-gray-400 hover:text-gray-200'
+                  }`}
+                >
+                  Reseñas Aprobadas ({approvedReviews.length})
+                </button>
+                <button
                   onClick={() => setActiveTab('gallery')}
                   className={`py-4 px-1 font-medium text-sm border-b-2 ${
                     activeTab === 'gallery' 
@@ -239,6 +302,34 @@ const Admin = () => {
               </div>
             )}
             
+            {activeTab === 'approved' && (
+              <div>
+                <h2 className="text-xl font-bold mb-6">Reseñas Aprobadas</h2>
+                {approvedReviews.length === 0 ? (
+                  <div className="text-center py-12 bg-zinc-800/50 rounded-lg">
+                    <p className="text-gray-400">No hay reseñas aprobadas todavía.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {approvedReviews.map((review) => (
+                      <div key={review.id} className="bg-zinc-800 rounded-lg p-6 border border-zinc-700">
+                        <div className="flex items-start">
+                          <img src={review.img} alt={review.name} className="w-12 h-12 rounded-full mr-4" />
+                          <div className="flex-1">
+                            <div>
+                              <h3 className="font-bold">{review.name}</h3>
+                              <p className="text-gray-400 text-sm">{review.username}</p>
+                            </div>
+                            <p className="mt-3">{review.body}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            
             {activeTab === 'gallery' && (
               <div>
                 <div className="flex justify-between items-center mb-6">
@@ -255,6 +346,61 @@ const Admin = () => {
                   </label>
                 </div>
                 
+                {newImages.length > 0 && (
+                  <div className="mb-10">
+                    <h3 className="text-lg font-semibold mb-3">Imágenes nuevas</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {newImages.map((image) => (
+                        <div key={image.id} className="bg-zinc-800 rounded-lg overflow-hidden border border-zinc-700">
+                          <div className="aspect-w-16 aspect-h-9 relative">
+                            <img 
+                              src={image.thumbnail} 
+                              alt={image.title} 
+                              className="w-full h-64 object-cover"
+                            />
+                            <div className="absolute top-2 right-2 flex space-x-2">
+                              <button
+                                onClick={() => handleAddToGallery(image.id)}
+                                className="w-8 h-8 flex items-center justify-center bg-green-600 rounded-full hover:bg-green-700 transition"
+                                title="Subir a la galería"
+                              >
+                                ✓
+                              </button>
+                              <button
+                                onClick={() => handleDeleteNewImage(image.id)}
+                                className="w-8 h-8 flex items-center justify-center bg-red-600 rounded-full hover:bg-red-700 transition"
+                                title="Eliminar"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          </div>
+                          <div className="p-4">
+                            <input
+                              type="text"
+                              value={image.title}
+                              onChange={(e) => {
+                                const updatedImages = [...newImages];
+                                const idx = updatedImages.findIndex(img => img.id === image.id);
+                                updatedImages[idx] = { ...updatedImages[idx], title: e.target.value };
+                                setNewImages(updatedImages);
+                              }}
+                              className="w-full p-2 bg-zinc-700 border border-zinc-600 rounded text-white"
+                            />
+                            <button
+                              onClick={() => handleAddToGallery(image.id)}
+                              className="w-full mt-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded text-sm font-semibold transition"
+                            >
+                              Subir imagen a la página
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                <h3 className="text-lg font-semibold mb-3">Imágenes en la galería</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {images.map((image) => (
                     <div key={image.id} className="bg-zinc-800 rounded-lg overflow-hidden border border-zinc-700">
@@ -267,6 +413,7 @@ const Admin = () => {
                         <button
                           onClick={() => handleDeleteImage(image.id)}
                           className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center bg-red-600 rounded-full hover:bg-red-700 transition"
+                          title="Eliminar de la galería"
                         >
                           ✕
                         </button>

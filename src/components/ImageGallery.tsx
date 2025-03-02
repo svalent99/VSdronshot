@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "../lib/utils";
 
@@ -10,8 +10,8 @@ type Card = {
   thumbnail: string;
 };
 
-// Datos de muestra - estos podrían cargarse desde Supabase en el futuro
-const cards: Card[] = [
+// Datos predeterminados - estos se pueden reemplazar con los aprobados del admin
+const defaultCards: Card[] = [
   {
     id: 1,
     content: <h3 className="text-xl font-bold text-white">Vista panorámica de campo</h3>,
@@ -49,6 +49,16 @@ const cards: Card[] = [
     thumbnail: "https://images.unsplash.com/photo-1523978591478-c753949ff840?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTd8fGRyb25lJTIwdmlld3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60",
   },
 ];
+
+// Función para convertir imágenes del admin a formato de tarjeta
+const convertToCards = (adminImages: any[]): Card[] => {
+  return adminImages.map(img => ({
+    id: img.id,
+    content: <h3 className="text-xl font-bold text-white">{img.title}</h3>,
+    className: "col-span-1 row-span-1",
+    thumbnail: img.thumbnail,
+  }));
+};
 
 export const LayoutGrid = ({ cards }: { cards: Card[] }) => {
   const [selected, setSelected] = useState<Card | null>(null);
@@ -136,6 +146,22 @@ const SelectedCard = ({ selected }: { selected: Card | null }) => {
 };
 
 const ImageGallery = () => {
+  const [cards, setCards] = useState<Card[]>(defaultCards);
+
+  // Cargar imágenes desde localStorage
+  useEffect(() => {
+    const storedImages = localStorage.getItem('galleryImages');
+    if (storedImages) {
+      const adminImages = JSON.parse(storedImages);
+      if (adminImages && adminImages.length > 0) {
+        // Convertir las imágenes del admin al formato de tarjeta
+        const adminCards = convertToCards(adminImages);
+        // Usar las imágenes del admin, complementadas con las predeterminadas si es necesario
+        setCards(adminCards.length >= 6 ? adminCards : [...adminCards, ...defaultCards].slice(0, 6));
+      }
+    }
+  }, []);
+
   return (
     <div className="w-full h-full">
       <p className="text-center text-gray-400 mb-10">

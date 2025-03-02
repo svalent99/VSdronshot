@@ -1,12 +1,13 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '../lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Star } from 'lucide-react';
+import { toast } from 'sonner';
 
-// Datos de muestra - estos podrían cargarse desde Supabase en el futuro
-const reviews = [
+// Datos de muestra por defecto - estos se pueden reemplazar con los aprobados del admin
+const defaultReviews = [
   {
     id: 1,
     name: "Carlos Mendoza",
@@ -116,23 +117,39 @@ const ReviewCard = ({
 // Formulario modal para dejar reseñas
 const ReviewForm = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const [name, setName] = useState('');
-  const [username, setUsername] = useState('');
+  const [company, setCompany] = useState('');
   const [body, setBody] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Aquí iría la lógica para enviar a Supabase
-    console.log('Enviando reseña:', { name, username, body });
+    // Crear un nuevo formato de nombre de usuario basado en el nombre de la empresa
+    const username = `@${company.toLowerCase().replace(/\s+/g, '')}`;
     
-    // Simular envío exitoso
-    setSubmitted(true);
+    // Crear una nueva reseña pendiente
+    const newReview = {
+      id: Date.now(),
+      name,
+      username,
+      body,
+      img: `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 70)}`,
+      rating: 5,
+      pending: true
+    };
+    
+    // Guardar en localStorage para que el admin la revise
+    const pendingReviews = JSON.parse(localStorage.getItem('pendingReviews') || '[]');
+    localStorage.setItem('pendingReviews', JSON.stringify([...pendingReviews, newReview]));
+    
+    // Notificar al usuario
+    toast.success('¡Gracias! Tu reseña ha sido enviada para revisión.');
     
     // Resetear formulario después de 2 segundos
+    setSubmitted(true);
     setTimeout(() => {
       setName('');
-      setUsername('');
+      setCompany('');
       setBody('');
       setSubmitted(false);
       onClose();
@@ -180,18 +197,15 @@ const ReviewForm = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
               />
             </div>
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-1">Nombre de usuario</label>
-              <div className="flex">
-                <span className="inline-flex items-center px-3 bg-zinc-700 border border-r-0 border-zinc-600 rounded-l-md text-gray-300">@</span>
-                <input
-                  type="text"
-                  id="username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                  className="w-full p-2 bg-zinc-800 border border-zinc-700 rounded-r-md text-white"
-                />
-              </div>
+              <label htmlFor="company" className="block text-sm font-medium text-gray-300 mb-1">Nombre de la Empresa</label>
+              <input
+                type="text"
+                id="company"
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
+                required
+                className="w-full p-2 bg-zinc-800 border border-zinc-700 rounded text-white"
+              />
             </div>
             <div>
               <label htmlFor="review" className="block text-sm font-medium text-gray-300 mb-1">Tu reseña</label>
@@ -219,6 +233,15 @@ const ReviewForm = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
 
 const ReviewsSection = () => {
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [reviews, setReviews] = useState(defaultReviews);
+
+  // Cargar reseñas aprobadas desde localStorage
+  useEffect(() => {
+    const approvedReviews = JSON.parse(localStorage.getItem('approvedReviews') || '[]');
+    if (approvedReviews.length > 0) {
+      setReviews([...approvedReviews, ...defaultReviews].slice(0, 6));
+    }
+  }, []);
 
   return (
     <section className="w-full py-12">
