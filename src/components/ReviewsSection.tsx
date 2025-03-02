@@ -1,6 +1,9 @@
+
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '../lib/utils';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { Star } from 'lucide-react';
 
 // Datos de muestra - estos podrían cargarse desde Supabase en el futuro
 const reviews = [
@@ -10,6 +13,7 @@ const reviews = [
     username: "@carlosmendoza",
     body: "Las imágenes que VS Dron Shot capturó de mi propiedad son impresionantes. Superaron mis expectativas por completo.",
     img: "https://i.pravatar.cc/150?img=1",
+    rating: 5,
   },
   {
     id: 2,
@@ -17,6 +21,7 @@ const reviews = [
     username: "@lauragomez",
     body: "Profesionalismo de principio a fin. Las tomas aéreas resaltaron perfectamente el entorno de nuestra casa.",
     img: "https://i.pravatar.cc/150?img=5",
+    rating: 5,
   },
   {
     id: 3,
@@ -24,6 +29,7 @@ const reviews = [
     username: "@miguelangel",
     body: "Gracias al equipo de VS Dron Shot, pudimos vender nuestra propiedad en tiempo récord. Las fotos aéreas hicieron toda la diferencia.",
     img: "https://i.pravatar.cc/150?img=3",
+    rating: 4,
   },
   {
     id: 4,
@@ -31,6 +37,7 @@ const reviews = [
     username: "@sofiamartinez",
     body: "Contratamos sus servicios para un evento corporativo y quedamos maravillados con los resultados. Totalmente recomendable.",
     img: "https://i.pravatar.cc/150?img=8",
+    rating: 5,
   },
   {
     id: 5,
@@ -38,6 +45,7 @@ const reviews = [
     username: "@aleruiz",
     body: "Excelente servicio, puntualidad y resultados extraordinarios. Sin duda volveré a contratarlos para futuros proyectos.",
     img: "https://i.pravatar.cc/150?img=4",
+    rating: 4,
   },
   {
     id: 6,
@@ -45,78 +53,63 @@ const reviews = [
     username: "@patriciavega",
     body: "La calidad de los videos es impresionante. Han dado vida a nuestro proyecto inmobiliario con estas tomas aéreas.",
     img: "https://i.pravatar.cc/150?img=9",
+    rating: 5,
   },
 ];
-
-// Usar todos los reviews en una sola fila (la segunda)
-const allReviews = reviews;
 
 const ReviewCard = ({
   img,
   name,
   username,
   body,
+  rating,
 }: {
   img: string;
   name: string;
   username: string;
   body: string;
+  rating: number;
 }) => {
   return (
-    <motion.figure
+    <motion.div
       whileHover={{ y: -5 }}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.5 }}
       className={cn(
-        "relative h-full w-64 cursor-pointer overflow-hidden rounded-xl border p-4 mx-4 mb-4",
-        "border-gray-800 bg-gray-950/[0.3] hover:bg-gray-950/[0.5]",
+        "flex flex-col h-full rounded-xl p-6",
+        "bg-zinc-900/80 backdrop-blur-sm border border-zinc-800",
+        "hover:border-zinc-700 transition-all duration-300"
       )}
     >
-      <div className="flex flex-row items-center gap-2">
-        <img className="rounded-full w-8 h-8" alt={name} src={img} />
-        <div className="flex flex-col">
-          <figcaption className="text-sm font-medium text-white">
-            {name}
-          </figcaption>
-          <p className="text-xs font-medium text-white/40">{username}</p>
+      <div className="flex justify-between items-start mb-4">
+        <div className="flex items-center gap-3">
+          <Avatar className="h-10 w-10 border border-zinc-700">
+            <AvatarImage src={img} alt={name} />
+            <AvatarFallback>{name.slice(0, 2)}</AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col">
+            <p className="font-medium text-white">{name}</p>
+            <p className="text-sm text-zinc-400">{username}</p>
+          </div>
+        </div>
+        <div className="flex">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Star
+              key={i}
+              className={`h-4 w-4 ${
+                i < rating ? "fill-yellow-500 text-yellow-500" : "text-zinc-600"
+              }`}
+            />
+          ))}
         </div>
       </div>
-      <blockquote className="mt-2 text-sm text-gray-300">{body}</blockquote>
-    </motion.figure>
-  );
-};
-
-// Componente simple de marquee sin dependencias externas
-const Marquee = ({
-  children,
-  direction = "left",
-  speed = 20,
-  className = "",
-  pauseOnHover = false,
-}: {
-  children: React.ReactNode;
-  direction?: "left" | "right";
-  speed?: number;
-  className?: string;
-  pauseOnHover?: boolean;
-}) => {
-  // Utilizamos clases CSS en lugar de <style jsx>
-  const marqueeClass = direction === "left" ? "animate-marquee" : "animate-marquee-reverse";
-  const hoverClass = pauseOnHover ? "hover:pause-animation" : "";
-  
-  return (
-    <div 
-      className={`overflow-hidden whitespace-nowrap ${className}`}
-      style={{ position: 'relative' }}
-    >
-      <div 
-        className={`inline-block whitespace-nowrap ${marqueeClass} ${hoverClass}`}
-        style={{
-          animationDuration: `${speed}s`,
-          paddingRight: '2rem'
-        }}
-      >
-        {children}
-      </div>
-    </div>
+      
+      <blockquote className="flex-grow text-zinc-300 text-sm md:text-base italic">
+        "{body}"
+      </blockquote>
+    </motion.div>
   );
 };
 
@@ -228,20 +221,34 @@ const ReviewsSection = () => {
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
 
   return (
-    <div className="relative flex w-full flex-col items-center justify-center overflow-hidden py-10">
-      <div className="w-full mt-4">
-        <div className="flex overflow-hidden space-x-4 animate-[marquee_20s_linear_infinite_reverse]">
-          {allReviews.map((review) => (
+    <section className="w-full py-12">
+      {/* Título con animación */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12"
+      >
+        <h2 className="text-3xl md:text-4xl font-bold text-center">
+          Lo que dicen nuestros clientes
+        </h2>
+        <p className="mt-4 text-zinc-400 text-center max-w-2xl mx-auto">
+          Descubre por qué nuestros clientes confían en nosotros para capturar momentos increíbles desde el aire.
+        </p>
+      </motion.div>
+
+      {/* Grid responsivo de reseñas */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {reviews.map((review) => (
             <ReviewCard key={review.id} {...review} />
-          ))}
-          {/* Repetir para dar efecto continuo */}
-          {allReviews.map((review) => (
-            <ReviewCard key={`repeat-${review.id}`} {...review} />
           ))}
         </div>
       </div>
       
-      <div className="mt-10 flex justify-center">
+      {/* Botón para dejar reseña */}
+      <div className="mt-12 flex justify-center">
         <motion.button
           onClick={() => setReviewModalOpen(true)}
           whileHover={{ scale: 1.05 }}
@@ -252,14 +259,12 @@ const ReviewsSection = () => {
         </motion.button>
       </div>
       
+      {/* Modal de formulario */}
       <ReviewForm 
         isOpen={reviewModalOpen} 
         onClose={() => setReviewModalOpen(false)}
       />
-      
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-black to-transparent"></div>
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-black to-transparent"></div>
-    </div>
+    </section>
   );
 };
 
