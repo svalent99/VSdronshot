@@ -7,7 +7,7 @@ interface AnimatedGradientBackgroundProps {
     className?: string;
     children?: React.ReactNode;
     intensity?: "subtle" | "medium" | "strong";
-    color?: "blue" | "purple" | "cyan";
+    color?: "blue" | "purple" | "cyan" | "orange" | "magenta";
 }
 
 interface Beam {
@@ -32,7 +32,7 @@ function createBeam(width: number, height: number, colorBase: number): Beam {
         length: height * 2.5,
         angle: angle,
         speed: 0.6 + Math.random() * 1.2,
-        opacity: 0.12 + Math.random() * 0.16,
+        opacity: 0.15 + Math.random() * 0.20, // Incrementado para mayor visibilidad
         hue: colorBase + Math.random() * 70,
         pulse: Math.random() * Math.PI * 2,
         pulseSpeed: 0.02 + Math.random() * 0.03,
@@ -48,18 +48,20 @@ export function BeamsBackground({
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const beamsRef = useRef<Beam[]>([]);
     const animationFrameRef = useRef<number>(0);
-    const MINIMUM_BEAMS = 15;
+    const MINIMUM_BEAMS = 18; // Aumenté la cantidad de vigas
 
     const opacityMap = {
-        subtle: 0.5,
-        medium: 0.7,
-        strong: 0.9,
+        subtle: 0.6,
+        medium: 0.8,
+        strong: 1.0,
     };
 
     const colorMap = {
         blue: 190,
         purple: 260,
         cyan: 180,
+        orange: 30,
+        magenta: 300,
     };
 
     useEffect(() => {
@@ -100,7 +102,7 @@ export function BeamsBackground({
             beam.width = 100 + Math.random() * 100;
             beam.speed = 0.5 + Math.random() * 0.4;
             beam.hue = colorMap[color] + (index * 70) / totalBeams;
-            beam.opacity = 0.2 + Math.random() * 0.1;
+            beam.opacity = 0.25 + Math.random() * 0.15; // Incrementado para mayor visibilidad
             return beam;
         }
 
@@ -118,24 +120,24 @@ export function BeamsBackground({
             const gradient = ctx.createLinearGradient(0, 0, 0, beam.length);
 
             // Enhanced gradient with multiple color stops
-            gradient.addColorStop(0, `hsla(${beam.hue}, 85%, 65%, 0)`);
+            gradient.addColorStop(0, `hsla(${beam.hue}, 90%, 65%, 0)`);
             gradient.addColorStop(
                 0.1,
-                `hsla(${beam.hue}, 85%, 65%, ${pulsingOpacity * 0.5})`
+                `hsla(${beam.hue}, 90%, 65%, ${pulsingOpacity * 0.5})`
             );
             gradient.addColorStop(
                 0.4,
-                `hsla(${beam.hue}, 85%, 65%, ${pulsingOpacity})`
+                `hsla(${beam.hue}, 90%, 65%, ${pulsingOpacity})`
             );
             gradient.addColorStop(
                 0.6,
-                `hsla(${beam.hue}, 85%, 65%, ${pulsingOpacity})`
+                `hsla(${beam.hue}, 90%, 65%, ${pulsingOpacity})`
             );
             gradient.addColorStop(
                 0.9,
-                `hsla(${beam.hue}, 85%, 65%, ${pulsingOpacity * 0.5})`
+                `hsla(${beam.hue}, 90%, 65%, ${pulsingOpacity * 0.5})`
             );
-            gradient.addColorStop(1, `hsla(${beam.hue}, 85%, 65%, 0)`);
+            gradient.addColorStop(1, `hsla(${beam.hue}, 90%, 65%, 0)`);
 
             ctx.fillStyle = gradient;
             ctx.fillRect(-beam.width / 2, 0, beam.width, beam.length);
@@ -146,7 +148,7 @@ export function BeamsBackground({
             if (!canvas || !ctx) return;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.filter = "blur(35px)";
+            ctx.filter = "blur(30px)"; // Reducido ligeramente para mayor nitidez
 
             const totalBeams = beamsRef.current.length;
             beamsRef.current.forEach((beam, index) => {
@@ -188,9 +190,9 @@ export function BeamsBackground({
             />
 
             <motion.div
-                className="absolute inset-0 bg-black/80"
+                className="absolute inset-0 bg-black/75" // Reducido para mayor visibilidad de los beams
                 animate={{
-                    opacity: [0.8, 0.85, 0.8],
+                    opacity: [0.75, 0.8, 0.75],
                 }}
                 transition={{
                     duration: 10,

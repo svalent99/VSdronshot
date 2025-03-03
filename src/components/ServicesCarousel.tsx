@@ -45,7 +45,7 @@ const ServicesCarousel = () => {
   } = useCarouselButtons(emblaApi);
 
   return (
-    <BeamsBackground intensity="medium" color="blue">
+    <BeamsBackground intensity="strong" color="cyan">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
