@@ -22,7 +22,7 @@ const Index = () => {
 
   useEffect(() => {
     // After showing the welcome animation, set the flag in localStorage
-    if (!showWelcome) {
+    if (showWelcome) {
       localStorage.setItem('hasVisitedBefore', 'true');
     }
     
@@ -37,14 +37,12 @@ const Index = () => {
     const handleVideoEnd = () => {
       console.log('Video de animación terminó');
       setShowWelcome(false);
-      localStorage.setItem('hasVisitedBefore', 'true');
     };
 
     const handleVideoError = () => {
       console.error('Error loading animation video');
       setVideoError(true);
       setShowWelcome(false);
-      localStorage.setItem('hasVisitedBefore', 'true');
     };
 
     const videoElement = document.querySelector('video.welcome-video') as HTMLVideoElement | null;
@@ -59,16 +57,10 @@ const Index = () => {
           console.error('Error intentando reproducir el video de bienvenida:', error);
           setVideoError(true);
           setShowWelcome(false);
-          localStorage.setItem('hasVisitedBefore', 'true');
         });
       }
     } else {
       console.warn('Video de animación no encontrado');
-    }
-
-    // Reset localStorage for demo purposes (remove in production)
-    if (!showWelcome) {
-      localStorage.removeItem('hasVisitedBefore');
     }
 
     return () => {
