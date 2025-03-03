@@ -1,4 +1,3 @@
-
 import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -20,44 +19,38 @@ const NavHeader = () => {
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8 }}
-      className="mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center"
+      className="mx-auto px-4 sm:px-6 lg:px-8 flex justify-center items-center"
     >
-      <div className="flex items-center flex-1">
-        <div className="flex items-center justify-between w-full">
-          <div className="flex items-center">
-            <span className="text-xl font-bold text-white">VS Dron Shot</span>
-          </div>
-          
-          {/* Desktop Navigation */}
-          <div className="hidden md:block">
-            <ul
-              className="relative flex w-fit rounded-full border border-sky-600 bg-black/40 backdrop-blur-sm p-1"
-              onMouseLeave={() => setPosition((pv) => ({ ...pv, opacity: 0 }))}
-            >
-              <Tab setPosition={setPosition} to="/">
-                Inicio
-              </Tab>
-              <Tab setPosition={setPosition} to="/servicios">
-                Servicios
-              </Tab>
-              <Tab setPosition={setPosition} to="/about">
-                Nosotros
-              </Tab>
-              <Tab setPosition={setPosition} to="/contacto">
-                Contacto
-              </Tab>
-              <Tab setPosition={setPosition} to="/admin" isAdmin={true}>
-                Admin
-              </Tab>
-              
-              <Cursor position={position} />
-            </ul>
-          </div>
+      <div className="flex items-center">
+        {/* Desktop Navigation */}
+        <div className="hidden md:block">
+          <ul
+            className="relative flex w-fit rounded-full border border-sky-600 bg-black/40 backdrop-blur-sm p-1"
+            onMouseLeave={() => setPosition((pv) => ({ ...pv, opacity: 0 }))}
+          >
+            <Tab setPosition={setPosition} to="/">
+              Inicio
+            </Tab>
+            <Tab setPosition={setPosition} to="/servicios">
+              Servicios
+            </Tab>
+            <Tab setPosition={setPosition} to="/about">
+              Nosotros
+            </Tab>
+            <Tab setPosition={setPosition} to="/contacto">
+              Contacto
+            </Tab>
+            <Tab setPosition={setPosition} to="/admin" isAdmin={true}>
+              Admin
+            </Tab>
+            
+            <Cursor position={position} />
+          </ul>
         </div>
       </div>
       
       {/* Mobile Menu Button */}
-      <div className="md:hidden flex items-center">
+      <div className="md:hidden absolute right-4">
         <button 
           className="text-white hover:text-sky-400 focus:outline-none"
           onClick={toggleMenu}

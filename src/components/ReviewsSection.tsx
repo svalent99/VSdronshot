@@ -117,7 +117,6 @@ const ReviewForm = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
       name,
       username,
       body,
-      img: `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 70)}`,
       rating: 5,
       pending: true
     };
