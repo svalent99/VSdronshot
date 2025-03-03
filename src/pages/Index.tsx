@@ -47,7 +47,7 @@ const Index = () => {
       localStorage.setItem('hasVisitedBefore', 'true');
     };
 
-    const videoElement = document.querySelector('video.welcome-video');
+    const videoElement = document.querySelector('video.welcome-video') as HTMLVideoElement | null;
     
     if (videoElement) {
       console.log('Video de animación encontrado');
