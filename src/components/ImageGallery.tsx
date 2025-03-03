@@ -8,7 +8,7 @@ type Card = {
   content: React.ReactNode;
   className: string;
   thumbnail: string;
-  description?: string; // Add description field
+  description?: string;
 };
 
 // Datos predeterminados - estos se pueden reemplazar con los aprobados del admin
@@ -64,7 +64,7 @@ const convertToCards = (adminImages: any[]): Card[] => {
     content: <h3 className="text-xl font-bold text-white">{img.title}</h3>,
     className: "col-span-1 row-span-1",
     thumbnail: img.thumbnail,
-    description: img.description || "", // Add description from admin images
+    description: img.description || "",
   }));
 };
 
@@ -102,6 +102,15 @@ export const LayoutGrid = ({ cards }: { cards: Card[] }) => {
           >
             {selected?.id === card.id && <SelectedCard selected={selected} />}
             <ImageComponent card={card} />
+            {/* Descripción de imagen en modo no seleccionado */}
+            {!selected && (
+              <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 p-3 text-white">
+                <h3 className="text-lg font-semibold">{card.content}</h3>
+                {card.description && (
+                  <p className="text-xs text-gray-300 mt-1">{card.description}</p>
+                )}
+              </div>
+            )}
           </motion.div>
         </div>
       ))}
@@ -163,12 +172,16 @@ const ImageGallery = () => {
   useEffect(() => {
     const storedImages = localStorage.getItem('galleryImages');
     if (storedImages) {
-      const adminImages = JSON.parse(storedImages);
-      if (adminImages && adminImages.length > 0) {
-        // Convertir las imágenes del admin al formato de tarjeta
-        const adminCards = convertToCards(adminImages);
-        // Usar las imágenes del admin, complementadas con las predeterminadas si es necesario
-        setCards(adminCards.length >= 6 ? adminCards : [...adminCards, ...defaultCards].slice(0, 6));
+      try {
+        const adminImages = JSON.parse(storedImages);
+        if (adminImages && adminImages.length > 0) {
+          // Convertir las imágenes del admin al formato de tarjeta
+          const adminCards = convertToCards(adminImages);
+          // Usar las imágenes del admin, complementadas con las predeterminadas si es necesario
+          setCards(adminCards.length >= 6 ? adminCards : [...adminCards, ...defaultCards].slice(0, 6));
+        }
+      } catch (error) {
+        console.error("Error parsing gallery images from localStorage:", error);
       }
     }
   }, []);
