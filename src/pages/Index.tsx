@@ -11,7 +11,6 @@ import '../App.css';
 import { MessageCircle } from 'lucide-react';
 
 const Index = () => {
-  // Use localStorage to check if this is the first visit
   const [showWelcome, setShowWelcome] = useState(() => {
     const hasVisited = localStorage.getItem('hasVisitedBefore');
     return !hasVisited;
@@ -21,7 +20,6 @@ const Index = () => {
   const [videoError, setVideoError] = useState(false);
 
   useEffect(() => {
-    // After showing the welcome animation, set the flag in localStorage
     if (showWelcome) {
       localStorage.setItem('hasVisitedBefore', 'true');
     }
@@ -183,24 +181,18 @@ const Index = () => {
               </div>
             </div>
             
-            <div className="w-full bg-black py-16">
-              <ServicesCarousel />
-            </div>
+            <ServicesCarousel />
             
             <DroneSection />
             
-            <div className="w-full bg-black py-16">
+            <div className="w-full bg-black">
               <div className="max-w-7xl mx-auto px-4">
-                <h2 className="text-3xl md:text-4xl font-bold text-center mb-10">Galería de Imágenes</h2>
+                <h2 className="text-3xl md:text-4xl font-bold text-center pt-10">Galería de Imágenes</h2>
                 <ImageGallery />
               </div>
             </div>
             
-            <div className="w-full bg-gradient-to-b from-black to-zinc-900 py-16">
-              <div className="max-w-7xl mx-auto px-4">
-                <ReviewsSection />
-              </div>
-            </div>
+            <ReviewsSection />
             
             <FaqSection />
             

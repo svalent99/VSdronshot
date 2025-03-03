@@ -1,7 +1,7 @@
-
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "../lib/utils";
+import BeamsBackground from "./BeamsBackground";
 
 type Card = {
   id: number;
@@ -11,7 +11,6 @@ type Card = {
   description?: string;
 };
 
-// Datos predeterminados - estos se pueden reemplazar con los aprobados del admin
 const defaultCards: Card[] = [
   {
     id: 1,
@@ -57,7 +56,6 @@ const defaultCards: Card[] = [
   },
 ];
 
-// Función para convertir imágenes del admin a formato de tarjeta
 const convertToCards = (adminImages: any[]): Card[] => {
   return adminImages.map(img => ({
     id: img.id,
@@ -68,7 +66,7 @@ const convertToCards = (adminImages: any[]): Card[] => {
   }));
 };
 
-export const LayoutGrid = ({ cards }: { cards: Card[] }) => {
+const LayoutGrid = ({ cards }: { cards: Card[] }) => {
   const [selected, setSelected] = useState<Card | null>(null);
   const [lastSelected, setLastSelected] = useState<Card | null>(null);
 
@@ -102,7 +100,6 @@ export const LayoutGrid = ({ cards }: { cards: Card[] }) => {
           >
             {selected?.id === card.id && <SelectedCard selected={selected} />}
             <ImageComponent card={card} />
-            {/* Descripción de imagen en modo no seleccionado */}
             {!selected && (
               <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 p-3 text-white">
                 <h3 className="text-lg font-semibold">{card.content}</h3>
@@ -168,16 +165,13 @@ const SelectedCard = ({ selected }: { selected: Card | null }) => {
 const ImageGallery = () => {
   const [cards, setCards] = useState<Card[]>(defaultCards);
 
-  // Cargar imágenes desde localStorage
   useEffect(() => {
     const storedImages = localStorage.getItem('galleryImages');
     if (storedImages) {
       try {
         const adminImages = JSON.parse(storedImages);
         if (adminImages && adminImages.length > 0) {
-          // Convertir las imágenes del admin al formato de tarjeta
           const adminCards = convertToCards(adminImages);
-          // Usar las imágenes del admin, complementadas con las predeterminadas si es necesario
           setCards(adminCards.length >= 6 ? adminCards : [...adminCards, ...defaultCards].slice(0, 6));
         }
       } catch (error) {
@@ -187,12 +181,14 @@ const ImageGallery = () => {
   }, []);
 
   return (
-    <div className="w-full h-full">
-      <p className="text-center text-gray-400 mb-10">
-        Galería de fotografías tomadas con nuestro dron
-      </p>
-      <LayoutGrid cards={cards} />
-    </div>
+    <BeamsBackground intensity="subtle" color="cyan" className="py-16">
+      <div className="w-full h-full">
+        <p className="text-center text-gray-400 mb-10">
+          Galería de fotografías tomadas con nuestro dron
+        </p>
+        <LayoutGrid cards={cards} />
+      </div>
+    </BeamsBackground>
   );
 };
 

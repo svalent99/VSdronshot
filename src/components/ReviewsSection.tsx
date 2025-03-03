@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { cn } from '../lib/utils';
 import { Star } from 'lucide-react';
 import { toast } from 'sonner';
+import BeamsBackground from './BeamsBackground';
 
 // Datos de muestra por defecto - estos se pueden reemplazar con los aprobados del admin
 const defaultReviews = [
@@ -227,50 +228,52 @@ const ReviewsSection = () => {
   }, []);
 
   return (
-    <section className="w-full py-12">
-      {/* Título con animación */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12"
-      >
-        <h2 className="text-3xl md:text-4xl font-bold text-center">
-          Lo que dicen nuestros clientes
-        </h2>
-        <p className="mt-4 text-zinc-400 text-center max-w-2xl mx-auto">
-          Descubre por qué nuestros clientes confían en nosotros para capturar momentos increíbles desde el aire.
-        </p>
-      </motion.div>
-
-      {/* Grid responsivo de reseñas */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {reviews.map((review) => (
-            <ReviewCard key={review.id} {...review} />
-          ))}
-        </div>
-      </div>
-      
-      {/* Botón para dejar reseña */}
-      <div className="mt-12 flex justify-center">
-        <motion.button
-          onClick={() => setReviewModalOpen(true)}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="px-6 py-3 bg-transparent border border-white/20 hover:border-white/50 text-white rounded-md font-medium transition-colors duration-300"
+    <BeamsBackground intensity="medium" color="purple" className="py-16">
+      <section className="w-full py-12">
+        {/* Título con animación */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12"
         >
-          Deja tu reseña
-        </motion.button>
-      </div>
-      
-      {/* Modal de formulario */}
-      <ReviewForm 
-        isOpen={reviewModalOpen} 
-        onClose={() => setReviewModalOpen(false)}
-      />
-    </section>
+          <h2 className="text-3xl md:text-4xl font-bold text-center">
+            Lo que dicen nuestros clientes
+          </h2>
+          <p className="mt-4 text-zinc-400 text-center max-w-2xl mx-auto">
+            Descubre por qué nuestros clientes confían en nosotros para capturar momentos increíbles desde el aire.
+          </p>
+        </motion.div>
+
+        {/* Grid responsivo de reseñas */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {reviews.map((review) => (
+              <ReviewCard key={review.id} {...review} />
+            ))}
+          </div>
+        </div>
+        
+        {/* Botón para dejar reseña */}
+        <div className="mt-12 flex justify-center">
+          <motion.button
+            onClick={() => setReviewModalOpen(true)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="px-6 py-3 bg-transparent border border-white/20 hover:border-white/50 text-white rounded-md font-medium transition-colors duration-300"
+          >
+            Deja tu reseña
+          </motion.button>
+        </div>
+        
+        {/* Modal de formulario */}
+        <ReviewForm 
+          isOpen={reviewModalOpen} 
+          onClose={() => setReviewModalOpen(false)}
+        />
+      </section>
+    </BeamsBackground>
   );
 };
 

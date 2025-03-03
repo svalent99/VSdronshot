@@ -3,6 +3,7 @@ import React from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { useCarouselButtons, PrevButton, NextButton } from './CarouselButtons';
 import { motion } from 'framer-motion';
+import BeamsBackground from './BeamsBackground';
 
 type Service = {
   title: string;
@@ -44,50 +45,52 @@ const ServicesCarousel = () => {
   } = useCarouselButtons(emblaApi);
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 1.3, duration: 0.8 }}
-      className="w-full max-w-6xl mx-auto mt-16 px-4"
-    >
-      <h2 className="text-3xl md:text-4xl font-bold text-center mb-10">Nuestros Servicios</h2>
-      
-      <div className="relative">
-        <div className="overflow-hidden" ref={emblaRef}>
-          <div className="flex">
-            {services.map((service, index) => (
-              <div key={index} className="flex-[0_0_100%] min-w-0 sm:flex-[0_0_50%] md:flex-[0_0_33.33%] lg:flex-[0_0_25%] px-4">
-                <div className="bg-black/30 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden h-full">
-                  <div className="aspect-video overflow-hidden">
-                    <img 
-                      src={service.imageUrl} 
-                      alt={service.title} 
-                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
-                    />
-                  </div>
-                  <div className="p-5">
-                    <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
-                    <p className="text-gray-300">{service.description}</p>
+    <BeamsBackground intensity="medium" color="blue">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.3, duration: 0.8 }}
+        className="w-full max-w-6xl mx-auto mt-16 px-4 py-16"
+      >
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-10">Nuestros Servicios</h2>
+        
+        <div className="relative">
+          <div className="overflow-hidden" ref={emblaRef}>
+            <div className="flex">
+              {services.map((service, index) => (
+                <div key={index} className="flex-[0_0_100%] min-w-0 sm:flex-[0_0_50%] md:flex-[0_0_33.33%] lg:flex-[0_0_25%] px-4">
+                  <div className="bg-black/50 backdrop-blur-sm border border-white/20 rounded-lg overflow-hidden h-full hover:border-white/40 transition-all duration-300">
+                    <div className="aspect-video overflow-hidden">
+                      <img 
+                        src={service.imageUrl} 
+                        alt={service.title} 
+                        className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                      />
+                    </div>
+                    <div className="p-5">
+                      <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
+                      <p className="text-gray-300">{service.description}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
+          
+          <PrevButton
+            onClick={onPrevButtonClick}
+            disabled={prevBtnDisabled}
+            className="absolute top-1/2 left-2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 disabled:opacity-30 disabled:cursor-not-allowed z-10"
+          />
+          
+          <NextButton
+            onClick={onNextButtonClick}
+            disabled={nextBtnDisabled}
+            className="absolute top-1/2 right-2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 disabled:opacity-30 disabled:cursor-not-allowed z-10"
+          />
         </div>
-        
-        <PrevButton
-          onClick={onPrevButtonClick}
-          disabled={prevBtnDisabled}
-          className="absolute top-1/2 left-2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 disabled:opacity-30 disabled:cursor-not-allowed z-10"
-        />
-        
-        <NextButton
-          onClick={onNextButtonClick}
-          disabled={nextBtnDisabled}
-          className="absolute top-1/2 right-2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 disabled:opacity-30 disabled:cursor-not-allowed z-10"
-        />
-      </div>
-    </motion.div>
+      </motion.div>
+    </BeamsBackground>
   );
 };
 
