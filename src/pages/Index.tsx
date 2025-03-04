@@ -12,30 +12,32 @@ import '../App.css';
 import { MessageCircle } from 'lucide-react';
 
 const Index = () => {
-  const [showWelcome, setShowWelcome] = useState(() => {
-    const hasVisited = localStorage.getItem('hasVisitedBefore');
-    return !hasVisited;
-  });
+  const [showWelcome, setShowWelcome] = useState(true); // Always show the welcome screen initially
   
   const [loading, setLoading] = useState(true);
   const [videoError, setVideoError] = useState(false);
 
   useEffect(() => {
-    if (showWelcome) {
-      localStorage.setItem('hasVisitedBefore', 'true');
-    }
+    // Set the localStorage item after successfully showing the animation once
+    const hasVisited = localStorage.getItem('hasVisitedBefore');
     
     // Increase timeout to ensure video has time to load
     const timeoutId = setTimeout(() => {
       if (showWelcome) {
         console.log('Forzando finalización de animación de carga después de tiempo de espera');
         setShowWelcome(false);
+        if (!hasVisited) {
+          localStorage.setItem('hasVisitedBefore', 'true');
+        }
       }
-    }, 8000); // Increased from 5000 to 8000
+    }, 8000); // 8 seconds timeout
 
     const handleVideoEnd = () => {
       console.log('Video de animación terminó');
       setShowWelcome(false);
+      if (!hasVisited) {
+        localStorage.setItem('hasVisitedBefore', 'true');
+      }
     };
 
     const handleVideoError = (error: any) => {
@@ -122,8 +124,8 @@ const Index = () => {
                 animate={{ opacity: loading ? 0 : 1 }}
                 transition={{ duration: 0.5 }}
               >
-                {/* Use crossOrigin (camelCase) for React components */}
-                <source src="/animacion dron pantalla  carga.mp4" type="video/mp4" crossOrigin="anonymous" />
+                {/* Use crossorigin (lowercase) for source element in React */}
+                <source src="/animacion dron pantalla  carga.mp4" type="video/mp4" crossorigin="anonymous" />
                 Tu navegador no soporta el tag de video.
               </motion.video>
               {loading && !videoError && (

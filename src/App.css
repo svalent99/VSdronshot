@@ -57,6 +57,19 @@ video.welcome-video,
   object-fit: cover;
 }
 
+/* Estilos optimizados para el video de bienvenida */
+.welcome-video {
+  display: block;
+  object-fit: cover;
+  position: absolute;
+  height: 100vh;
+  width: 100vw;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  background-color: black; /* Fondo negro mientras se carga */
+}
+
 /* Estilos para el panel de administración */
 .admin-section {
   background-color: #1e1e1e;
@@ -84,16 +97,4 @@ video.welcome-video,
 
 .pause-animation:hover {
   animation-play-state: paused;
-}
-
-/* Ensure welcome animation plays correctly */
-.welcome-video {
-  display: block;
-  object-fit: cover;
-  position: absolute;
-  height: 100vh;
-  width: 100vw;
-  top: 0;
-  left: 0;
-  z-index: 0;
 }
