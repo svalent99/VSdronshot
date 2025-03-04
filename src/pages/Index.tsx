@@ -122,8 +122,8 @@ const Index = () => {
                 animate={{ opacity: loading ? 0 : 1 }}
                 transition={{ duration: 0.5 }}
               >
-                {/* Use crossorigin (lowercase) instead of crossOrigin for TypeScript compatibility */}
-                <source src="/animacion dron pantalla  carga.mp4" type="video/mp4" crossorigin="anonymous" />
+                {/* Use crossOrigin (camelCase) for React components */}
+                <source src="/animacion dron pantalla  carga.mp4" type="video/mp4" crossOrigin="anonymous" />
                 Tu navegador no soporta el tag de video.
               </motion.video>
               {loading && !videoError && (
