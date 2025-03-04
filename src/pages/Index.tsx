@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import NavHeader from '../components/NavHeader';
@@ -24,21 +25,21 @@ const Index = () => {
       localStorage.setItem('hasVisitedBefore', 'true');
     }
     
+    // Increase timeout to ensure video has time to load
     const timeoutId = setTimeout(() => {
       if (showWelcome) {
         console.log('Forzando finalización de animación de carga después de tiempo de espera');
         setShowWelcome(false);
-        localStorage.setItem('hasVisitedBefore', 'true');
       }
-    }, 5000);
+    }, 8000); // Increased from 5000 to 8000
 
     const handleVideoEnd = () => {
       console.log('Video de animación terminó');
       setShowWelcome(false);
     };
 
-    const handleVideoError = () => {
-      console.error('Error loading animation video');
+    const handleVideoError = (error: any) => {
+      console.error('Error loading animation video', error);
       setVideoError(true);
       setShowWelcome(false);
     };
@@ -46,19 +47,36 @@ const Index = () => {
     const videoElement = document.querySelector('video.welcome-video') as HTMLVideoElement | null;
     
     if (videoElement) {
-      console.log('Video de animación encontrado');
+      console.log('Video de animación encontrado, intentando reproducir:', videoElement.src);
       videoElement.addEventListener('ended', handleVideoEnd);
       videoElement.addEventListener('error', handleVideoError);
       
-      if (videoElement.play) {
-        videoElement.play().catch(error => {
-          console.error('Error intentando reproducir el video de bienvenida:', error);
-          setVideoError(true);
-          setShowWelcome(false);
-        });
-      }
+      // Preload the video to improve chances of successful loading
+      videoElement.preload = 'auto';
+      
+      // Force reload the video element
+      const currentSrc = videoElement.src;
+      videoElement.src = '';
+      setTimeout(() => {
+        videoElement.src = currentSrc || '/animacion dron pantalla  carga.mp4';
+        
+        if (videoElement.play) {
+          videoElement.play().catch(error => {
+            console.error('Error intentando reproducir el video de bienvenida:', error);
+            // Try playing again after a short delay
+            setTimeout(() => {
+              videoElement.play().catch(e => {
+                console.error('Segundo intento de reproducción falló:', e);
+                setVideoError(true);
+                setShowWelcome(false);
+              });
+            }, 1000);
+          });
+        }
+      }, 100);
     } else {
       console.warn('Video de animación no encontrado');
+      setVideoError(true);
     }
 
     return () => {
@@ -95,8 +113,8 @@ const Index = () => {
                   console.log('Video de animación cargado');
                   setLoading(false);
                 }}
-                onError={() => {
-                  console.error('Error cargando video de animación');
+                onError={(e) => {
+                  console.error('Error cargando video de animación', e);
                   setVideoError(true);
                   setShowWelcome(false);
                 }}
@@ -104,7 +122,8 @@ const Index = () => {
                 animate={{ opacity: loading ? 0 : 1 }}
                 transition={{ duration: 0.5 }}
               >
-                <source src="/animacion dron pantalla  carga.mp4" type="video/mp4" />
+                {/* Add type attribute and crossorigin for better compatibility */}
+                <source src="/animacion dron pantalla  carga.mp4" type="video/mp4" crossOrigin="anonymous" />
                 Tu navegador no soporta el tag de video.
               </motion.video>
               {loading && !videoError && (
