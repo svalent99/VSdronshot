@@ -1,4 +1,5 @@
 
+
 #root {
   max-width: 100%;
   margin: 0 auto;
@@ -55,6 +56,14 @@ video.welcome-video,
   width: 100%;
   height: 100%;
   object-fit: cover;
+  max-width: 100vw;
+  max-height: 100vh;
+}
+
+/* Make sure welcome video is always visible */
+.welcome-video {
+  z-index: 10;
+  position: relative;
 }
 
 /* Estilos para el panel de administración */
@@ -85,3 +94,4 @@ video.welcome-video,
 .pause-animation:hover {
   animation-play-state: paused;
 }
+

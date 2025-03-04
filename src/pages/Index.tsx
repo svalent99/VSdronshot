@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import NavHeader from '../components/NavHeader';
@@ -10,64 +11,70 @@ import Footer from '../components/Footer';
 import '../App.css';
 
 const Index = () => {
-  // Use localStorage to check if this is the first visit
-  const [showWelcome, setShowWelcome] = useState(() => {
-    const hasVisited = localStorage.getItem('hasVisitedBefore');
-    return !hasVisited;
-  });
-  
+  // Always show welcome animation on first render
+  const [showWelcome, setShowWelcome] = useState(true);
   const [loading, setLoading] = useState(true);
   const [videoError, setVideoError] = useState(false);
 
   useEffect(() => {
-    // After showing the welcome animation, set the flag in localStorage
-    if (!showWelcome) {
-      localStorage.setItem('hasVisitedBefore', 'true');
-    }
-    
+    // Set a timer to ensure animation doesn't hang indefinitely
     const timeoutId = setTimeout(() => {
       if (showWelcome) {
         console.log('Forzando finalización de animación de carga después de tiempo de espera');
         setShowWelcome(false);
-        localStorage.setItem('hasVisitedBefore', 'true');
       }
     }, 5000);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [showWelcome]);
+
+  // Separate effect for video handling to ensure DOM is ready
+  useEffect(() => {
+    if (!showWelcome) return;
 
     const handleVideoEnd = () => {
       console.log('Video de animación terminó');
       setShowWelcome(false);
-      localStorage.setItem('hasVisitedBefore', 'true');
     };
 
-    const handleVideoError = () => {
-      console.error('Error loading animation video');
+    const handleVideoError = (error) => {
+      console.error('Error loading animation video:', error);
       setVideoError(true);
       setShowWelcome(false);
-      localStorage.setItem('hasVisitedBefore', 'true');
     };
 
-    const videoElement = document.querySelector('video.welcome-video') as HTMLVideoElement;
-    
-    if (videoElement) {
-      console.log('Video de animación encontrado');
-      videoElement.addEventListener('ended', handleVideoEnd);
-      videoElement.addEventListener('error', handleVideoError);
+    // Use a short timeout to ensure the DOM is fully rendered
+    const videoTimeoutId = setTimeout(() => {
+      const videoElement = document.querySelector('.welcome-video');
       
-      if (videoElement.play) {
+      if (videoElement && videoElement instanceof HTMLVideoElement) {
+        console.log('Video de animación encontrado');
+        videoElement.addEventListener('ended', handleVideoEnd);
+        videoElement.addEventListener('error', handleVideoError);
+        
         videoElement.play().catch(error => {
           console.error('Error intentando reproducir el video de bienvenida:', error);
           setVideoError(true);
           setShowWelcome(false);
-          localStorage.setItem('hasVisitedBefore', 'true');
         });
+      } else {
+        console.warn('Video de animación no encontrado');
+        // If video element isn't found after a reasonable time, we'll skip the animation
+        setTimeout(() => {
+          if (showWelcome) {
+            console.warn('Video de animación nunca encontrado, saltando animación');
+            setShowWelcome(false);
+          }
+        }, 1000);
       }
-    } else {
-      console.warn('Video de animación no encontrado');
-    }
+    }, 100);
 
     return () => {
-      clearTimeout(timeoutId);
-      if (videoElement) {
+      clearTimeout(videoTimeoutId);
+      const videoElement = document.querySelector('.welcome-video');
+      if (videoElement && videoElement instanceof HTMLVideoElement) {
         videoElement.removeEventListener('ended', handleVideoEnd);
         videoElement.removeEventListener('error', handleVideoError);
       }
@@ -90,7 +97,7 @@ const Index = () => {
               animate={{ scale: 1 }}
               className="relative w-screen h-screen flex items-center justify-center"
             >
-              <motion.video
+              <video
                 autoPlay
                 muted
                 playsInline
@@ -104,13 +111,10 @@ const Index = () => {
                   setVideoError(true);
                   setShowWelcome(false);
                 }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: loading ? 0 : 1 }}
-                transition={{ duration: 0.5 }}
               >
-                <source src="/animacion dron pantalla  carga.mp4" type="video/mp4" />
+                <source src="/animacion dron pantalla carga.mp4" type="video/mp4" />
                 Tu navegador no soporta el tag de video.
-              </motion.video>
+              </video>
               {loading && !videoError && (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
