@@ -9,76 +9,61 @@ import ReviewsSection from '../components/ReviewsSection';
 import FaqSection from '../components/FaqSection';
 import Footer from '../components/Footer';
 import '../App.css';
-import { MessageCircle } from 'lucide-react';
 
 const Index = () => {
-  const [showWelcome, setShowWelcome] = useState(true); // Always show the welcome screen initially
+  // Use localStorage to check if this is the first visit
+  const [showWelcome, setShowWelcome] = useState(() => {
+    const hasVisited = localStorage.getItem('hasVisitedBefore');
+    return !hasVisited;
+  });
   
   const [loading, setLoading] = useState(true);
   const [videoError, setVideoError] = useState(false);
 
   useEffect(() => {
-    // Set the localStorage item after successfully showing the animation once
-    const hasVisited = localStorage.getItem('hasVisitedBefore');
+    // After showing the welcome animation, set the flag in localStorage
+    if (!showWelcome) {
+      localStorage.setItem('hasVisitedBefore', 'true');
+    }
     
-    // Increase timeout to ensure video has time to load
     const timeoutId = setTimeout(() => {
       if (showWelcome) {
         console.log('Forzando finalización de animación de carga después de tiempo de espera');
         setShowWelcome(false);
-        if (!hasVisited) {
-          localStorage.setItem('hasVisitedBefore', 'true');
-        }
+        localStorage.setItem('hasVisitedBefore', 'true');
       }
-    }, 8000); // 8 seconds timeout
+    }, 5000);
 
     const handleVideoEnd = () => {
       console.log('Video de animación terminó');
       setShowWelcome(false);
-      if (!hasVisited) {
-        localStorage.setItem('hasVisitedBefore', 'true');
-      }
+      localStorage.setItem('hasVisitedBefore', 'true');
     };
 
-    const handleVideoError = (error: any) => {
-      console.error('Error loading animation video', error);
+    const handleVideoError = () => {
+      console.error('Error loading animation video');
       setVideoError(true);
       setShowWelcome(false);
+      localStorage.setItem('hasVisitedBefore', 'true');
     };
 
-    const videoElement = document.querySelector('video.welcome-video') as HTMLVideoElement | null;
+    const videoElement = document.querySelector('video.welcome-video') as HTMLVideoElement;
     
     if (videoElement) {
-      console.log('Video de animación encontrado, intentando reproducir:', videoElement.src);
+      console.log('Video de animación encontrado');
       videoElement.addEventListener('ended', handleVideoEnd);
       videoElement.addEventListener('error', handleVideoError);
       
-      // Preload the video to improve chances of successful loading
-      videoElement.preload = 'auto';
-      
-      // Force reload the video element
-      const currentSrc = videoElement.src;
-      videoElement.src = '';
-      setTimeout(() => {
-        videoElement.src = currentSrc || '/animacion dron pantalla  carga.mp4';
-        
-        if (videoElement.play) {
-          videoElement.play().catch(error => {
-            console.error('Error intentando reproducir el video de bienvenida:', error);
-            // Try playing again after a short delay
-            setTimeout(() => {
-              videoElement.play().catch(e => {
-                console.error('Segundo intento de reproducción falló:', e);
-                setVideoError(true);
-                setShowWelcome(false);
-              });
-            }, 1000);
-          });
-        }
-      }, 100);
+      if (videoElement.play) {
+        videoElement.play().catch(error => {
+          console.error('Error intentando reproducir el video de bienvenida:', error);
+          setVideoError(true);
+          setShowWelcome(false);
+          localStorage.setItem('hasVisitedBefore', 'true');
+        });
+      }
     } else {
       console.warn('Video de animación no encontrado');
-      setVideoError(true);
     }
 
     return () => {
@@ -115,8 +100,8 @@ const Index = () => {
                   console.log('Video de animación cargado');
                   setLoading(false);
                 }}
-                onError={(e) => {
-                  console.error('Error cargando video de animación', e);
+                onError={() => {
+                  console.error('Error cargando video de animación');
                   setVideoError(true);
                   setShowWelcome(false);
                 }}
@@ -124,8 +109,7 @@ const Index = () => {
                 animate={{ opacity: loading ? 0 : 1 }}
                 transition={{ duration: 0.5 }}
               >
-                {/* Use crossOrigin (camelCase) for React components */}
-                <source src="/animacion dron pantalla  carga.mp4" type="video/mp4" crossOrigin="anonymous" />
+                <source src="/animacion dron pantalla  carga.mp4" type="video/mp4" />
                 Tu navegador no soporta el tag de video.
               </motion.video>
               {loading && !videoError && (
@@ -202,32 +186,28 @@ const Index = () => {
               </div>
             </div>
             
-            <ServicesCarousel />
+            <div className="w-full bg-black py-16">
+              <ServicesCarousel />
+            </div>
             
             <DroneSection />
             
-            <div className="w-full bg-black">
+            <div className="w-full bg-black py-16">
               <div className="max-w-7xl mx-auto px-4">
-                <h2 className="text-3xl md:text-4xl font-bold text-center pt-10">Galería de Imágenes</h2>
+                <h2 className="text-3xl md:text-4xl font-bold text-center mb-10">Galería de Imágenes</h2>
                 <ImageGallery />
               </div>
             </div>
             
-            <ReviewsSection />
+            <div className="w-full bg-gradient-to-b from-black to-zinc-900 py-16">
+              <div className="max-w-7xl mx-auto px-4">
+                <ReviewsSection />
+              </div>
+            </div>
             
             <FaqSection />
             
             <Footer />
-            
-            <a
-              href="https://wa.me/1127424407?text=Hola,%20me%20gustaría%20obtener%20más%20información%20sobre%20sus%20servicios%20de%20dron"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="fixed bottom-6 right-6 z-50 bg-green-500 text-white rounded-full p-4 shadow-lg hover:bg-green-600 transition-colors duration-300"
-              aria-label="Chat on WhatsApp"
-            >
-              <MessageCircle className="h-6 w-6" />
-            </a>
           </motion.div>
         )}
       </AnimatePresence>

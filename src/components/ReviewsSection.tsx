@@ -1,9 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '../lib/utils';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Star } from 'lucide-react';
 import { toast } from 'sonner';
-import BeamsBackground from './BeamsBackground';
 
 // Datos de muestra por defecto - estos se pueden reemplazar con los aprobados del admin
 const defaultReviews = [
@@ -12,6 +13,7 @@ const defaultReviews = [
     name: "Carlos Mendoza",
     username: "@carlosmendoza",
     body: "Las imágenes que VS Dron Shot capturó de mi propiedad son impresionantes. Superaron mis expectativas por completo.",
+    img: "https://i.pravatar.cc/150?img=1",
     rating: 5,
   },
   {
@@ -19,6 +21,7 @@ const defaultReviews = [
     name: "Laura Gómez",
     username: "@lauragomez",
     body: "Profesionalismo de principio a fin. Las tomas aéreas resaltaron perfectamente el entorno de nuestra casa.",
+    img: "https://i.pravatar.cc/150?img=5",
     rating: 5,
   },
   {
@@ -26,6 +29,7 @@ const defaultReviews = [
     name: "Miguel Ángel",
     username: "@miguelangel",
     body: "Gracias al equipo de VS Dron Shot, pudimos vender nuestra propiedad en tiempo récord. Las fotos aéreas hicieron toda la diferencia.",
+    img: "https://i.pravatar.cc/150?img=3",
     rating: 4,
   },
   {
@@ -33,6 +37,7 @@ const defaultReviews = [
     name: "Sofía Martínez",
     username: "@sofiamartinez",
     body: "Contratamos sus servicios para un evento corporativo y quedamos maravillados con los resultados. Totalmente recomendable.",
+    img: "https://i.pravatar.cc/150?img=8",
     rating: 5,
   },
   {
@@ -40,6 +45,7 @@ const defaultReviews = [
     name: "Alejandro Ruiz",
     username: "@aleruiz",
     body: "Excelente servicio, puntualidad y resultados extraordinarios. Sin duda volveré a contratarlos para futuros proyectos.",
+    img: "https://i.pravatar.cc/150?img=4",
     rating: 4,
   },
   {
@@ -47,16 +53,19 @@ const defaultReviews = [
     name: "Patricia Vega",
     username: "@patriciavega",
     body: "La calidad de los videos es impresionante. Han dado vida a nuestro proyecto inmobiliario con estas tomas aéreas.",
+    img: "https://i.pravatar.cc/150?img=9",
     rating: 5,
   },
 ];
 
 const ReviewCard = ({
+  img,
   name,
   username,
   body,
   rating,
 }: {
+  img: string;
   name: string;
   username: string;
   body: string;
@@ -76,9 +85,15 @@ const ReviewCard = ({
       )}
     >
       <div className="flex justify-between items-start mb-4">
-        <div className="flex flex-col">
-          <p className="font-medium text-white">{name}</p>
-          <p className="text-sm text-zinc-400">{username}</p>
+        <div className="flex items-center gap-3">
+          <Avatar className="h-10 w-10 border border-zinc-700">
+            <AvatarImage src={img} alt={name} />
+            <AvatarFallback>{name.slice(0, 2)}</AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col">
+            <p className="font-medium text-white">{name}</p>
+            <p className="text-sm text-zinc-400">{username}</p>
+          </div>
         </div>
         <div className="flex">
           {Array.from({ length: 5 }).map((_, i) => (
@@ -118,6 +133,7 @@ const ReviewForm = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
       name,
       username,
       body,
+      img: `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 70)}`,
       rating: 5,
       pending: true
     };
@@ -228,52 +244,50 @@ const ReviewsSection = () => {
   }, []);
 
   return (
-    <BeamsBackground intensity="medium" color="purple" className="py-16">
-      <section className="w-full py-12">
-        {/* Título con animación */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12"
-        >
-          <h2 className="text-3xl md:text-4xl font-bold text-center">
-            Lo que dicen nuestros clientes
-          </h2>
-          <p className="mt-4 text-zinc-400 text-center max-w-2xl mx-auto">
-            Descubre por qué nuestros clientes confían en nosotros para capturar momentos increíbles desde el aire.
-          </p>
-        </motion.div>
+    <section className="w-full py-12">
+      {/* Título con animación */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12"
+      >
+        <h2 className="text-3xl md:text-4xl font-bold text-center">
+          Lo que dicen nuestros clientes
+        </h2>
+        <p className="mt-4 text-zinc-400 text-center max-w-2xl mx-auto">
+          Descubre por qué nuestros clientes confían en nosotros para capturar momentos increíbles desde el aire.
+        </p>
+      </motion.div>
 
-        {/* Grid responsivo de reseñas */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {reviews.map((review) => (
-              <ReviewCard key={review.id} {...review} />
-            ))}
-          </div>
+      {/* Grid responsivo de reseñas */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {reviews.map((review) => (
+            <ReviewCard key={review.id} {...review} />
+          ))}
         </div>
-        
-        {/* Botón para dejar reseña */}
-        <div className="mt-12 flex justify-center">
-          <motion.button
-            onClick={() => setReviewModalOpen(true)}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-6 py-3 bg-transparent border border-white/20 hover:border-white/50 text-white rounded-md font-medium transition-colors duration-300"
-          >
-            Deja tu reseña
-          </motion.button>
-        </div>
-        
-        {/* Modal de formulario */}
-        <ReviewForm 
-          isOpen={reviewModalOpen} 
-          onClose={() => setReviewModalOpen(false)}
-        />
-      </section>
-    </BeamsBackground>
+      </div>
+      
+      {/* Botón para dejar reseña */}
+      <div className="mt-12 flex justify-center">
+        <motion.button
+          onClick={() => setReviewModalOpen(true)}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="px-6 py-3 bg-transparent border border-white/20 hover:border-white/50 text-white rounded-md font-medium transition-colors duration-300"
+        >
+          Deja tu reseña
+        </motion.button>
+      </div>
+      
+      {/* Modal de formulario */}
+      <ReviewForm 
+        isOpen={reviewModalOpen} 
+        onClose={() => setReviewModalOpen(false)}
+      />
+    </section>
   );
 };
 

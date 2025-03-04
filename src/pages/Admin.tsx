@@ -36,24 +36,21 @@ const pendingReviews = [
 ];
 
 // Datos de prueba para imágenes de la galería
-const defaultGalleryImages = [
+const galleryImages = [
   {
     id: 1,
     title: "Vista panorámica de campo",
     thumbnail: "https://images.unsplash.com/photo-1473968512647-3e447244af8f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZHJvbmV8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=60",
-    description: "Hermosa vista panorámica de campo abierto",
   },
   {
     id: 2,
     title: "Propiedad residencial",
     thumbnail: "https://images.unsplash.com/photo-1577724862607-83214b7d0e89?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8ZHJvbmUlMjB2aWV3fGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60",
-    description: "Vista aérea de propiedad residencial de lujo",
   },
   {
     id: 3,
     title: "Complejo turístico",
     thumbnail: "https://images.unsplash.com/photo-1534372860894-9476556ea6c7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fGRyb25lJTIwdmlld3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60",
-    description: "Complejo turístico frente al mar con vista aérea",
   }
 ];
 
@@ -63,11 +60,6 @@ const getStoredData = (key, defaultValue) => {
   return storedData ? JSON.parse(storedData) : defaultValue;
 };
 
-// Guardar datos en localStorage
-const saveToLocalStorage = (key, data) => {
-  localStorage.setItem(key, JSON.stringify(data));
-};
-
 const Admin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -75,32 +67,31 @@ const Admin = () => {
   const [activeTab, setActiveTab] = useState('reviews');
   const [reviews, setReviews] = useState(() => getStoredData('pendingReviews', pendingReviews));
   const [approvedReviews, setApprovedReviews] = useState(() => getStoredData('approvedReviews', []));
-  const [images, setImages] = useState(() => getStoredData('galleryImages', defaultGalleryImages));
+  const [images, setImages] = useState(() => getStoredData('galleryImages', galleryImages));
   const [newImages, setNewImages] = useState([]);
   const [uploading, setUploading] = useState(false);
   const navigate = useNavigate();
 
   // Guardar datos en localStorage cuando cambian
   useEffect(() => {
-    saveToLocalStorage('pendingReviews', reviews);
+    localStorage.setItem('pendingReviews', JSON.stringify(reviews));
   }, [reviews]);
 
   useEffect(() => {
-    saveToLocalStorage('approvedReviews', approvedReviews);
+    localStorage.setItem('approvedReviews', JSON.stringify(approvedReviews));
   }, [approvedReviews]);
 
   useEffect(() => {
-    saveToLocalStorage('galleryImages', images);
+    localStorage.setItem('galleryImages', JSON.stringify(images));
   }, [images]);
 
   // Función para manejar el inicio de sesión
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Verificar las credenciales con los valores correctos
-    if (email === 'valen.sotelo.123@gmail.com' && password === 'vsdronshot9') {
+    // Verificar las credenciales (simplificado para el ejemplo)
+    if (email === 'valen.sotelo.123@gmail.com' && password === 'svolando9') {
       setIsLoggedIn(true);
-      toast.success('Inicio de sesión exitoso');
     } else {
       toast.error('Credenciales incorrectas. Por favor, intenta de nuevo.');
     }
@@ -131,42 +122,17 @@ const Admin = () => {
     
     setUploading(true);
     
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      if (event.target && event.target.result) {
-        // Crear nueva imagen con URL temporal
-        const newImage = {
-          id: Date.now(),
-          title: "Nueva imagen",
-          thumbnail: event.target.result.toString(),
-          description: "Añade una descripción",
-          file: files[0]
-        };
-        
-        setNewImages(prev => [...prev, newImage]);
-        setUploading(false);
-        toast.success('Imagen subida correctamente');
-      }
+    // Crear nueva imagen con URL temporal
+    const newImage = {
+      id: Date.now(),
+      title: "Nueva imagen",
+      thumbnail: URL.createObjectURL(files[0]), // Crear URL temporal para la vista previa
+      file: files[0]
     };
     
-    reader.readAsDataURL(files[0]);
-  };
-
-  // Función para actualizar título o descripción de imagen nueva
-  const updateNewImageField = (id: number, field: string, value: string) => {
-    const updatedImages = newImages.map(img => 
-      img.id === id ? { ...img, [field]: value } : img
-    );
-    setNewImages(updatedImages);
-  };
-
-  // Función para actualizar título o descripción de imagen en galería
-  const updateGalleryImageField = (id: number, field: string, value: string) => {
-    const updatedImages = images.map(img => 
-      img.id === id ? { ...img, [field]: value } : img
-    );
-    setImages(updatedImages);
-    saveToLocalStorage('galleryImages', updatedImages);
+    setNewImages([...newImages, newImage]);
+    setUploading(false);
+    toast.success('Imagen subida correctamente');
   };
 
   // Función para subir imagen a la galería
@@ -174,16 +140,12 @@ const Admin = () => {
     const imageToAdd = newImages.find(img => img.id === id);
     if (imageToAdd) {
       const newGalleryImage = {
-        id: Date.now(),
+        id: images.length + 1,
         title: imageToAdd.title,
-        thumbnail: imageToAdd.thumbnail,
-        description: imageToAdd.description || "Descripción de la imagen"
+        thumbnail: imageToAdd.thumbnail
       };
       
-      const updatedGalleryImages = [...images, newGalleryImage];
-      setImages(updatedGalleryImages);
-      saveToLocalStorage('galleryImages', updatedGalleryImages);
-      
+      setImages([...images, newGalleryImage]);
       setNewImages(newImages.filter(img => img.id !== id));
       toast.success('Imagen añadida a la galería');
     }
@@ -191,9 +153,7 @@ const Admin = () => {
 
   // Función para eliminar una imagen
   const handleDeleteImage = (id: number) => {
-    const updatedImages = images.filter(img => img.id !== id);
-    setImages(updatedImages);
-    saveToLocalStorage('galleryImages', updatedImages);
+    setImages(images.filter(img => img.id !== id));
     toast.success('Imagen eliminada de la galería');
   };
 
@@ -415,26 +375,18 @@ const Admin = () => {
                               </button>
                             </div>
                           </div>
-                          <div className="p-4 space-y-2">
-                            <div>
-                              <label className="text-xs text-gray-400 mb-1 block">Título</label>
-                              <input
-                                type="text"
-                                value={image.title}
-                                onChange={(e) => updateNewImageField(image.id, 'title', e.target.value)}
-                                className="w-full p-2 bg-zinc-700 border border-zinc-600 rounded text-white"
-                              />
-                            </div>
-                            <div>
-                              <label className="text-xs text-gray-400 mb-1 block">Descripción</label>
-                              <input
-                                type="text"
-                                value={image.description || ""}
-                                onChange={(e) => updateNewImageField(image.id, 'description', e.target.value)}
-                                className="w-full p-2 bg-zinc-700 border border-zinc-600 rounded text-white"
-                                placeholder="Añade una descripción corta"
-                              />
-                            </div>
+                          <div className="p-4">
+                            <input
+                              type="text"
+                              value={image.title}
+                              onChange={(e) => {
+                                const updatedImages = [...newImages];
+                                const idx = updatedImages.findIndex(img => img.id === image.id);
+                                updatedImages[idx] = { ...updatedImages[idx], title: e.target.value };
+                                setNewImages(updatedImages);
+                              }}
+                              className="w-full p-2 bg-zinc-700 border border-zinc-600 rounded text-white"
+                            />
                             <button
                               onClick={() => handleAddToGallery(image.id)}
                               className="w-full mt-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded text-sm font-semibold transition"
@@ -466,26 +418,18 @@ const Admin = () => {
                           ✕
                         </button>
                       </div>
-                      <div className="p-4 space-y-2">
-                        <div>
-                          <label className="text-xs text-gray-400 mb-1 block">Título</label>
-                          <input
-                            type="text"
-                            value={image.title}
-                            onChange={(e) => updateGalleryImageField(image.id, 'title', e.target.value)}
-                            className="w-full p-2 bg-zinc-700 border border-zinc-600 rounded text-white"
-                          />
-                        </div>
-                        <div>
-                          <label className="text-xs text-gray-400 mb-1 block">Descripción</label>
-                          <input
-                            type="text"
-                            value={image.description || ""}
-                            onChange={(e) => updateGalleryImageField(image.id, 'description', e.target.value)}
-                            className="w-full p-2 bg-zinc-700 border border-zinc-600 rounded text-white"
-                            placeholder="Añade una descripción corta"
-                          />
-                        </div>
+                      <div className="p-4">
+                        <input
+                          type="text"
+                          value={image.title}
+                          onChange={(e) => {
+                            const newImages = [...images];
+                            const idx = newImages.findIndex(img => img.id === image.id);
+                            newImages[idx] = { ...newImages[idx], title: e.target.value };
+                            setImages(newImages);
+                          }}
+                          className="w-full p-2 bg-zinc-700 border border-zinc-600 rounded text-white"
+                        />
                       </div>
                     </div>
                   ))}
