@@ -44,7 +44,7 @@ const WelcomeAnimation = ({ onAnimationComplete }: WelcomeAnimationProps) => {
       videoEl.addEventListener('ended', handleVideoEnd);
       videoEl.addEventListener('error', handleVideoError);
       
-      // Ensure video can play
+      // Define playVideo function outside so it's accessible in the cleanup function
       const playVideo = () => {
         videoEl.play().catch(error => {
           console.error('Error playing welcome video:', error);
@@ -70,7 +70,12 @@ const WelcomeAnimation = ({ onAnimationComplete }: WelcomeAnimationProps) => {
       if (videoEl) {
         videoEl.removeEventListener('ended', handleVideoEnd);
         videoEl.removeEventListener('error', handleVideoError);
-        videoEl.removeEventListener('canplay', playVideo);
+        
+        // This is the line that was causing the error - now playVideo is in scope
+        if (videoEl.readyState < 2) {
+          // Only remove if we actually added it
+          videoEl.removeEventListener('canplay', playVideo);
+        }
       }
     };
   }, [onAnimationComplete]);
