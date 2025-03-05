@@ -44,7 +44,7 @@ const WelcomeAnimation = ({ onAnimationComplete }: WelcomeAnimationProps) => {
       videoEl.addEventListener('ended', handleVideoEnd);
       videoEl.addEventListener('error', handleVideoError);
       
-      // Define playVideo function outside so it's accessible in the cleanup function
+      // Define the playVideo function properly at this scope level
       const playVideo = () => {
         videoEl.play().catch(error => {
           console.error('Error playing welcome video:', error);
@@ -53,11 +53,27 @@ const WelcomeAnimation = ({ onAnimationComplete }: WelcomeAnimationProps) => {
         });
       };
 
+      // Track if we added the canplay listener to properly clean it up
+      let canplayListenerAdded = false;
+
       if (videoEl.readyState >= 2) {
         playVideo();
       } else {
         videoEl.addEventListener('canplay', playVideo);
+        canplayListenerAdded = true;
       }
+
+      // Clean up function
+      return () => {
+        if (videoEl) {
+          videoEl.removeEventListener('ended', handleVideoEnd);
+          videoEl.removeEventListener('error', handleVideoError);
+          
+          if (canplayListenerAdded) {
+            videoEl.removeEventListener('canplay', playVideo);
+          }
+        }
+      };
     } else {
       console.warn('Welcome video element not found');
       // Fallback if video element isn't found
@@ -65,19 +81,6 @@ const WelcomeAnimation = ({ onAnimationComplete }: WelcomeAnimationProps) => {
         onAnimationComplete();
       }, 1000);
     }
-
-    return () => {
-      if (videoEl) {
-        videoEl.removeEventListener('ended', handleVideoEnd);
-        videoEl.removeEventListener('error', handleVideoError);
-        
-        // This is the line that was causing the error - now playVideo is in scope
-        if (videoEl.readyState < 2) {
-          // Only remove if we actually added it
-          videoEl.removeEventListener('canplay', playVideo);
-        }
-      }
-    };
   }, [onAnimationComplete]);
 
   if (videoError) {
@@ -113,7 +116,7 @@ const WelcomeAnimation = ({ onAnimationComplete }: WelcomeAnimationProps) => {
             onAnimationComplete();
           }}
         >
-          <source src="/animacion dron pantalla carga.mp4" type="video/mp4" />
+          <source src="/animacion dron pantalla  carga.mp4" type="video/mp4" />
           Tu navegador no soporta el tag de video.
         </video>
         {loading && !videoError && (
