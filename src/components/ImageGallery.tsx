@@ -2,20 +2,12 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "../lib/utils";
-import { createClient } from '@supabase/supabase-js';
-
-// Crear cliente de Supabase
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 type Card = {
   id: number;
   content: React.ReactNode;
   className: string;
   thumbnail: string;
-  title: string;
-  description?: string;
 };
 
 // Datos predeterminados - estos se pueden reemplazar con los aprobados del admin
@@ -25,61 +17,46 @@ const defaultCards: Card[] = [
     content: <h3 className="text-xl font-bold text-white">Vista panorámica de campo</h3>,
     className: "col-span-1 row-span-1",
     thumbnail: "https://images.unsplash.com/photo-1473968512647-3e447244af8f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZHJvbmV8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=60",
-    title: "Vista panorámica de campo"
   },
   {
     id: 2,
     content: <h3 className="text-xl font-bold text-white">Propiedad residencial</h3>,
     className: "col-span-1 row-span-1",
     thumbnail: "https://images.unsplash.com/photo-1577724862607-83214b7d0e89?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8ZHJvbmUlMjB2aWV3fGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60",
-    title: "Propiedad residencial"
   },
   {
     id: 3,
     content: <h3 className="text-xl font-bold text-white">Complejo turístico</h3>,
     className: "col-span-1 row-span-1",
     thumbnail: "https://images.unsplash.com/photo-1534372860894-9476556ea6c7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fGRyb25lJTIwdmlld3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60",
-    title: "Complejo turístico"
   },
   {
     id: 4,
     content: <h3 className="text-xl font-bold text-white">Costa mediterránea</h3>,
     className: "col-span-1 row-span-1",
     thumbnail: "https://images.unsplash.com/photo-1582968819890-e7fb0b93cda4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fGRyb25lJTIwdmlld3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60",
-    title: "Costa mediterránea"
   },
   {
     id: 5,
     content: <h3 className="text-xl font-bold text-white">Mansión de lujo</h3>,
     className: "col-span-1 row-span-1",
     thumbnail: "https://images.unsplash.com/photo-1513486490664-9173ae868f41?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fGRyb25lJTIwdmlld3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60",
-    title: "Mansión de lujo"
   },
   {
     id: 6,
     content: <h3 className="text-xl font-bold text-white">Zona de golf</h3>,
     className: "col-span-1 row-span-1",
     thumbnail: "https://images.unsplash.com/photo-1523978591478-c753949ff840?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTd8fGRyb25lJTIwdmlld3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60",
-    title: "Zona de golf"
   },
 ];
 
-// Función para convertir imágenes de Supabase a formato de tarjeta
-const convertToCards = (dbImages: any[]): Card[] => {
-  return dbImages.map(img => ({
+// Función para convertir imágenes del admin a formato de tarjeta
+const convertToCards = (adminImages: any[]): Card[] => {
+  return adminImages.map(img => ({
     id: img.id,
-    content: (
-      <div>
-        <h3 className="text-xl font-bold text-white">{img.title}</h3>
-        {img.description && (
-          <p className="text-sm text-gray-300 mt-2">{img.description}</p>
-        )}
-      </div>
-    ),
+    content: <h3 className="text-xl font-bold text-white">{img.title}</h3>,
     className: "col-span-1 row-span-1",
     thumbnail: img.thumbnail,
-    title: img.title,
-    description: img.description
   }));
 };
 
@@ -170,37 +147,19 @@ const SelectedCard = ({ selected }: { selected: Card | null }) => {
 
 const ImageGallery = () => {
   const [cards, setCards] = useState<Card[]>(defaultCards);
-  const [loading, setLoading] = useState(true);
 
-  // Cargar imágenes desde Supabase
+  // Cargar imágenes desde localStorage
   useEffect(() => {
-    const fetchImages = async () => {
-      setLoading(true);
-      try {
-        const { data, error } = await supabase
-          .from('gallery_images')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (error) {
-          throw error;
-        }
-
-        if (data && data.length > 0) {
-          // Convertir las imágenes de Supabase al formato de tarjeta
-          const supabaseCards = convertToCards(data);
-          // Usar las imágenes de Supabase, complementadas con las predeterminadas si es necesario
-          setCards(supabaseCards.length >= 6 ? supabaseCards : [...supabaseCards, ...defaultCards].slice(0, 6));
-        }
-      } catch (error) {
-        console.error('Error al cargar imágenes de la galería:', error);
-        // Usar datos de prueba si hay un error
-      } finally {
-        setLoading(false);
+    const storedImages = localStorage.getItem('galleryImages');
+    if (storedImages) {
+      const adminImages = JSON.parse(storedImages);
+      if (adminImages && adminImages.length > 0) {
+        // Convertir las imágenes del admin al formato de tarjeta
+        const adminCards = convertToCards(adminImages);
+        // Usar las imágenes del admin, complementadas con las predeterminadas si es necesario
+        setCards(adminCards.length >= 6 ? adminCards : [...adminCards, ...defaultCards].slice(0, 6));
       }
-    };
-
-    fetchImages();
+    }
   }, []);
 
   return (
@@ -208,16 +167,7 @@ const ImageGallery = () => {
       <p className="text-center text-gray-400 mb-10">
         Galería de fotografías tomadas con nuestro dron
       </p>
-      {loading ? (
-        <div className="text-center py-12">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
-            <span className="sr-only">Cargando...</span>
-          </div>
-          <p className="mt-2 text-gray-400">Cargando galería...</p>
-        </div>
-      ) : (
-        <LayoutGrid cards={cards} />
-      )}
+      <LayoutGrid cards={cards} />
     </div>
   );
 };
