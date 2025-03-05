@@ -1,8 +1,13 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
+import { createClient } from '@supabase/supabase-js';
+
+// Crear cliente de Supabase
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Datos de prueba para reseñas pendientes
 const pendingReviews = [
@@ -67,10 +72,46 @@ const Admin = () => {
   const [activeTab, setActiveTab] = useState('reviews');
   const [reviews, setReviews] = useState(() => getStoredData('pendingReviews', pendingReviews));
   const [approvedReviews, setApprovedReviews] = useState(() => getStoredData('approvedReviews', []));
-  const [images, setImages] = useState(() => getStoredData('galleryImages', galleryImages));
+  const [images, setImages] = useState([]);
   const [newImages, setNewImages] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+
+  // Cargar imágenes desde Supabase al iniciar
+  useEffect(() => {
+    const fetchImages = async () => {
+      setIsLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('gallery_images')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          throw error;
+        }
+
+        if (data && data.length > 0) {
+          setImages(data);
+        } else {
+          // Usar datos de prueba si no hay imágenes en Supabase
+          setImages(galleryImages);
+        }
+      } catch (error) {
+        console.error('Error fetching images:', error);
+        toast.error('Error al cargar las imágenes');
+        // Usar datos de prueba si hay un error
+        setImages(galleryImages);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (isLoggedIn) {
+      fetchImages();
+    }
+  }, [isLoggedIn]);
 
   // Guardar datos en localStorage cuando cambian
   useEffect(() => {
@@ -122,45 +163,138 @@ const Admin = () => {
     
     setUploading(true);
     
-    // Crear nueva imagen con URL temporal
+    // Crear nueva imagen con URL temporal para vista previa
     const newImage = {
       id: Date.now(),
       title: "Nueva imagen",
-      thumbnail: URL.createObjectURL(files[0]), // Crear URL temporal para la vista previa
+      description: "",
+      thumbnail: URL.createObjectURL(files[0]), // URL temporal para la vista previa
       file: files[0]
     };
     
     setNewImages([...newImages, newImage]);
     setUploading(false);
-    toast.success('Imagen subida correctamente');
+    toast.success('Imagen cargada correctamente para vista previa');
   };
 
-  // Función para subir imagen a la galería
-  const handleAddToGallery = (id: number) => {
+  // Función para subir imagen a Supabase
+  const handleAddToGallery = async (id: number) => {
     const imageToAdd = newImages.find(img => img.id === id);
-    if (imageToAdd) {
-      const newGalleryImage = {
-        id: images.length + 1,
-        title: imageToAdd.title,
-        thumbnail: imageToAdd.thumbnail
-      };
+    if (!imageToAdd || !imageToAdd.file) return;
+    
+    setUploading(true);
+    
+    try {
+      // 1. Subir archivo a Supabase Storage
+      const fileName = `${Date.now()}_${imageToAdd.file.name}`;
+      const { data: fileData, error: fileError } = await supabase
+        .storage
+        .from('gallery')
+        .upload(fileName, imageToAdd.file);
+        
+      if (fileError) throw fileError;
       
-      setImages([...images, newGalleryImage]);
-      setNewImages(newImages.filter(img => img.id !== id));
-      toast.success('Imagen añadida a la galería');
+      // 2. Obtener URL pública del archivo
+      const { data: urlData } = await supabase
+        .storage
+        .from('gallery')
+        .getPublicUrl(fileName);
+        
+      if (!urlData.publicUrl) throw new Error('No se pudo obtener la URL pública');
+      
+      // 3. Guardar registro en la tabla gallery_images
+      const { data: imageData, error: imageError } = await supabase
+        .from('gallery_images')
+        .insert([
+          { 
+            title: imageToAdd.title, 
+            description: imageToAdd.description || '',
+            thumbnail: urlData.publicUrl
+          }
+        ])
+        .select();
+        
+      if (imageError) throw imageError;
+      
+      // 4. Actualizar el estado con los nuevos datos
+      if (imageData && imageData.length > 0) {
+        setImages([imageData[0], ...images]);
+        setNewImages(newImages.filter(img => img.id !== id));
+        toast.success('Imagen añadida a la galería correctamente');
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast.error('Error al subir la imagen a la galería');
+    } finally {
+      setUploading(false);
     }
   };
 
-  // Función para eliminar una imagen
-  const handleDeleteImage = (id: number) => {
-    setImages(images.filter(img => img.id !== id));
-    toast.success('Imagen eliminada de la galería');
+  // Función para eliminar una imagen de Supabase
+  const handleDeleteImage = async (id: number) => {
+    try {
+      // 1. Obtener información de la imagen para eliminar el archivo
+      const imageToDelete = images.find(img => img.id === id);
+      if (!imageToDelete) return;
+      
+      // 2. Eliminar el registro de la base de datos
+      const { error: dbError } = await supabase
+        .from('gallery_images')
+        .delete()
+        .eq('id', id);
+        
+      if (dbError) throw dbError;
+      
+      // 3. Eliminar el archivo de Storage si tenemos el nombre de archivo
+      // Extraer el nombre del archivo de la URL (esto depende de la estructura de tu URL)
+      const fileName = imageToDelete.thumbnail.split('/').pop();
+      if (fileName) {
+        const { error: storageError } = await supabase
+          .storage
+          .from('gallery')
+          .remove([fileName]);
+          
+        if (storageError) console.warn('Error removing file from storage:', storageError);
+      }
+      
+      // 4. Actualizar el estado
+      setImages(images.filter(img => img.id !== id));
+      toast.success('Imagen eliminada de la galería');
+    } catch (error) {
+      console.error('Error deleting image:', error);
+      toast.error('Error al eliminar la imagen');
+    }
   };
 
-  // Función para eliminar una imagen nueva
+  // Función para eliminar una imagen nueva (solo del estado)
   const handleDeleteNewImage = (id: number) => {
     setNewImages(newImages.filter(img => img.id !== id));
     toast.success('Imagen eliminada');
+  };
+
+  // Función para actualizar el título o descripción de una imagen
+  const handleUpdateImage = async (id: number, field: 'title' | 'description', value: string) => {
+    try {
+      // 1. Actualizar en Supabase
+      const { error } = await supabase
+        .from('gallery_images')
+        .update({ [field]: value })
+        .eq('id', id);
+        
+      if (error) throw error;
+      
+      // 2. Actualizar el estado local
+      const updatedImages = images.map(img => {
+        if (img.id === id) {
+          return { ...img, [field]: value };
+        }
+        return img;
+      });
+      setImages(updatedImages);
+    } catch (error) {
+      console.error(`Error updating image ${field}:`, error);
+      toast.error(`Error al actualizar ${field === 'title' ? 'el título' : 'la descripción'}`);
+    }
   };
 
   return (
@@ -375,23 +509,48 @@ const Admin = () => {
                               </button>
                             </div>
                           </div>
-                          <div className="p-4">
-                            <input
-                              type="text"
-                              value={image.title}
-                              onChange={(e) => {
-                                const updatedImages = [...newImages];
-                                const idx = updatedImages.findIndex(img => img.id === image.id);
-                                updatedImages[idx] = { ...updatedImages[idx], title: e.target.value };
-                                setNewImages(updatedImages);
-                              }}
-                              className="w-full p-2 bg-zinc-700 border border-zinc-600 rounded text-white"
-                            />
+                          <div className="p-4 space-y-3">
+                            <div>
+                              <label htmlFor={`title-${image.id}`} className="block text-sm font-medium text-gray-300 mb-1">
+                                Título
+                              </label>
+                              <input
+                                id={`title-${image.id}`}
+                                type="text"
+                                value={image.title}
+                                onChange={(e) => {
+                                  const updatedImages = [...newImages];
+                                  const idx = updatedImages.findIndex(img => img.id === image.id);
+                                  updatedImages[idx] = { ...updatedImages[idx], title: e.target.value };
+                                  setNewImages(updatedImages);
+                                }}
+                                className="w-full p-2 bg-zinc-700 border border-zinc-600 rounded text-white"
+                                placeholder="Título de la imagen"
+                              />
+                            </div>
+                            <div>
+                              <label htmlFor={`desc-${image.id}`} className="block text-sm font-medium text-gray-300 mb-1">
+                                Descripción
+                              </label>
+                              <textarea
+                                id={`desc-${image.id}`}
+                                value={image.description || ''}
+                                onChange={(e) => {
+                                  const updatedImages = [...newImages];
+                                  const idx = updatedImages.findIndex(img => img.id === image.id);
+                                  updatedImages[idx] = { ...updatedImages[idx], description: e.target.value };
+                                  setNewImages(updatedImages);
+                                }}
+                                className="w-full p-2 bg-zinc-700 border border-zinc-600 rounded text-white"
+                                placeholder="Descripción de la imagen"
+                                rows={2}
+                              />
+                            </div>
                             <button
                               onClick={() => handleAddToGallery(image.id)}
-                              className="w-full mt-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded text-sm font-semibold transition"
+                              className="w-full px-4 py-2 bg-green-600 hover:bg-green-700 rounded text-sm font-semibold transition"
                             >
-                              Subir imagen a la página
+                              Subir imagen a la galería
                             </button>
                           </div>
                         </div>
@@ -401,39 +560,77 @@ const Admin = () => {
                 )}
                 
                 <h3 className="text-lg font-semibold mb-3">Imágenes en la galería</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {images.map((image) => (
-                    <div key={image.id} className="bg-zinc-800 rounded-lg overflow-hidden border border-zinc-700">
-                      <div className="aspect-w-16 aspect-h-9 relative">
-                        <img 
-                          src={image.thumbnail} 
-                          alt={image.title} 
-                          className="w-full h-64 object-cover"
-                        />
-                        <button
-                          onClick={() => handleDeleteImage(image.id)}
-                          className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center bg-red-600 rounded-full hover:bg-red-700 transition"
-                          title="Eliminar de la galería"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                      <div className="p-4">
-                        <input
-                          type="text"
-                          value={image.title}
-                          onChange={(e) => {
-                            const newImages = [...images];
-                            const idx = newImages.findIndex(img => img.id === image.id);
-                            newImages[idx] = { ...newImages[idx], title: e.target.value };
-                            setImages(newImages);
-                          }}
-                          className="w-full p-2 bg-zinc-700 border border-zinc-600 rounded text-white"
-                        />
-                      </div>
+                {isLoading ? (
+                  <div className="text-center py-8">
+                    <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
+                      <span className="sr-only">Cargando...</span>
                     </div>
-                  ))}
-                </div>
+                    <p className="mt-2 text-gray-400">Cargando imágenes...</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {images.length === 0 ? (
+                      <div className="col-span-full text-center py-12 bg-zinc-800/50 rounded-lg">
+                        <p className="text-gray-400">No hay imágenes en la galería. Sube algunas.</p>
+                      </div>
+                    ) : (
+                      images.map((image) => (
+                        <div key={image.id} className="bg-zinc-800 rounded-lg overflow-hidden border border-zinc-700">
+                          <div className="aspect-w-16 aspect-h-9 relative">
+                            <img 
+                              src={image.thumbnail} 
+                              alt={image.title} 
+                              className="w-full h-64 object-cover"
+                            />
+                            <button
+                              onClick={() => handleDeleteImage(image.id)}
+                              className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center bg-red-600 rounded-full hover:bg-red-700 transition"
+                              title="Eliminar de la galería"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                          <div className="p-4 space-y-3">
+                            <div>
+                              <label htmlFor={`gallery-title-${image.id}`} className="block text-sm font-medium text-gray-300 mb-1">
+                                Título
+                              </label>
+                              <input
+                                id={`gallery-title-${image.id}`}
+                                type="text"
+                                value={image.title}
+                                onChange={(e) => handleUpdateImage(image.id, 'title', e.target.value)}
+                                onBlur={(e) => {
+                                  if (e.target.value !== image.title) {
+                                    handleUpdateImage(image.id, 'title', e.target.value);
+                                  }
+                                }}
+                                className="w-full p-2 bg-zinc-700 border border-zinc-600 rounded text-white"
+                              />
+                            </div>
+                            <div>
+                              <label htmlFor={`gallery-desc-${image.id}`} className="block text-sm font-medium text-gray-300 mb-1">
+                                Descripción
+                              </label>
+                              <textarea
+                                id={`gallery-desc-${image.id}`}
+                                value={image.description || ''}
+                                onChange={(e) => handleUpdateImage(image.id, 'description', e.target.value)}
+                                onBlur={(e) => {
+                                  if (e.target.value !== image.description) {
+                                    handleUpdateImage(image.id, 'description', e.target.value);
+                                  }
+                                }}
+                                className="w-full p-2 bg-zinc-700 border border-zinc-600 rounded text-white"
+                                rows={2}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>
