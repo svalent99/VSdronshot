@@ -17,7 +17,7 @@ const HeroSection = () => {
             e.currentTarget.parentElement?.classList.add('video-fallback');
           }}
         >
-          <source src="./video hero.mp4" type="video/mp4" />
+          <source src="/video hero.mp4" type="video/mp4" />
         </video>
         <div className="absolute inset-0 bg-black bg-opacity-60"></div>
       </div>

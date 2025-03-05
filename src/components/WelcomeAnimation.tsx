@@ -45,20 +45,18 @@ const WelcomeAnimation = ({ onAnimationComplete }: WelcomeAnimationProps) => {
       videoEl.addEventListener('error', handleVideoError);
       
       // Ensure video can play
-      if (videoEl.readyState >= 2) {
+      const playVideo = () => {
         videoEl.play().catch(error => {
           console.error('Error playing welcome video:', error);
           setVideoError(true);
           onAnimationComplete();
         });
+      };
+
+      if (videoEl.readyState >= 2) {
+        playVideo();
       } else {
-        videoEl.addEventListener('canplay', () => {
-          videoEl.play().catch(error => {
-            console.error('Error playing welcome video after canplay:', error);
-            setVideoError(true);
-            onAnimationComplete();
-          });
-        });
+        videoEl.addEventListener('canplay', playVideo);
       }
     } else {
       console.warn('Welcome video element not found');
@@ -72,7 +70,7 @@ const WelcomeAnimation = ({ onAnimationComplete }: WelcomeAnimationProps) => {
       if (videoEl) {
         videoEl.removeEventListener('ended', handleVideoEnd);
         videoEl.removeEventListener('error', handleVideoError);
-        videoEl.removeEventListener('canplay', () => {});
+        videoEl.removeEventListener('canplay', playVideo);
       }
     };
   }, [onAnimationComplete]);
@@ -110,7 +108,7 @@ const WelcomeAnimation = ({ onAnimationComplete }: WelcomeAnimationProps) => {
             onAnimationComplete();
           }}
         >
-          <source src="./animacion dron pantalla carga.mp4" type="video/mp4" />
+          <source src="/animacion dron pantalla carga.mp4" type="video/mp4" />
           Tu navegador no soporta el tag de video.
         </video>
         {loading && !videoError && (
