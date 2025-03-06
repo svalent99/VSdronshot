@@ -99,7 +99,7 @@ const Admin = () => {
   useEffect(() => {
     try {
       localStorage.setItem('galleryImages', JSON.stringify(images));
-      console.log('Guardadas imágenes de galería:', images.length);
+      console.log('Guardadas imágenes de galería en localStorage:', images);
     } catch (error) {
       console.error('Error al guardar imágenes de galería:', error);
     }
@@ -175,12 +175,23 @@ const Admin = () => {
         thumbnail: imageToAdd.thumbnail
       };
       
+      // Agregar a las imágenes existentes
       const updatedImages = [...images, newGalleryImage];
       setImages(updatedImages);
       
-      // Guardar inmediatamente en localStorage
-      localStorage.setItem('galleryImages', JSON.stringify(updatedImages));
+      // Guardar inmediatamente en localStorage - adicional para debug
+      try {
+        localStorage.setItem('galleryImages', JSON.stringify(updatedImages));
+        console.log('Guardando imágenes en localStorage después de añadir:', updatedImages);
+        
+        // Verificar que se guardó correctamente
+        const saved = localStorage.getItem('galleryImages');
+        console.log('Verificación de guardado:', saved ? JSON.parse(saved) : 'No hay datos');
+      } catch (error) {
+        console.error('Error al guardar imágenes en localStorage:', error);
+      }
       
+      // Eliminar de imágenes nuevas
       setNewImages(newImages.filter(img => img.id !== id));
       toast.success('Imagen añadida a la galería');
     }
@@ -192,7 +203,12 @@ const Admin = () => {
     setImages(filteredImages);
     
     // Guardar inmediatamente en localStorage
-    localStorage.setItem('galleryImages', JSON.stringify(filteredImages));
+    try {
+      localStorage.setItem('galleryImages', JSON.stringify(filteredImages));
+      console.log('Guardando imágenes en localStorage después de eliminar:', filteredImages);
+    } catch (error) {
+      console.error('Error al guardar imágenes en localStorage:', error);
+    }
     
     toast.success('Imagen eliminada de la galería');
   };

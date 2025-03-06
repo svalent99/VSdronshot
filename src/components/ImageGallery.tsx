@@ -8,45 +8,52 @@ type Card = {
   content: React.ReactNode;
   className: string;
   thumbnail: string;
+  title: string;
 };
 
 // Datos predeterminados - estos se pueden reemplazar con los aprobados del admin
 const defaultCards: Card[] = [
   {
     id: 1,
-    content: <h3 className="text-xl font-bold text-white">Vista panorámica de campo</h3>,
+    content: null,
     className: "col-span-1 row-span-1",
     thumbnail: "https://images.unsplash.com/photo-1473968512647-3e447244af8f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZHJvbmV8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=60",
+    title: "Vista panorámica de campo",
   },
   {
     id: 2,
-    content: <h3 className="text-xl font-bold text-white">Propiedad residencial</h3>,
+    content: null,
     className: "col-span-1 row-span-1",
     thumbnail: "https://images.unsplash.com/photo-1577724862607-83214b7d0e89?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8ZHJvbmUlMjB2aWV3fGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60",
+    title: "Propiedad residencial",
   },
   {
     id: 3,
-    content: <h3 className="text-xl font-bold text-white">Complejo turístico</h3>,
+    content: null,
     className: "col-span-1 row-span-1",
     thumbnail: "https://images.unsplash.com/photo-1534372860894-9476556ea6c7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fGRyb25lJTIwdmlld3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60",
+    title: "Complejo turístico",
   },
   {
     id: 4,
-    content: <h3 className="text-xl font-bold text-white">Costa mediterránea</h3>,
+    content: null,
     className: "col-span-1 row-span-1",
     thumbnail: "https://images.unsplash.com/photo-1582968819890-e7fb0b93cda4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fGRyb25lJTIwdmlld3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60",
+    title: "Costa mediterránea",
   },
   {
     id: 5,
-    content: <h3 className="text-xl font-bold text-white">Mansión de lujo</h3>,
+    content: null,
     className: "col-span-1 row-span-1",
     thumbnail: "https://images.unsplash.com/photo-1513486490664-9173ae868f41?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fGRyb25lJTIwdmlld3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60",
+    title: "Mansión de lujo",
   },
   {
     id: 6,
-    content: <h3 className="text-xl font-bold text-white">Zona de golf</h3>,
+    content: null,
     className: "col-span-1 row-span-1",
     thumbnail: "https://images.unsplash.com/photo-1523978591478-c753949ff840?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTd8fGRyb25lJTIwdmlld3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60",
+    title: "Zona de golf",
   },
 ];
 
@@ -54,9 +61,10 @@ const defaultCards: Card[] = [
 const convertToCards = (adminImages: any[]): Card[] => {
   return adminImages.map(img => ({
     id: img.id,
-    content: <h3 className="text-xl font-bold text-white">{img.title}</h3>,
+    content: null,
     className: "col-span-1 row-span-1",
     thumbnail: img.thumbnail,
+    title: img.title || "Sin título",
   }));
 };
 
@@ -94,6 +102,11 @@ export const LayoutGrid = ({ cards }: { cards: Card[] }) => {
           >
             {selected?.id === card.id && <SelectedCard selected={selected} />}
             <ImageComponent card={card} />
+            
+            {/* Título de imagen estilo pequeño, como en el ejemplo */}
+            <div className="absolute bottom-0 left-0 w-full bg-black bg-opacity-70 p-2 text-left">
+              <h3 className="text-sm font-medium text-white">{card.title}</h3>
+            </div>
           </motion.div>
         </div>
       ))}
@@ -117,7 +130,7 @@ const ImageComponent = ({ card }: { card: Card }) => {
     <motion.img
       layoutId={`image-${card.id}-image`}
       src={card.thumbnail}
-      alt="thumbnail"
+      alt={card.title}
       className="object-cover object-top absolute inset-0 h-full w-full transition duration-200"
     />
   );
@@ -139,7 +152,7 @@ const SelectedCard = ({ selected }: { selected: Card | null }) => {
         transition={{ duration: 0.3, ease: "easeInOut" }}
         className="relative px-8 pb-4 z-[70]"
       >
-        {selected?.content}
+        <h3 className="text-xl font-bold text-white">{selected?.title}</h3>
       </motion.div>
     </div>
   );
@@ -151,9 +164,13 @@ const ImageGallery = () => {
   // Cargar imágenes desde localStorage
   useEffect(() => {
     const storedImages = localStorage.getItem('galleryImages');
+    console.log("Intentando cargar imágenes desde localStorage");
+    
     if (storedImages) {
       try {
         const adminImages = JSON.parse(storedImages);
+        console.log("Imágenes cargadas desde localStorage:", adminImages);
+        
         if (adminImages && adminImages.length > 0) {
           // Convertir las imágenes del admin al formato de tarjeta
           const adminCards = convertToCards(adminImages);
@@ -165,6 +182,8 @@ const ImageGallery = () => {
         console.error("Error al cargar imágenes desde localStorage:", error);
         setCards(defaultCards);
       }
+    } else {
+      console.log("No se encontraron imágenes en localStorage, usando predeterminadas");
     }
   }, []);
 
