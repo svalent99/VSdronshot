@@ -5,6 +5,8 @@ import { cn } from '../lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Star } from 'lucide-react';
 import { toast } from 'sonner';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "./ui/carousel";
+import { useMediaQuery } from '../hooks/use-media-query';
 
 // Datos de muestra por defecto - estos se pueden reemplazar con los aprobados del admin
 const defaultReviews = [
@@ -234,6 +236,7 @@ const ReviewForm = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
 const ReviewsSection = () => {
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [reviews, setReviews] = useState(defaultReviews);
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   // Cargar reseñas aprobadas desde localStorage
   useEffect(() => {
@@ -271,14 +274,32 @@ const ReviewsSection = () => {
         </p>
       </motion.div>
 
-      {/* Grid responsivo de reseñas */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {reviews.map((review) => (
-            <ReviewCard key={review.id} {...review} />
-          ))}
+      {/* Vista condicional: carrusel en móvil, grid en escritorio */}
+      {isMobile ? (
+        <div className="max-w-sm mx-auto px-4">
+          <Carousel className="w-full">
+            <CarouselContent>
+              {reviews.map((review) => (
+                <CarouselItem key={review.id} className="basis-full">
+                  <ReviewCard {...review} />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <div className="flex justify-center gap-2 mt-4">
+              <CarouselPrevious className="relative inset-0 translate-y-0 left-0" />
+              <CarouselNext className="relative inset-0 translate-y-0 right-0" />
+            </div>
+          </Carousel>
         </div>
-      </div>
+      ) : (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {reviews.map((review) => (
+              <ReviewCard key={review.id} {...review} />
+            ))}
+          </div>
+        </div>
+      )}
       
       {/* Botón para dejar reseña */}
       <div className="mt-12 flex justify-center">

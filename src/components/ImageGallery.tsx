@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "../lib/utils";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "./ui/carousel";
+import { useMediaQuery } from "../hooks/use-media-query";
 
 type Card = {
   id: number;
@@ -71,6 +73,7 @@ const convertToCards = (adminImages: any[]): Card[] => {
 export const LayoutGrid = ({ cards }: { cards: Card[] }) => {
   const [selected, setSelected] = useState<Card | null>(null);
   const [lastSelected, setLastSelected] = useState<Card | null>(null);
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   const handleClick = (card: Card) => {
     setLastSelected(selected);
@@ -82,6 +85,69 @@ export const LayoutGrid = ({ cards }: { cards: Card[] }) => {
     setSelected(null);
   };
 
+  // Renderizado condicional basado en tamaño de pantalla
+  if (isMobile) {
+    return (
+      <div className="w-full p-4">
+        <Carousel className="w-full max-w-xs mx-auto">
+          <CarouselContent>
+            {cards.map((card, i) => (
+              <CarouselItem key={i} className="basis-full">
+                <div className="relative rounded-lg overflow-hidden" style={{ aspectRatio: "1/1" }}>
+                  <img 
+                    src={card.thumbnail} 
+                    alt={card.title} 
+                    className="object-cover w-full h-full" 
+                    onClick={() => handleClick(card)}
+                  />
+                  {/* Título con letra pequeña */}
+                  <div className="absolute bottom-0 left-0 w-full bg-black bg-opacity-70 p-2 text-left">
+                    <h3 className="text-sm font-medium text-white">{card.title}</h3>
+                  </div>
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <div className="flex justify-center gap-2 mt-4">
+            <CarouselPrevious className="relative inset-0 translate-y-0 left-0" />
+            <CarouselNext className="relative inset-0 translate-y-0 right-0" />
+          </div>
+        </Carousel>
+
+        {/* Modal para imagen seleccionada */}
+        <AnimatePresence>
+          {selected && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.8 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black z-50"
+                onClick={handleOutsideClick}
+              />
+              <motion.div
+                layoutId={`card-${selected.id}`}
+                className="fixed inset-0 flex items-center justify-center z-50 p-4"
+              >
+                <div className="relative w-full max-w-lg rounded-lg overflow-hidden">
+                  <img 
+                    src={selected.thumbnail} 
+                    alt={selected.title} 
+                    className="w-full object-contain"
+                  />
+                  <div className="absolute bottom-0 left-0 w-full bg-black bg-opacity-70 p-4">
+                    <h3 className="text-xl font-bold text-white">{selected.title}</h3>
+                  </div>
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+      </div>
+    );
+  }
+
+  // Diseño de escritorio original
   return (
     <div className="w-full h-full p-4 md:p-10 grid grid-cols-1 md:grid-cols-3 max-w-7xl mx-auto gap-4 relative">
       {cards.map((card, i) => (
@@ -103,7 +169,7 @@ export const LayoutGrid = ({ cards }: { cards: Card[] }) => {
             {selected?.id === card.id && <SelectedCard selected={selected} />}
             <ImageComponent card={card} />
             
-            {/* Título de imagen estilo pequeño, como en el ejemplo */}
+            {/* Título de imagen estilo pequeño */}
             <div className="absolute bottom-0 left-0 w-full bg-black bg-opacity-70 p-2 text-left">
               <h3 className="text-sm font-medium text-white">{card.title}</h3>
             </div>
@@ -189,7 +255,7 @@ const ImageGallery = () => {
 
   return (
     <div className="w-full h-full">
-      <p className="text-center text-gray-400 mb-10">
+      <p className="text-center text-gray-400 mb-10 text-sm">
         Galería de fotografías tomadas con nuestro dron
       </p>
       <LayoutGrid cards={cards} />
