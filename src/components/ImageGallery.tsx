@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "../lib/utils";
@@ -90,27 +89,31 @@ export const LayoutGrid = ({ cards }: { cards: Card[] }) => {
     return (
       <div className="w-full p-4">
         <Carousel className="w-full max-w-xs mx-auto">
-          <CarouselContent>
-            {cards.map((card, i) => (
-              <CarouselItem key={i} className="basis-full">
-                <div className="relative rounded-lg overflow-hidden" style={{ aspectRatio: "1/1" }}>
-                  <img 
-                    src={card.thumbnail} 
-                    alt={card.title} 
-                    className="object-cover w-full h-full" 
-                    onClick={() => handleClick(card)}
-                  />
-                  {/* Título con letra pequeña */}
-                  <div className="absolute bottom-0 left-0 w-full bg-black bg-opacity-70 p-2 text-left">
-                    <h3 className="text-sm font-medium text-white">{card.title}</h3>
+          <div className="relative">
+            <CarouselContent>
+              {cards.map((card, i) => (
+                <CarouselItem key={i} className="basis-full">
+                  <div className="relative rounded-lg overflow-hidden" style={{ aspectRatio: "1/1" }}>
+                    <img 
+                      src={card.thumbnail} 
+                      alt={card.title} 
+                      className="object-cover w-full h-full" 
+                      onClick={() => handleClick(card)}
+                    />
+                    {/* Título con letra pequeña */}
+                    <div className="absolute bottom-0 left-0 w-full bg-black bg-opacity-70 p-2 text-left">
+                      <h3 className="text-sm font-medium text-white">{card.title}</h3>
+                    </div>
                   </div>
-                </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <div className="flex justify-center gap-2 mt-4">
-            <CarouselPrevious className="relative inset-0 translate-y-0 left-0" />
-            <CarouselNext className="relative inset-0 translate-y-0 right-0" />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <div className="absolute inset-y-0 left-0 flex items-center">
+              <CarouselPrevious className="relative h-8 w-8 translate-x-0 translate-y-0 bg-black/50 hover:bg-black/70 border-0" />
+            </div>
+            <div className="absolute inset-y-0 right-0 flex items-center">
+              <CarouselNext className="relative h-8 w-8 translate-x-0 translate-y-0 bg-black/50 hover:bg-black/70 border-0" />
+            </div>
           </div>
         </Carousel>
 

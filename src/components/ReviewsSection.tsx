@@ -109,7 +109,7 @@ const ReviewCard = ({
         </div>
       </div>
       
-      <blockquote className="flex-grow text-zinc-300 text-sm md:text-base italic">
+      <blockquote className="flex-grow text-zinc-300 text-sm md:text-base italic min-h-[80px] flex items-center">
         "{body}"
       </blockquote>
     </motion.div>
@@ -278,16 +278,22 @@ const ReviewsSection = () => {
       {isMobile ? (
         <div className="max-w-sm mx-auto px-4">
           <Carousel className="w-full">
-            <CarouselContent>
-              {reviews.map((review) => (
-                <CarouselItem key={review.id} className="basis-full">
-                  <ReviewCard {...review} />
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <div className="flex justify-center gap-2 mt-4">
-              <CarouselPrevious className="relative inset-0 translate-y-0 left-0" />
-              <CarouselNext className="relative inset-0 translate-y-0 right-0" />
+            <div className="relative">
+              <CarouselContent>
+                {reviews.map((review) => (
+                  <CarouselItem key={review.id} className="basis-full">
+                    <div className="h-full">
+                      <ReviewCard {...review} />
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <div className="absolute inset-y-0 left-0 flex items-center">
+                <CarouselPrevious className="relative h-8 w-8 translate-x-0 translate-y-0 bg-black/50 hover:bg-black/70 border-0" />
+              </div>
+              <div className="absolute inset-y-0 right-0 flex items-center">
+                <CarouselNext className="relative h-8 w-8 translate-x-0 translate-y-0 bg-black/50 hover:bg-black/70 border-0" />
+              </div>
             </div>
           </Carousel>
         </div>
@@ -295,7 +301,9 @@ const ReviewsSection = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {reviews.map((review) => (
-              <ReviewCard key={review.id} {...review} />
+              <div key={review.id} className="h-full flex">
+                <ReviewCard key={review.id} {...review} />
+              </div>
             ))}
           </div>
         </div>
