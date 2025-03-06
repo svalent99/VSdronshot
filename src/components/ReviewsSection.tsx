@@ -237,9 +237,19 @@ const ReviewsSection = () => {
 
   // Cargar reseñas aprobadas desde localStorage
   useEffect(() => {
-    const approvedReviews = JSON.parse(localStorage.getItem('approvedReviews') || '[]');
-    if (approvedReviews.length > 0) {
-      setReviews([...approvedReviews, ...defaultReviews].slice(0, 6));
+    const storedReviews = localStorage.getItem('approvedReviews');
+    if (storedReviews) {
+      try {
+        const approvedReviews = JSON.parse(storedReviews);
+        if (approvedReviews && approvedReviews.length > 0) {
+          // Combinar las reseñas aprobadas con las predeterminadas si es necesario
+          setReviews([...approvedReviews, ...defaultReviews].slice(0, 6));
+          console.log("Cargadas reseñas desde localStorage:", approvedReviews.length);
+        }
+      } catch (error) {
+        console.error("Error al cargar reseñas desde localStorage:", error);
+        setReviews(defaultReviews);
+      }
     }
   }, []);
 

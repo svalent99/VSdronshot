@@ -56,8 +56,13 @@ const galleryImages = [
 
 // Obtener los datos almacenados de localStorage o usar los valores predeterminados
 const getStoredData = (key, defaultValue) => {
-  const storedData = localStorage.getItem(key);
-  return storedData ? JSON.parse(storedData) : defaultValue;
+  try {
+    const storedData = localStorage.getItem(key);
+    return storedData ? JSON.parse(storedData) : defaultValue;
+  } catch (error) {
+    console.error(`Error retrieving ${key} from localStorage:`, error);
+    return defaultValue;
+  }
 };
 
 const Admin = () => {
@@ -74,15 +79,30 @@ const Admin = () => {
 
   // Guardar datos en localStorage cuando cambian
   useEffect(() => {
-    localStorage.setItem('pendingReviews', JSON.stringify(reviews));
+    try {
+      localStorage.setItem('pendingReviews', JSON.stringify(reviews));
+      console.log('Guardadas reseñas pendientes:', reviews.length);
+    } catch (error) {
+      console.error('Error al guardar reseñas pendientes:', error);
+    }
   }, [reviews]);
 
   useEffect(() => {
-    localStorage.setItem('approvedReviews', JSON.stringify(approvedReviews));
+    try {
+      localStorage.setItem('approvedReviews', JSON.stringify(approvedReviews));
+      console.log('Guardadas reseñas aprobadas:', approvedReviews.length);
+    } catch (error) {
+      console.error('Error al guardar reseñas aprobadas:', error);
+    }
   }, [approvedReviews]);
 
   useEffect(() => {
-    localStorage.setItem('galleryImages', JSON.stringify(images));
+    try {
+      localStorage.setItem('galleryImages', JSON.stringify(images));
+      console.log('Guardadas imágenes de galería:', images.length);
+    } catch (error) {
+      console.error('Error al guardar imágenes de galería:', error);
+    }
   }, [images]);
 
   // Función para manejar el inicio de sesión
@@ -92,6 +112,7 @@ const Admin = () => {
     // Verificar las credenciales (simplificado para el ejemplo)
     if (email === 'valen.sotelo.123@gmail.com' && password === 'svolando9') {
       setIsLoggedIn(true);
+      toast.success('Inicio de sesión exitoso');
     } else {
       toast.error('Credenciales incorrectas. Por favor, intenta de nuevo.');
     }
@@ -104,7 +125,12 @@ const Admin = () => {
       const reviewToApprove = reviews.find(review => review.id === id);
       if (reviewToApprove) {
         // Agregar a la lista de aprobadas
-        setApprovedReviews([...approvedReviews, reviewToApprove]);
+        const updatedApprovedReviews = [...approvedReviews, reviewToApprove];
+        setApprovedReviews(updatedApprovedReviews);
+        
+        // Guardar inmediatamente en localStorage para asegurar persistencia
+        localStorage.setItem('approvedReviews', JSON.stringify(updatedApprovedReviews));
+        
         toast.success('Reseña aprobada y publicada');
       }
     } else {
@@ -112,7 +138,11 @@ const Admin = () => {
     }
     
     // Eliminar la reseña de la lista de pendientes
-    setReviews(reviews.filter(review => review.id !== id));
+    const filteredReviews = reviews.filter(review => review.id !== id);
+    setReviews(filteredReviews);
+    
+    // Guardar inmediatamente en localStorage
+    localStorage.setItem('pendingReviews', JSON.stringify(filteredReviews));
   };
 
   // Función para subir una nueva imagen
@@ -140,12 +170,17 @@ const Admin = () => {
     const imageToAdd = newImages.find(img => img.id === id);
     if (imageToAdd) {
       const newGalleryImage = {
-        id: images.length + 1,
+        id: Date.now(), // Usar timestamp para asegurar IDs únicos
         title: imageToAdd.title,
         thumbnail: imageToAdd.thumbnail
       };
       
-      setImages([...images, newGalleryImage]);
+      const updatedImages = [...images, newGalleryImage];
+      setImages(updatedImages);
+      
+      // Guardar inmediatamente en localStorage
+      localStorage.setItem('galleryImages', JSON.stringify(updatedImages));
+      
       setNewImages(newImages.filter(img => img.id !== id));
       toast.success('Imagen añadida a la galería');
     }
@@ -153,7 +188,12 @@ const Admin = () => {
 
   // Función para eliminar una imagen
   const handleDeleteImage = (id: number) => {
-    setImages(images.filter(img => img.id !== id));
+    const filteredImages = images.filter(img => img.id !== id);
+    setImages(filteredImages);
+    
+    // Guardar inmediatamente en localStorage
+    localStorage.setItem('galleryImages', JSON.stringify(filteredImages));
+    
     toast.success('Imagen eliminada de la galería');
   };
 

@@ -152,12 +152,18 @@ const ImageGallery = () => {
   useEffect(() => {
     const storedImages = localStorage.getItem('galleryImages');
     if (storedImages) {
-      const adminImages = JSON.parse(storedImages);
-      if (adminImages && adminImages.length > 0) {
-        // Convertir las imágenes del admin al formato de tarjeta
-        const adminCards = convertToCards(adminImages);
-        // Usar las imágenes del admin, complementadas con las predeterminadas si es necesario
-        setCards(adminCards.length >= 6 ? adminCards : [...adminCards, ...defaultCards].slice(0, 6));
+      try {
+        const adminImages = JSON.parse(storedImages);
+        if (adminImages && adminImages.length > 0) {
+          // Convertir las imágenes del admin al formato de tarjeta
+          const adminCards = convertToCards(adminImages);
+          // Usar las imágenes del admin, complementadas con las predeterminadas si es necesario
+          setCards(adminCards.length >= 6 ? adminCards : [...adminCards, ...defaultCards].slice(0, 6));
+          console.log("Cargadas imágenes desde localStorage:", adminImages.length);
+        }
+      } catch (error) {
+        console.error("Error al cargar imágenes desde localStorage:", error);
+        setCards(defaultCards);
       }
     }
   }, []);
