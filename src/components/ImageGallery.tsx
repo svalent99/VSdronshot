@@ -108,10 +108,10 @@ export const LayoutGrid = ({ cards }: { cards: Card[] }) => {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <div className="absolute inset-y-0 left-0 flex items-center">
+            <div className="absolute top-1/2 -translate-y-1/2 left-0 flex items-center">
               <CarouselPrevious className="relative h-8 w-8 translate-x-0 translate-y-0 bg-black/50 hover:bg-black/70 border-0" />
             </div>
-            <div className="absolute inset-y-0 right-0 flex items-center">
+            <div className="absolute top-1/2 -translate-y-1/2 right-0 flex items-center">
               <CarouselNext className="relative h-8 w-8 translate-x-0 translate-y-0 bg-black/50 hover:bg-black/70 border-0" />
             </div>
           </div>
