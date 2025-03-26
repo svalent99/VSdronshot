@@ -1,77 +1,21 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '../lib/utils';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "./ui/carousel";
 import { useMediaQuery } from '../hooks/use-media-query';
 
-// Datos de muestra por defecto - estos se pueden reemplazar con los aprobados del admin
-const defaultReviews = [
-  {
-    id: 1,
-    name: "Carlos Mendoza",
-    username: "@carlosmendoza",
-    body: "Las imágenes que VS Dron Shot capturó de mi propiedad son impresionantes. Superaron mis expectativas por completo.",
-    img: "https://i.pravatar.cc/150?img=1",
-    rating: 5,
-  },
-  {
-    id: 2,
-    name: "Laura Gómez",
-    username: "@lauragomez",
-    body: "Profesionalismo de principio a fin. Las tomas aéreas resaltaron perfectamente el entorno de nuestra casa.",
-    img: "https://i.pravatar.cc/150?img=5",
-    rating: 5,
-  },
-  {
-    id: 3,
-    name: "Miguel Ángel",
-    username: "@miguelangel",
-    body: "Gracias al equipo de VS Dron Shot, pudimos vender nuestra propiedad en tiempo récord. Las fotos aéreas hicieron toda la diferencia.",
-    img: "https://i.pravatar.cc/150?img=3",
-    rating: 4,
-  },
-  {
-    id: 4,
-    name: "Sofía Martínez",
-    username: "@sofiamartinez",
-    body: "Contratamos sus servicios para un evento corporativo y quedamos maravillados con los resultados. Totalmente recomendable.",
-    img: "https://i.pravatar.cc/150?img=8",
-    rating: 5,
-  },
-  {
-    id: 5,
-    name: "Alejandro Ruiz",
-    username: "@aleruiz",
-    body: "Excelente servicio, puntualidad y resultados extraordinarios. Sin duda volveré a contratarlos para futuros proyectos.",
-    img: "https://i.pravatar.cc/150?img=4",
-    rating: 4,
-  },
-  {
-    id: 6,
-    name: "Patricia Vega",
-    username: "@patriciavega",
-    body: "La calidad de los videos es impresionante. Han dado vida a nuestro proyecto inmobiliario con estas tomas aéreas.",
-    img: "https://i.pravatar.cc/150?img=9",
-    rating: 5,
-  },
-];
+// Empty default array - we'll only show admin-approved reviews
+const defaultReviews = [];
 
 const ReviewCard = ({
-  img,
   name,
   username,
   body,
-  rating,
 }: {
-  img: string;
   name: string;
   username: string;
   body: string;
-  rating: number;
 }) => {
   return (
     <motion.div
@@ -87,29 +31,13 @@ const ReviewCard = ({
       )}
     >
       <div className="flex justify-between items-start mb-4">
-        <div className="flex items-center gap-3">
-          <Avatar className="h-10 w-10 border border-zinc-700">
-            <AvatarImage src={img} alt={name} />
-            <AvatarFallback>{name.slice(0, 2)}</AvatarFallback>
-          </Avatar>
-          <div className="flex flex-col">
-            <p className="font-medium text-white">{name}</p>
-            <p className="text-sm text-zinc-400">{username}</p>
-          </div>
-        </div>
-        <div className="flex">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Star
-              key={i}
-              className={`h-4 w-4 ${
-                i < rating ? "fill-yellow-500 text-yellow-500" : "text-zinc-600"
-              }`}
-            />
-          ))}
+        <div className="flex flex-col">
+          <p className="font-medium text-white">{name}</p>
+          <p className="text-sm text-zinc-400">{username}</p>
         </div>
       </div>
       
-      <blockquote className="flex-grow text-zinc-300 text-sm md:text-base italic min-h-[80px] flex items-center">
+      <blockquote className="flex-grow text-zinc-300 text-sm md:text-base italic min-h-[120px] flex items-center">
         "{body}"
       </blockquote>
     </motion.div>
@@ -235,23 +163,22 @@ const ReviewForm = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
 
 const ReviewsSection = () => {
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
-  const [reviews, setReviews] = useState(defaultReviews);
+  const [reviews, setReviews] = useState([]);
   const isMobile = useMediaQuery("(max-width: 768px)");
 
-  // Cargar reseñas aprobadas desde localStorage
+  // Cargar SOLO reseñas aprobadas desde localStorage
   useEffect(() => {
     const storedReviews = localStorage.getItem('approvedReviews');
     if (storedReviews) {
       try {
         const approvedReviews = JSON.parse(storedReviews);
         if (approvedReviews && approvedReviews.length > 0) {
-          // Combinar las reseñas aprobadas con las predeterminadas si es necesario
-          setReviews([...approvedReviews, ...defaultReviews].slice(0, 6));
-          console.log("Cargadas reseñas desde localStorage:", approvedReviews.length);
+          setReviews(approvedReviews);
+          console.log("Cargadas reseñas aprobadas desde localStorage:", approvedReviews.length);
         }
       } catch (error) {
         console.error("Error al cargar reseñas desde localStorage:", error);
-        setReviews(defaultReviews);
+        setReviews([]);
       }
     }
   }, []);
@@ -274,52 +201,68 @@ const ReviewsSection = () => {
         </p>
       </motion.div>
 
-      {/* Vista condicional: carrusel en móvil, grid en escritorio */}
-      {isMobile ? (
-        <div className="max-w-sm mx-auto px-4">
-          <Carousel className="w-full">
-            <div className="relative">
-              <CarouselContent>
-                {reviews.map((review) => (
-                  <CarouselItem key={review.id} className="basis-full">
-                    <div className="h-full">
-                      <ReviewCard {...review} />
-                    </div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <div className="absolute inset-y-0 left-0 flex items-center">
-                <CarouselPrevious className="relative h-8 w-8 translate-x-0 translate-y-0 bg-black/50 hover:bg-black/70 border-0" />
-              </div>
-              <div className="absolute inset-y-0 right-0 flex items-center">
-                <CarouselNext className="relative h-8 w-8 translate-x-0 translate-y-0 bg-black/50 hover:bg-black/70 border-0" />
-              </div>
-            </div>
-          </Carousel>
+      {reviews.length === 0 ? (
+        <div className="text-center py-12 max-w-2xl mx-auto px-4">
+          <p className="text-zinc-400">Aún no hay reseñas disponibles. ¡Sé el primero en opinar sobre nuestro servicio!</p>
+          <motion.button
+            onClick={() => setReviewModalOpen(true)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="mt-6 px-6 py-3 bg-transparent border border-white/20 hover:border-white/50 text-white rounded-md font-medium transition-colors duration-300"
+          >
+            Deja tu reseña
+          </motion.button>
         </div>
       ) : (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {reviews.map((review) => (
-              <div key={review.id} className="h-full flex">
-                <ReviewCard key={review.id} {...review} />
+        <>
+          {/* Vista condicional: carrusel en móvil, grid en escritorio */}
+          {isMobile ? (
+            <div className="max-w-sm mx-auto px-4">
+              <Carousel className="w-full">
+                <div className="relative">
+                  <CarouselContent>
+                    {reviews.map((review) => (
+                      <CarouselItem key={review.id} className="basis-full">
+                        <div className="h-full">
+                          <ReviewCard name={review.name} username={review.username} body={review.body} />
+                        </div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <div className="absolute top-1/2 -translate-y-1/2 left-2 flex items-center">
+                    <CarouselPrevious className="relative h-8 w-8 translate-x-0 translate-y-0 bg-black/50 hover:bg-black/70 border-0" />
+                  </div>
+                  <div className="absolute top-1/2 -translate-y-1/2 right-2 flex items-center">
+                    <CarouselNext className="relative h-8 w-8 translate-x-0 translate-y-0 bg-black/50 hover:bg-black/70 border-0" />
+                  </div>
+                </div>
+              </Carousel>
+            </div>
+          ) : (
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {reviews.map((review) => (
+                  <div key={review.id} className="h-full flex">
+                    <ReviewCard name={review.name} username={review.username} body={review.body} />
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
+          )}
+          
+          {/* Botón para dejar reseña */}
+          <div className="mt-12 flex justify-center">
+            <motion.button
+              onClick={() => setReviewModalOpen(true)}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-6 py-3 bg-transparent border border-white/20 hover:border-white/50 text-white rounded-md font-medium transition-colors duration-300"
+            >
+              Deja tu reseña
+            </motion.button>
           </div>
-        </div>
+        </>
       )}
-      
-      {/* Botón para dejar reseña */}
-      <div className="mt-12 flex justify-center">
-        <motion.button
-          onClick={() => setReviewModalOpen(true)}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="px-6 py-3 bg-transparent border border-white/20 hover:border-white/50 text-white rounded-md font-medium transition-colors duration-300"
-        >
-          Deja tu reseña
-        </motion.button>
-      </div>
       
       {/* Modal de formulario */}
       <ReviewForm 
