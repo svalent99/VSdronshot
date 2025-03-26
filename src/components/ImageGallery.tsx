@@ -12,7 +12,6 @@ type Card = {
   title: string;
 };
 
-// Datos predeterminados - estos se pueden reemplazar con los aprobados del admin
 const defaultCards: Card[] = [
   {
     id: 1,
@@ -58,7 +57,6 @@ const defaultCards: Card[] = [
   },
 ];
 
-// Función para convertir imágenes del admin a formato de tarjeta
 const convertToCards = (adminImages: any[]): Card[] => {
   return adminImages.map(img => ({
     id: img.id,
@@ -84,7 +82,6 @@ export const LayoutGrid = ({ cards }: { cards: Card[] }) => {
     setSelected(null);
   };
 
-  // Renderizado condicional basado en tamaño de pantalla
   if (isMobile) {
     return (
       <div className="w-full p-4">
@@ -100,7 +97,6 @@ export const LayoutGrid = ({ cards }: { cards: Card[] }) => {
                       className="object-cover w-full h-full" 
                       onClick={() => handleClick(card)}
                     />
-                    {/* Título con letra pequeña */}
                     <div className="absolute bottom-0 left-0 w-full bg-black bg-opacity-70 p-2 text-left">
                       <h3 className="text-sm font-medium text-white">{card.title}</h3>
                     </div>
@@ -108,16 +104,15 @@ export const LayoutGrid = ({ cards }: { cards: Card[] }) => {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <div className="absolute top-1/2 -translate-y-1/2 left-0 flex items-center">
+            <div className="absolute top-1/2 -translate-y-1/2 left-2 flex items-center">
               <CarouselPrevious className="relative h-8 w-8 translate-x-0 translate-y-0 bg-black/50 hover:bg-black/70 border-0" />
             </div>
-            <div className="absolute top-1/2 -translate-y-1/2 right-0 flex items-center">
+            <div className="absolute top-1/2 -translate-y-1/2 right-2 flex items-center">
               <CarouselNext className="relative h-8 w-8 translate-x-0 translate-y-0 bg-black/50 hover:bg-black/70 border-0" />
             </div>
           </div>
         </Carousel>
 
-        {/* Modal para imagen seleccionada */}
         <AnimatePresence>
           {selected && (
             <>
@@ -150,7 +145,6 @@ export const LayoutGrid = ({ cards }: { cards: Card[] }) => {
     );
   }
 
-  // Diseño de escritorio original
   return (
     <div className="w-full h-full p-4 md:p-10 grid grid-cols-1 md:grid-cols-3 max-w-7xl mx-auto gap-4 relative">
       {cards.map((card, i) => (
@@ -171,8 +165,6 @@ export const LayoutGrid = ({ cards }: { cards: Card[] }) => {
           >
             {selected?.id === card.id && <SelectedCard selected={selected} />}
             <ImageComponent card={card} />
-            
-            {/* Título de imagen estilo pequeño */}
             <div className="absolute bottom-0 left-0 w-full bg-black bg-opacity-70 p-2 text-left">
               <h3 className="text-sm font-medium text-white">{card.title}</h3>
             </div>
@@ -230,7 +222,6 @@ const SelectedCard = ({ selected }: { selected: Card | null }) => {
 const ImageGallery = () => {
   const [cards, setCards] = useState<Card[]>(defaultCards);
 
-  // Cargar imágenes desde localStorage
   useEffect(() => {
     const storedImages = localStorage.getItem('galleryImages');
     console.log("Intentando cargar imágenes desde localStorage");
@@ -241,9 +232,7 @@ const ImageGallery = () => {
         console.log("Imágenes cargadas desde localStorage:", adminImages);
         
         if (adminImages && adminImages.length > 0) {
-          // Convertir las imágenes del admin al formato de tarjeta
           const adminCards = convertToCards(adminImages);
-          // Usar las imágenes del admin, complementadas con las predeterminadas si es necesario
           setCards(adminCards.length >= 6 ? adminCards : [...adminCards, ...defaultCards].slice(0, 6));
           console.log("Cargadas imágenes desde localStorage:", adminImages.length);
         }
