@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '../lib/utils';
@@ -17,6 +18,9 @@ const ReviewCard = ({
   username: string;
   body: string;
 }) => {
+  // Limit review text to 150 characters
+  const limitedBody = body.length > 150 ? body.substring(0, 147) + '...' : body;
+  
   return (
     <motion.div
       whileHover={{ y: -5 }}
@@ -37,8 +41,8 @@ const ReviewCard = ({
         </div>
       </div>
       
-      <blockquote className="flex-grow text-zinc-300 text-sm md:text-base italic min-h-[120px] flex items-center">
-        "{body}"
+      <blockquote className="flex-grow text-zinc-300 text-sm md:text-base italic min-h-[120px] h-[120px] flex items-center">
+        "{limitedBody}"
       </blockquote>
     </motion.div>
   );
