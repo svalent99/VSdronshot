@@ -1,8 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
+import { Textarea } from "@/components/ui/textarea";
 
 // Datos de prueba para reseñas pendientes
 const pendingReviews = [
@@ -325,31 +325,31 @@ const Admin = () => {
                   <div className="space-y-6">
                     {reviews.map((review) => (
                       <div key={review.id} className="bg-zinc-800 rounded-lg p-6 border border-zinc-700">
-                        <div className="flex items-start">
-                          <img src={review.img} alt={review.name} className="w-12 h-12 rounded-full mr-4" />
-                          <div className="flex-1">
-                            <div className="flex justify-between">
-                              <div>
-                                <h3 className="font-bold">{review.name}</h3>
-                                <p className="text-gray-400 text-sm">{review.username}</p>
-                              </div>
-                              <div className="flex space-x-2">
-                                <button
-                                  onClick={() => handleReviewAction(review.id, true)}
-                                  className="px-3 py-1 bg-green-600 hover:bg-green-700 rounded text-sm"
-                                >
-                                  Aprobar
-                                </button>
-                                <button
-                                  onClick={() => handleReviewAction(review.id, false)}
-                                  className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-sm"
-                                >
-                                  Rechazar
-                                </button>
-                              </div>
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-start">
+                            <img src={review.img} alt={review.name} className="w-12 h-12 rounded-full mr-4" />
+                            <div>
+                              <h3 className="font-bold">{review.name}</h3>
+                              <p className="text-gray-400 text-sm">{review.username}</p>
                             </div>
-                            <p className="mt-3">{review.body}</p>
                           </div>
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => handleReviewAction(review.id, true)}
+                              className="px-3 py-1 bg-green-600 hover:bg-green-700 rounded text-sm"
+                            >
+                              Aprobar
+                            </button>
+                            <button
+                              onClick={() => handleReviewAction(review.id, false)}
+                              className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-sm"
+                            >
+                              Rechazar
+                            </button>
+                          </div>
+                        </div>
+                        <div className="mt-3 max-w-full overflow-hidden">
+                          <p className="break-words whitespace-pre-wrap">{review.body}</p>
                         </div>
                       </div>
                     ))}
@@ -376,7 +376,9 @@ const Admin = () => {
                               <h3 className="font-bold">{review.name}</h3>
                               <p className="text-gray-400 text-sm">{review.username}</p>
                             </div>
-                            <p className="mt-3">{review.body}</p>
+                            <div className="mt-3 max-w-full overflow-hidden">
+                              <p className="break-words whitespace-pre-wrap">{review.body}</p>
+                            </div>
                           </div>
                         </div>
                       </div>

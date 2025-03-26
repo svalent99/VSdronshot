@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '../lib/utils';
@@ -16,7 +17,7 @@ const ReviewCard = ({
   username: string;
   body: string;
 }) => {
-  const limitedBody = body.length > 150 ? body.substring(0, 147) + '...' : body;
+  const limitedBody = body.length > 120 ? body.substring(0, 117) + '...' : body;
   
   return (
     <motion.div
@@ -54,7 +55,7 @@ const ReviewForm = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const trimmedBody = body.trim().substring(0, 150);
+    const trimmedBody = body.trim().substring(0, 120);
     
     const username = `@${company.toLowerCase().replace(/\s+/g, '')}`;
     
@@ -140,18 +141,18 @@ const ReviewForm = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
                 id="review"
                 value={body}
                 onChange={(e) => {
-                  if (e.target.value.length <= 150) {
+                  if (e.target.value.length <= 120) {
                     setBody(e.target.value);
                   }
                 }}
                 required
-                maxLength={150}
+                maxLength={120}
                 rows={4}
                 className="w-full p-2 bg-zinc-800 border border-zinc-700 rounded text-white"
-                placeholder="Máximo 150 caracteres"
+                placeholder="Máximo 120 caracteres"
               />
               <p className="text-sm text-zinc-400 mt-1">
-                {body.length}/150 caracteres
+                {body.length}/120 caracteres
               </p>
             </div>
             <button
