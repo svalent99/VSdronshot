@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '../lib/utils';
@@ -6,7 +5,6 @@ import { toast } from 'sonner';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "./ui/carousel";
 import { useMediaQuery } from '../hooks/use-media-query';
 
-// Empty default array - we'll only show admin-approved reviews
 const defaultReviews = [];
 
 const ReviewCard = ({
@@ -18,7 +16,6 @@ const ReviewCard = ({
   username: string;
   body: string;
 }) => {
-  // Limit review text to 150 characters
   const limitedBody = body.length > 150 ? body.substring(0, 147) + '...' : body;
   
   return (
@@ -48,7 +45,6 @@ const ReviewCard = ({
   );
 };
 
-// Formulario modal para dejar reseñas
 const ReviewForm = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const [name, setName] = useState('');
   const [company, setCompany] = useState('');
@@ -58,28 +54,25 @@ const ReviewForm = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Crear un nuevo formato de nombre de usuario basado en el nombre de la empresa
+    const trimmedBody = body.trim().substring(0, 150);
+    
     const username = `@${company.toLowerCase().replace(/\s+/g, '')}`;
     
-    // Crear una nueva reseña pendiente
     const newReview = {
       id: Date.now(),
       name,
       username,
-      body,
+      body: trimmedBody,
       img: `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 70)}`,
       rating: 5,
       pending: true
     };
     
-    // Guardar en localStorage para que el admin la revise
     const pendingReviews = JSON.parse(localStorage.getItem('pendingReviews') || '[]');
     localStorage.setItem('pendingReviews', JSON.stringify([...pendingReviews, newReview]));
     
-    // Notificar al usuario
     toast.success('¡Gracias! Tu reseña ha sido enviada para revisión.');
     
-    // Resetear formulario después de 2 segundos
     setSubmitted(true);
     setTimeout(() => {
       setName('');
@@ -146,11 +139,20 @@ const ReviewForm = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
               <textarea
                 id="review"
                 value={body}
-                onChange={(e) => setBody(e.target.value)}
+                onChange={(e) => {
+                  if (e.target.value.length <= 150) {
+                    setBody(e.target.value);
+                  }
+                }}
                 required
+                maxLength={150}
                 rows={4}
                 className="w-full p-2 bg-zinc-800 border border-zinc-700 rounded text-white"
+                placeholder="Máximo 150 caracteres"
               />
+              <p className="text-sm text-zinc-400 mt-1">
+                {body.length}/150 caracteres
+              </p>
             </div>
             <button
               type="submit"
@@ -170,7 +172,6 @@ const ReviewsSection = () => {
   const [reviews, setReviews] = useState([]);
   const isMobile = useMediaQuery("(max-width: 768px)");
 
-  // Cargar SOLO reseñas aprobadas desde localStorage
   useEffect(() => {
     const storedReviews = localStorage.getItem('approvedReviews');
     if (storedReviews) {
@@ -189,7 +190,6 @@ const ReviewsSection = () => {
 
   return (
     <section className="w-full py-12">
-      {/* Título con animación */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -219,7 +219,6 @@ const ReviewsSection = () => {
         </div>
       ) : (
         <>
-          {/* Vista condicional: carrusel en móvil, grid en escritorio */}
           {isMobile ? (
             <div className="max-w-sm mx-auto px-4">
               <Carousel className="w-full">
@@ -254,7 +253,6 @@ const ReviewsSection = () => {
             </div>
           )}
           
-          {/* Botón para dejar reseña */}
           <div className="mt-12 flex justify-center">
             <motion.button
               onClick={() => setReviewModalOpen(true)}
@@ -268,7 +266,6 @@ const ReviewsSection = () => {
         </>
       )}
       
-      {/* Modal de formulario */}
       <ReviewForm 
         isOpen={reviewModalOpen} 
         onClose={() => setReviewModalOpen(false)}
