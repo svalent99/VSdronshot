@@ -82,6 +82,16 @@ export const LayoutGrid = ({ cards }: { cards: Card[] }) => {
     setSelected(null);
   };
 
+  if (cards.length === 0) {
+    return (
+      <div className="w-full p-4 text-center">
+        <p className="text-gray-400 py-16">
+          No hay imágenes disponibles en la galería. Agrega imágenes desde el panel de administración.
+        </p>
+      </div>
+    );
+  }
+
   if (isMobile) {
     return (
       <div className="w-full p-4">
@@ -220,7 +230,7 @@ const SelectedCard = ({ selected }: { selected: Card | null }) => {
 };
 
 const ImageGallery = () => {
-  const [cards, setCards] = useState<Card[]>(defaultCards);
+  const [cards, setCards] = useState<Card[]>([]);
 
   useEffect(() => {
     const storedImages = localStorage.getItem('galleryImages');
@@ -233,15 +243,16 @@ const ImageGallery = () => {
         
         if (adminImages && adminImages.length > 0) {
           const adminCards = convertToCards(adminImages);
-          setCards(adminCards.length >= 6 ? adminCards : [...adminCards, ...defaultCards].slice(0, 6));
+          setCards(adminCards);
           console.log("Cargadas imágenes desde localStorage:", adminImages.length);
         }
       } catch (error) {
         console.error("Error al cargar imágenes desde localStorage:", error);
-        setCards(defaultCards);
+        setCards([]);
       }
     } else {
-      console.log("No se encontraron imágenes en localStorage, usando predeterminadas");
+      console.log("No se encontraron imágenes en localStorage");
+      setCards([]);
     }
   }, []);
 
