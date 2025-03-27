@@ -1,8 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
+import ReviewsSection from "@/components/ReviewsSection";
 
 // Datos de prueba para reseñas pendientes
 const pendingReviews = [
@@ -71,7 +73,6 @@ const Admin = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState('reviews');
   const [reviews, setReviews] = useState(() => getStoredData('pendingReviews', pendingReviews));
-  const [approvedReviews, setApprovedReviews] = useState(() => getStoredData('approvedReviews', []));
   const [images, setImages] = useState(() => getStoredData('galleryImages', galleryImages));
   const [newImages, setNewImages] = useState([]);
   const [uploading, setUploading] = useState(false);
@@ -86,15 +87,6 @@ const Admin = () => {
       console.error('Error al guardar reseñas pendientes:', error);
     }
   }, [reviews]);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('approvedReviews', JSON.stringify(approvedReviews));
-      console.log('Guardadas reseñas aprobadas:', approvedReviews.length);
-    } catch (error) {
-      console.error('Error al guardar reseñas aprobadas:', error);
-    }
-  }, [approvedReviews]);
 
   useEffect(() => {
     try {
@@ -124,9 +116,11 @@ const Admin = () => {
       // Buscar la reseña en la lista de pendientes
       const reviewToApprove = reviews.find(review => review.id === id);
       if (reviewToApprove) {
+        // Obtener las reseñas aprobadas actuales
+        const currentApprovedReviews = getStoredData('approvedReviews', []);
+        
         // Agregar a la lista de aprobadas
-        const updatedApprovedReviews = [...approvedReviews, reviewToApprove];
-        setApprovedReviews(updatedApprovedReviews);
+        const updatedApprovedReviews = [...currentApprovedReviews, reviewToApprove];
         
         // Guardar inmediatamente en localStorage para asegurar persistencia
         localStorage.setItem('approvedReviews', JSON.stringify(updatedApprovedReviews));
@@ -299,7 +293,7 @@ const Admin = () => {
                       : 'border-transparent text-gray-400 hover:text-gray-200'
                   }`}
                 >
-                  Reseñas Aprobadas ({approvedReviews.length})
+                  Reseñas Aprobadas
                 </button>
                 <button
                   onClick={() => setActiveTab('gallery')}
@@ -361,30 +355,7 @@ const Admin = () => {
             {activeTab === 'approved' && (
               <div>
                 <h2 className="text-xl font-bold mb-6">Reseñas Aprobadas</h2>
-                {approvedReviews.length === 0 ? (
-                  <div className="text-center py-12 bg-zinc-800/50 rounded-lg">
-                    <p className="text-gray-400">No hay reseñas aprobadas todavía.</p>
-                  </div>
-                ) : (
-                  <div className="space-y-6">
-                    {approvedReviews.map((review) => (
-                      <div key={review.id} className="bg-zinc-800 rounded-lg p-6 border border-zinc-700">
-                        <div className="flex items-start">
-                          <img src={review.img} alt={review.name} className="w-12 h-12 rounded-full mr-4" />
-                          <div className="flex-1">
-                            <div>
-                              <h3 className="font-bold">{review.name}</h3>
-                              <p className="text-gray-400 text-sm">{review.username}</p>
-                            </div>
-                            <div className="mt-3 max-w-full overflow-hidden">
-                              <p className="break-words whitespace-pre-wrap">{review.body}</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <ReviewsSection isAdmin={true} />
               </div>
             )}
             

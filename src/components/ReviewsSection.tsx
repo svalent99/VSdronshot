@@ -1,10 +1,11 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '../lib/utils';
 import { toast } from 'sonner';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "./ui/carousel";
 import { useMediaQuery } from '../hooks/use-media-query';
+import { Card, CardContent, CardFooter, CardHeader } from "./ui/card";
+import { Button } from "./ui/button";
 
 const defaultReviews = [];
 
@@ -12,10 +13,14 @@ const ReviewCard = ({
   name,
   username,
   body,
+  isAdmin = false,
+  onDelete = () => {},
 }: {
   name: string;
   username: string;
   body: string;
+  isAdmin?: boolean;
+  onDelete?: () => void;
 }) => {
   const limitedBody = body.length > 120 ? body.substring(0, 117) + '...' : body;
   
@@ -26,22 +31,38 @@ const ReviewCard = ({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
       transition={{ duration: 0.5 }}
-      className={cn(
-        "flex flex-col h-full rounded-xl p-6",
+      className="h-full"
+    >
+      <Card className={cn(
+        "flex flex-col h-[200px] w-full", 
         "bg-zinc-900/80 backdrop-blur-sm border border-zinc-800",
         "hover:border-zinc-700 transition-all duration-300"
-      )}
-    >
-      <div className="flex justify-between items-start mb-4">
-        <div className="flex flex-col">
-          <p className="font-medium text-white">{name}</p>
-          <p className="text-sm text-zinc-400">{username}</p>
-        </div>
-      </div>
-      
-      <blockquote className="flex-grow text-zinc-300 text-sm md:text-base italic min-h-[120px] h-[120px] flex items-center">
-        "{limitedBody}"
-      </blockquote>
+      )}>
+        <CardHeader className="p-4 pb-0">
+          <div className="flex justify-between items-start">
+            <div className="flex flex-col">
+              <p className="font-medium text-white">{name}</p>
+              <p className="text-sm text-zinc-400">{username}</p>
+            </div>
+            {isAdmin && (
+              <Button 
+                variant="destructive" 
+                size="sm" 
+                onClick={onDelete} 
+                className="h-8 w-8 p-0"
+              >
+                ✕
+              </Button>
+            )}
+          </div>
+        </CardHeader>
+        
+        <CardContent className="p-4 flex-grow overflow-hidden">
+          <blockquote className="text-zinc-300 text-sm md:text-base italic">
+            "{limitedBody}"
+          </blockquote>
+        </CardContent>
+      </Card>
     </motion.div>
   );
 };
@@ -168,7 +189,7 @@ const ReviewForm = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
   );
 };
 
-const ReviewsSection = () => {
+const ReviewsSection = ({ isAdmin = false }: { isAdmin?: boolean }) => {
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [reviews, setReviews] = useState([]);
   const isMobile = useMediaQuery("(max-width: 768px)");
@@ -188,6 +209,15 @@ const ReviewsSection = () => {
       }
     }
   }, []);
+
+  const handleDeleteReview = (reviewId) => {
+    const updatedReviews = reviews.filter(review => review.id !== reviewId);
+    setReviews(updatedReviews);
+    
+    // Guardar en localStorage
+    localStorage.setItem('approvedReviews', JSON.stringify(updatedReviews));
+    toast.success('Reseña eliminada correctamente');
+  };
 
   return (
     <section className="w-full py-12">
@@ -227,8 +257,14 @@ const ReviewsSection = () => {
                   <CarouselContent>
                     {reviews.map((review) => (
                       <CarouselItem key={review.id} className="basis-full">
-                        <div className="h-full">
-                          <ReviewCard name={review.name} username={review.username} body={review.body} />
+                        <div className="h-full px-1">
+                          <ReviewCard 
+                            name={review.name} 
+                            username={review.username} 
+                            body={review.body}
+                            isAdmin={isAdmin}
+                            onDelete={() => handleDeleteReview(review.id)}
+                          />
                         </div>
                       </CarouselItem>
                     ))}
@@ -246,24 +282,32 @@ const ReviewsSection = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {reviews.map((review) => (
-                  <div key={review.id} className="h-full flex">
-                    <ReviewCard name={review.name} username={review.username} body={review.body} />
+                  <div key={review.id} className="h-full">
+                    <ReviewCard 
+                      name={review.name} 
+                      username={review.username} 
+                      body={review.body}
+                      isAdmin={isAdmin}
+                      onDelete={() => handleDeleteReview(review.id)}
+                    />
                   </div>
                 ))}
               </div>
             </div>
           )}
           
-          <div className="mt-12 flex justify-center">
-            <motion.button
-              onClick={() => setReviewModalOpen(true)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-6 py-3 bg-transparent border border-white/20 hover:border-white/50 text-white rounded-md font-medium transition-colors duration-300"
-            >
-              Deja tu reseña
-            </motion.button>
-          </div>
+          {!isAdmin && (
+            <div className="mt-12 flex justify-center">
+              <motion.button
+                onClick={() => setReviewModalOpen(true)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-6 py-3 bg-transparent border border-white/20 hover:border-white/50 text-white rounded-md font-medium transition-colors duration-300"
+              >
+                Deja tu reseña
+              </motion.button>
+            </div>
+          )}
         </>
       )}
       
