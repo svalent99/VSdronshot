@@ -1,6 +1,7 @@
 
 import ServicesCarousel from './ServicesCarousel';
 import DroneSection from './DroneSection';
+import CertificationSection from './CertificationSection';
 import ImageGallery from './ImageGallery';
 import ReviewsSection from './ReviewsSection';
 import FaqSection from './FaqSection';
@@ -14,6 +15,10 @@ const MainContent = () => {
       </div>
       
       <DroneSection />
+      
+      <div className="w-full bg-zinc-900">
+        <CertificationSection />
+      </div>
       
       <div className="w-full bg-black py-16">
         <div className="max-w-7xl mx-auto px-4">
