@@ -42,5 +42,6 @@ export const loadGalleryImages = (): GalleryCard[] => {
     console.error("Error al cargar imágenes desde localStorage:", error);
   }
   
+  // Return empty array - no default images
   return [];
 };
