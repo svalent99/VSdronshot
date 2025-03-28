@@ -22,37 +22,46 @@ const NavHeader = () => {
       transition={{ duration: 0.8 }}
       className="mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center"
     >
-      <div className="flex items-center flex-1">
-        <div className="flex items-center justify-between w-full">
-          <div className="flex items-center">
-            <span className="text-xl font-bold text-white">VS Dron Shot</span>
-          </div>
-          
-          {/* Desktop Navigation */}
-          <div className="hidden md:block">
-            <ul
-              className="relative flex w-fit rounded-full border border-sky-600 bg-black/40 backdrop-blur-sm p-1"
-              onMouseLeave={() => setPosition((pv) => ({ ...pv, opacity: 0 }))}
-            >
-              <Tab setPosition={setPosition} to="/">
-                Inicio
-              </Tab>
-              <Tab setPosition={setPosition} to="/servicios">
-                Servicios
-              </Tab>
-              <Tab setPosition={setPosition} to="/about">
-                Nosotros
-              </Tab>
-              <Tab setPosition={setPosition} to="/contacto">
-                Contacto
-              </Tab>
-              <Tab setPosition={setPosition} to="/admin" isAdmin={true}>
-                Admin
-              </Tab>
-              
-              <Cursor position={position} />
-            </ul>
-          </div>
+      {/* Centered Navigation */}
+      <div className="flex-1 flex justify-center">
+        {/* Desktop Navigation */}
+        <div className="hidden md:block">
+          <ul
+            className="relative flex w-fit rounded-full border border-sky-600 bg-black/40 backdrop-blur-sm p-1"
+            onMouseLeave={() => setPosition((pv) => ({ ...pv, opacity: 0 }))}
+          >
+            <Tab setPosition={setPosition} to="/">
+              Inicio
+            </Tab>
+            <Tab setPosition={setPosition} to="/servicios">
+              Servicios
+            </Tab>
+            <Tab setPosition={setPosition} to="/about">
+              Nosotros
+            </Tab>
+            <Tab setPosition={setPosition} to="/contacto">
+              Contacto
+            </Tab>
+            
+            <Cursor position={position} />
+          </ul>
+        </div>
+      </div>
+      
+      {/* Logo - Small/Mobile only */}
+      <div className="md:hidden absolute left-0">
+        <span className="text-xl font-bold text-white">VS Dron Shot</span>
+      </div>
+      
+      {/* Admin Button - Right Side */}
+      <div className="flex justify-end">
+        <div className="hidden md:block">
+          <Link
+            to="/admin"
+            className="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white font-medium rounded-full transition-colors duration-200"
+          >
+            Admin
+          </Link>
         </div>
       </div>
       
