@@ -2,6 +2,15 @@
 import { motion } from 'framer-motion';
 
 const HeroSection = () => {
+  const scrollToCertificationSection = () => {
+    // Find the certification section by ID
+    const certificationSection = document.getElementById('certification-section');
+    
+    if (certificationSection) {
+      certificationSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center">
       <div className="absolute inset-0 z-0 w-full h-full overflow-hidden">
@@ -52,6 +61,7 @@ const HeroSection = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.1, duration: 0.8 }}
           className="mt-8 px-8 py-3 bg-[#0EA5E9] text-white rounded-md font-semibold text-lg hover:bg-[#0284C7] transition-colors duration-300 transform hover:scale-105"
+          onClick={scrollToCertificationSection}
         >
           Conocenos
         </motion.button>

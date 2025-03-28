@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 
 const CertificationSection = () => {
   return (
-    <div className="w-full py-24 relative">
+    <div id="certification-section" className="w-full py-24 relative certification-section">
       {/* Background Image with Blur */}
       <div 
         className="absolute inset-0 bg-cover bg-center"
