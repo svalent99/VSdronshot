@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
 
@@ -9,7 +8,7 @@ const CertificationSection = () => {
       <div 
         className="absolute inset-0 bg-cover bg-center"
         style={{
-          backgroundImage: "url('/lovable-uploads/fbe1cf48-7a9d-4a15-8f1d-dfafaf3d1dfc.png')",
+          backgroundImage: "url('martillera.jpeg')",
           filter: "blur(5px)",
           opacity: 0.2
         }}
