@@ -12,38 +12,13 @@ const Footer = () => {
             <p className="text-gray-400 text-sm">
               Descubre un nuevo mundo desde las alturas con nuestros servicios de filmación aérea.
             </p>
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Enlaces</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link to="/" className="text-gray-400 hover:text-sky-400 text-sm transition-colors">
-                  Inicio
-                </Link>
-              </li>
-              <li>
-                <Link to="/servicios" className="text-gray-400 hover:text-sky-400 text-sm transition-colors">
-                  Servicios
-                </Link>
-              </li>
-              <li>
-                <Link to="/about" className="text-gray-400 hover:text-sky-400 text-sm transition-colors">
-                  Nosotros
-                </Link>
-              </li>
-              <li>
-                <Link to="/contacto" className="text-gray-400 hover:text-sky-400 text-sm transition-colors">
-                  Contacto
-                </Link>
-              </li>
-            </ul>
-          </div>
+          </div>        
           <div>
             <h3 className="text-lg font-semibold mb-4">Contacto</h3>
             <ul className="space-y-2 text-sm text-gray-400">
-              <li>Email: info@vsdronshot.com</li>
-              <li>Teléfono: +34 123 456 789</li>
-              <li>Dirección: Ciudad, País</li>
+              <li>Email: valen.sotelo.123@gmail.com </li>
+              <li>Teléfono: 1127424407</li>
+              <li>Argentina</li>
             </ul>
           </div>
         </div>

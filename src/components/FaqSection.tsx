@@ -10,19 +10,15 @@ import {
 const faqItems = [
   {
     question: "¿Dónde operamos?",
-    answer: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare, eros dolor interdum nulla, ut commodo diam libero vitae erat."
+    answer: "Actualmente ofrecemos nuestros servicios en Buenos Aires (principalmente en zona norte-oeste) y en Córdoba. Sin embargo, estamos totalmente dispuestos a expandirnos y realizar proyectos en cualquier punto del país. Consultanos para coordinar trabajos en otras provincias. "
   },
   {
     question: "Costo de nuestros servicios",
-    answer: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare, eros dolor interdum nulla, ut commodo diam libero vitae erat."
-  },
-  {
-    question: "Tipo de servicios",
-    answer: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare, eros dolor interdum nulla, ut commodo diam libero vitae erat."
+    answer: "Los valores varian dependiendo del tipo de servicio, la duración del proyecto y la ubicación. Cada propuesta se adapta a las necesidades del cliente, garantizando calidad y resultados profesionales. Consultanos para recibir una cotización personalizada."
   },
   {
     question: "Tiempo de entrega del contenido",
-    answer: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare, eros dolor interdum nulla, ut commodo diam libero vitae erat."
+    answer: "Entregamos el material final en un plazo estimado de 3 a 5 días hábiles, dependiendo del tipo y la complejidad del proyecto. Siempre buscamos garantizar una entrega rápida sin comprometer la calidad del contenido."
   }
 ];
 

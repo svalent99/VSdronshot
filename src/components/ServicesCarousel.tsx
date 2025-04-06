@@ -13,24 +13,29 @@ type Service = {
 const services: Service[] = [
   {
     title: "Fotografía Aérea",
-    description: "Captura impresionantes vistas aéreas con nuestros drones de alta resolución.",
+    description: "Capturamos imágenes aéreas en alta resolución que realzan el valor de tu propiedad desde una perspectiva única.",
     imageUrl: "https://images.unsplash.com/photo-1473968512647-3e447244af8f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZHJvbmV8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=60"
   },
   {
-    title: "Videografía Profesional",
-    description: "Creamos contenido visual cinematográfico desde perspectivas únicas.",
+    title: "Videografía Profesional y Reels",
+    description: "Videos panoramicos y reels para captar las mejores vistas. El contenido visual de calidad genera mayor interés, más visitas y ventas más rápidas.",
     imageUrl: "https://images.unsplash.com/photo-1527977966376-1c8408f9f108?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGRyb25lfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60"
   },
   {
-    title: "Inspección de Infraestructuras",
-    description: "Evaluamos estructuras y propiedades con precisión y seguridad.",
-    imageUrl: "https://images.unsplash.com/photo-1579829366248-204fe8413f31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGRyb25lfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60"
+    title: "Timelapse de Obra en Construccion",
+    description: " Capturamos en un solo video el inicio, el desarrollo y el resultado final de tu obra. Una forma impactante de documentar el proceso, compartirlo con tus clientes y destacar la calidad del trabajo realizado.",
+    imageUrl: "https://images.unsplash.com/photo-1701844279504-e3a974aaafb5?q=80&w=1374&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
   },
   {
     title: "Cartografía y Modelado 3D",
-    description: "Creamos mapas detallados y modelos tridimensionales de cualquier terreno.",
+    description: "Mostrá con claridad la ubicación, dimensiones y características de tu terreno. Creamos mapas detallados y modelos 3D ideales para presentaciones, ventas y planificación.",
+    imageUrl: "https://plus.unsplash.com/premium_photo-1712665535102-fddaf87dbc17?q=80&w=1632&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+  },
+  {
+    title: "Contenido Comercial y Eventos",
+    description: "Potenciá la imagen de tu negocio con fotos y videos profesionales. Ideal para emprendimientos, ferias, fiestas patronales y todo tipo de eventos que merecen ser capturados desde el aire.",
     imageUrl: "https://images.unsplash.com/photo-1508444845599-5c89863b1c44?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fGRyb25lfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60"
-  }
+  },
 ];
 
 const ServicesCarousel = () => {

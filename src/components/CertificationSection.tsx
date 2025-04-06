@@ -9,7 +9,7 @@ const CertificationSection = () => {
         className="absolute inset-0 bg-cover bg-center"
         style={{
           backgroundImage: "url('martillera.jpeg')",
-          filter: "blur(5px)",
+          filter: "blur(2px)",
           opacity: 0.2
         }}
       />
