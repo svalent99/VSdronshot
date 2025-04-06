@@ -1,3 +1,4 @@
+
 import React, {
   ComponentPropsWithRef,
   useCallback,
@@ -5,9 +6,6 @@ import React, {
   useState,
 } from "react";
 import { EmblaCarouselType } from "embla-carousel";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight } from "lucide-react";
-import { useCarousel } from "@/components/ui/carousel";
 
 type UseCarouselButtonsType = {
   prevBtnDisabled: boolean;
@@ -86,41 +84,5 @@ export const NextButton: React.FC<PropType> = (props) => {
       </svg>
       {children}
     </button>
-  );
-};
-
-export const CustomCarouselPrevious: React.FC<React.HTMLAttributes<HTMLButtonElement>> = ({ className, ...props }) => {
-  const { scrollPrev, canScrollPrev } = useCarousel();
-  
-  return (
-    <Button
-      variant="ghost"
-      size="icon"
-      className={`absolute z-10 flex h-8 w-8 items-center justify-center rounded-full bg-zinc-800/70 text-white hover:bg-zinc-800 disabled:opacity-50 ${className}`}
-      disabled={!canScrollPrev}
-      onClick={scrollPrev}
-      {...props}
-    >
-      <ArrowLeft className="h-4 w-4" />
-      <span className="sr-only">Previous slide</span>
-    </Button>
-  );
-};
-
-export const CustomCarouselNext: React.FC<React.HTMLAttributes<HTMLButtonElement>> = ({ className, ...props }) => {
-  const { scrollNext, canScrollNext } = useCarousel();
-  
-  return (
-    <Button
-      variant="ghost"
-      size="icon"
-      className={`absolute z-10 flex h-8 w-8 items-center justify-center rounded-full bg-zinc-800/70 text-white hover:bg-zinc-800 disabled:opacity-50 ${className}`}
-      disabled={!canScrollNext}
-      onClick={scrollNext}
-      {...props}
-    >
-      <ArrowRight className="h-4 w-4" />
-      <span className="sr-only">Next slide</span>
-    </Button>
   );
 };

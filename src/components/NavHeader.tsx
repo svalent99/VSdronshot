@@ -15,14 +15,6 @@ const NavHeader = () => {
   
   const toggleMenu = () => setIsOpen(!isOpen);
 
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
-    setIsOpen(false); // Close mobile menu after clicking
-  };
-
   return (
     <motion.nav
       initial={{ y: -100, opacity: 0 }}
@@ -38,13 +30,16 @@ const NavHeader = () => {
             className="relative flex w-fit rounded-full border border-sky-600 bg-black/40 backdrop-blur-sm p-1"
             onMouseLeave={() => setPosition((pv) => ({ ...pv, opacity: 0 }))}
           >
-            <Tab setPosition={setPosition} onClick={() => scrollToSection("services-section")}>
+            <Tab setPosition={setPosition} to="/">
+              Inicio
+            </Tab>
+            <Tab setPosition={setPosition} to="/servicios">
               Servicios
             </Tab>
-            <Tab setPosition={setPosition} onClick={() => scrollToSection("drone-section")}>
+            <Tab setPosition={setPosition} to="/about">
               Nosotros
             </Tab>
-            <Tab setPosition={setPosition} onClick={() => scrollToSection("footer-section")}>
+            <Tab setPosition={setPosition} to="/contacto">
               Contacto
             </Tab>
             
@@ -94,9 +89,10 @@ const NavHeader = () => {
           className="absolute top-16 left-0 right-0 bg-black bg-opacity-90 backdrop-blur-sm z-50 p-4 rounded-b-lg shadow-lg md:hidden"
         >
           <ul className="flex flex-col space-y-4">
-            <MobileTab onClick={() => scrollToSection("services-section")}>Servicios</MobileTab>
-            <MobileTab onClick={() => scrollToSection("drone-section")}>Nosotros</MobileTab>
-            <MobileTab onClick={() => scrollToSection("footer-section")}>Contacto</MobileTab>
+            <MobileTab to="/" onClick={() => setIsOpen(false)}>Inicio</MobileTab>
+            <MobileTab to="/servicios" onClick={() => setIsOpen(false)}>Servicios</MobileTab>
+            <MobileTab to="/about" onClick={() => setIsOpen(false)}>Nosotros</MobileTab>
+            <MobileTab to="/contacto" onClick={() => setIsOpen(false)}>Contacto</MobileTab>
             <MobileTab to="/admin" onClick={() => setIsOpen(false)} isAdmin={true}>Admin</MobileTab>
           </ul>
         </motion.div>
@@ -108,7 +104,6 @@ const NavHeader = () => {
 const Tab = ({
   children,
   setPosition,
-  onClick,
   to,
   isAdmin = false,
 }: {
@@ -118,8 +113,7 @@ const Tab = ({
     width: number;
     opacity: number;
   }>>;
-  onClick?: () => void;
-  to?: string;
+  to: string;
   isAdmin?: boolean;
 }) => {
   const ref = useRef<HTMLLIElement>(null);
@@ -137,24 +131,15 @@ const Tab = ({
         });
       }}
       className="relative z-10 block cursor-pointer"
-      onClick={onClick}
     >
-      {to ? (
-        <Link
-          to={to}
-          className={`block px-3 py-1.5 text-sm font-medium text-white mix-blend-difference transition-colors duration-200 ${
-            isAdmin ? "bg-transparent" : ""
-          }`}
-        >
-          {children}
-        </Link>
-      ) : (
-        <button
-          className="block px-3 py-1.5 text-sm font-medium text-white mix-blend-difference transition-colors duration-200"
-        >
-          {children}
-        </button>
-      )}
+      <Link
+        to={to}
+        className={`block px-3 py-1.5 text-sm font-medium text-white mix-blend-difference transition-colors duration-200 ${
+          isAdmin ? "bg-transparent" : ""
+        }`}
+      >
+        {children}
+      </Link>
     </li>
   );
 };
@@ -166,30 +151,21 @@ const MobileTab = ({
   isAdmin = false,
 }: {
   children: React.ReactNode;
-  to?: string;
+  to: string;
   onClick: () => void;
   isAdmin?: boolean;
 }) => {
   return (
     <li className="block">
-      {to ? (
-        <Link
-          to={to}
-          onClick={onClick}
-          className={`block px-4 py-2 text-base font-medium text-white hover:text-sky-400 transition-colors duration-200 ${
-            isAdmin ? "bg-sky-600 hover:bg-sky-700 rounded-md" : ""
-          }`}
-        >
-          {children}
-        </Link>
-      ) : (
-        <button
-          onClick={onClick}
-          className="w-full text-left px-4 py-2 text-base font-medium text-white hover:text-sky-400 transition-colors duration-200"
-        >
-          {children}
-        </button>
-      )}
+      <Link
+        to={to}
+        onClick={onClick}
+        className={`block px-4 py-2 text-base font-medium text-white hover:text-sky-400 transition-colors duration-200 ${
+          isAdmin ? "bg-sky-600 hover:bg-sky-700 rounded-md" : ""
+        }`}
+      >
+        {children}
+      </Link>
     </li>
   );
 };
