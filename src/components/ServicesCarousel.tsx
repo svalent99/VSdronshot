@@ -50,16 +50,13 @@ const ServicesCarousel = () => {
         opts={{
           align: "start",
           loop: true,
-          slides: {
-            perView: numSlides,
-            spacing: 16,
-          },
+          slidesToScroll: numSlides,
         }}
         className="w-full relative"
       >
         <CarouselContent>
           {serviceItems.map((item, index) => (
-            <CarouselItem key={index}>
+            <CarouselItem key={index} className={isDesktop ? "basis-1/3" : "basis-full"}>
               <Card className="h-56 md:h-64 bg-zinc-900 border border-zinc-800 hover:border-sky-600 transition-colors duration-300">
                 <CardHeader>
                   <CardTitle className="text-xl font-bold text-white">{item.title}</CardTitle>

@@ -1,4 +1,3 @@
-
 import React, {
   ComponentPropsWithRef,
   useCallback,
@@ -8,6 +7,7 @@ import React, {
 import { EmblaCarouselType } from "embla-carousel";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import { useCarousel } from "@/components/ui/carousel";
 
 type UseCarouselButtonsType = {
   prevBtnDisabled: boolean;
@@ -89,7 +89,6 @@ export const NextButton: React.FC<PropType> = (props) => {
   );
 };
 
-// Add the custom carousel navigation components
 export const CustomCarouselPrevious: React.FC<React.HTMLAttributes<HTMLButtonElement>> = ({ className, ...props }) => {
   const { scrollPrev, canScrollPrev } = useCarousel();
   
@@ -125,6 +124,3 @@ export const CustomCarouselNext: React.FC<React.HTMLAttributes<HTMLButtonElement
     </Button>
   );
 };
-
-// We need to import useCarousel from the carousel component
-import { useCarousel } from "@/components/ui/carousel";
