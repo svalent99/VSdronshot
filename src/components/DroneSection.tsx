@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 
 const DroneSection = () => {
   return (
-    <div className="w-full bg-zinc-900 py-24">
+    <div id="drone-section" className="w-full bg-zinc-900 py-24">
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
           <motion.div
