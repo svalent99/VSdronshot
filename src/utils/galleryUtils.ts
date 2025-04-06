@@ -45,3 +45,15 @@ export const loadGalleryImages = (): GalleryCard[] => {
   // Return empty array - no default images
   return [];
 };
+
+/**
+ * Saves gallery images to localStorage
+ */
+export const saveGalleryImages = (images: any[]): void => {
+  try {
+    localStorage.setItem('galleryImages', JSON.stringify(images));
+    console.log("Imágenes guardadas en localStorage:", images);
+  } catch (error) {
+    console.error("Error al guardar imágenes en localStorage:", error);
+  }
+};

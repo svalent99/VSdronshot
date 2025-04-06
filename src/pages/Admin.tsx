@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -173,18 +172,6 @@ const Admin = () => {
       const updatedImages = [...images, newGalleryImage];
       setImages(updatedImages);
       
-      // Guardar inmediatamente en localStorage - adicional para debug
-      try {
-        localStorage.setItem('galleryImages', JSON.stringify(updatedImages));
-        console.log('Guardando imágenes en localStorage después de añadir:', updatedImages);
-        
-        // Verificar que se guardó correctamente
-        const saved = localStorage.getItem('galleryImages');
-        console.log('Verificación de guardado:', saved ? JSON.parse(saved) : 'No hay datos');
-      } catch (error) {
-        console.error('Error al guardar imágenes en localStorage:', error);
-      }
-      
       // Eliminar de imágenes nuevas
       setNewImages(newImages.filter(img => img.id !== id));
       toast.success('Imagen añadida a la galería');
@@ -195,15 +182,6 @@ const Admin = () => {
   const handleDeleteImage = (id: number) => {
     const filteredImages = images.filter(img => img.id !== id);
     setImages(filteredImages);
-    
-    // Guardar inmediatamente en localStorage
-    try {
-      localStorage.setItem('galleryImages', JSON.stringify(filteredImages));
-      console.log('Guardando imágenes en localStorage después de eliminar:', filteredImages);
-    } catch (error) {
-      console.error('Error al guardar imágenes en localStorage:', error);
-    }
-    
     toast.success('Imagen eliminada de la galería');
   };
 

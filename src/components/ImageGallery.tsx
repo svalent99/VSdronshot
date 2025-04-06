@@ -7,8 +7,21 @@ const ImageGallery = () => {
   const [cards, setCards] = useState<GalleryCard[]>([]);
 
   useEffect(() => {
-    const galleryImages = loadGalleryImages();
-    setCards(galleryImages);
+    const loadImages = () => {
+      const galleryImages = loadGalleryImages();
+      setCards(galleryImages);
+    };
+    
+    // Load images initially
+    loadImages();
+    
+    // Add an event listener to reload images when storage changes
+    window.addEventListener('storage', loadImages);
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('storage', loadImages);
+    };
   }, []);
 
   return (
