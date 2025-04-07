@@ -41,12 +41,7 @@ const Footer = () => {
                 </li>
                 
                 <li className="flex space-x-4 mt-4">
-                  <a href="#" className="bg-zinc-700 p-2 rounded-full hover:bg-sky-600 transition-colors">
-                    <Instagram className="h-5 w-5" />
-                  </a>
-                  <a href="#" className="bg-zinc-700 p-2 rounded-full hover:bg-sky-600 transition-colors">
-                    <Facebook className="h-5 w-5" />
-                  </a>
+                  <a href="https://www.instagram.com/vsdronshot/" target="_blank" className="bg-zinc-700 p-2 rounded-full hover:bg-sky-600 transition-colors"><Instagram className="h-5 w-5" /></a>
                 </li>
               </ul>
             </div>
