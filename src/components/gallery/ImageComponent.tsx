@@ -13,7 +13,7 @@ const ImageComponent = ({ card }: ImageComponentProps) => {
       layoutId={`image-${card.id}-image`}
       src={card.thumbnail}
       alt={card.title}
-      className="object-cover object-top absolute inset-0 h-full w-full transition duration-200"
+      className="object-cover object-center absolute inset-0 h-full w-full transition duration-200"
     />
   );
 };

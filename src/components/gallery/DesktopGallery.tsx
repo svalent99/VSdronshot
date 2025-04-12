@@ -32,7 +32,7 @@ const DesktopGallery = ({
               card.className,
               "relative overflow-hidden rounded-lg cursor-pointer",
               selected?.id === card.id
-                ? "absolute inset-0 h-1/2 w-full md:w-1/2 m-auto z-50 flex justify-center items-center flex-wrap flex-col"
+                ? "absolute inset-0 h-full w-full md:w-3/4 m-auto z-50 flex justify-center items-center flex-wrap flex-col"
                 : lastSelected?.id === card.id
                 ? "z-40 bg-white h-full w-full"
                 : "bg-black h-full w-full"
@@ -69,7 +69,7 @@ const DesktopGallery = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.3 }}
             exit={{ opacity: 0 }}
-            className="absolute h-full w-full left-0 top-0 bg-black z-10"
+            className="fixed inset-0 h-full w-full left-0 top-0 bg-black z-10"
           />
         )}
       </AnimatePresence>

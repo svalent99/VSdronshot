@@ -15,6 +15,13 @@ const SelectedCard = ({ selected }: SelectedCardProps) => {
         animate={{ opacity: 0.6 }}
         className="absolute inset-0 h-full w-full bg-black opacity-60 z-10"
       />
+      <div className="absolute inset-0 flex items-center justify-center z-20 p-4">
+        <img 
+          src={selected?.thumbnail} 
+          alt={selected?.title} 
+          className="max-w-full max-h-[80vh] object-contain" 
+        />
+      </div>
       <motion.div
         layoutId={`content-${selected?.id}`}
         initial={{ opacity: 0, y: 100 }}

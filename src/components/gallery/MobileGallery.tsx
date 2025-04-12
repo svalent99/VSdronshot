@@ -68,7 +68,7 @@ const MobileGallery = ({ cards, selected, handleClick, handleOutsideClick }: Mob
                 <img 
                   src={selected.thumbnail} 
                   alt={selected.title} 
-                  className="w-full object-contain" 
+                  className="w-full h-auto max-h-[80vh] object-contain" 
                 />
                 <div className="absolute bottom-0 left-0 w-full bg-black bg-opacity-70 p-4">
                   <h3 className="text-xl font-bold text-white">{selected.title}</h3>
