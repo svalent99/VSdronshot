@@ -15,19 +15,16 @@ const ImageGallery = () => {
     // Load images initially
     loadImages();
     
-    // Add an event listener to reload images when storage changes
-    window.addEventListener('storage', loadImages);
-    
-    // Also listen for our custom event
+    // Add storage event listener to reload images when they change
     const handleStorageUpdate = () => {
       console.log("Storage event detected, reloading images");
       loadImages();
     };
+    
     window.addEventListener('storage', handleStorageUpdate);
     
     // Cleanup
     return () => {
-      window.removeEventListener('storage', loadImages);
       window.removeEventListener('storage', handleStorageUpdate);
     };
   }, []);

@@ -3,7 +3,7 @@ import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "../ui/carousel";
 import { GalleryCard } from "../../utils/galleryUtils";
-import { X } from "lucide-react"; // Import X icon for close button
+import { X } from "lucide-react";
 
 type MobileGalleryProps = {
   cards: GalleryCard[];
@@ -25,7 +25,7 @@ const MobileGallery = ({ cards, selected, handleClick, handleOutsideClick }: Mob
                     src={card.thumbnail} 
                     alt={card.title} 
                     className="object-cover w-full h-full" 
-                    onClick={() => handleClick(card)}
+                    // Remove onClick handler to disable click functionality
                   />
                   <div className="absolute bottom-0 left-0 w-full bg-black bg-opacity-70 p-2 text-left">
                     <h3 className="text-sm font-medium text-white">{card.title}</h3>
