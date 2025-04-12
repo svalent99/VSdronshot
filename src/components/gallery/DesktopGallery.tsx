@@ -5,7 +5,7 @@ import { cn } from "../../lib/utils";
 import { GalleryCard } from "../../utils/galleryUtils";
 import ImageComponent from "./ImageComponent";
 import SelectedCard from "./SelectedCard";
-import { X } from "lucide-react";
+import { X, ImageOff } from "lucide-react";
 
 type DesktopGalleryProps = {
   cards: GalleryCard[];
@@ -55,7 +55,27 @@ const DesktopGallery = ({
                 <SelectedCard selected={selected} />
               </>
             )}
-            <ImageComponent card={card} />
+            <div className="relative w-full h-full bg-zinc-900">
+              <img 
+                src={card.thumbnail} 
+                alt={card.title} 
+                className="object-cover object-center absolute inset-0 h-full w-full transition duration-200" 
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.onerror = null;
+                  target.style.display = 'none';
+                  const parent = target.parentElement;
+                  if (parent) {
+                    const fallback = document.createElement('div');
+                    fallback.className = 'flex items-center justify-center w-full h-full';
+                    const icon = document.createElement('div');
+                    icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400"><line x1="2" y1="2" x2="22" y2="22"></line><path d="M10.41 10.41a2 2 0 1 1-2.83-2.83"></path><line x1="13.5" y1="13.5" x2="6" y2="21"></line><path d="M18 12h.01"></path><path d="M18 21l-4.35-4.35"></path><path d="M9 3h.01"></path><path d="M9 6h.01"></path><path d="M15 3h.01"></path><path d="M15 6h.01"></path><path d="M9 9h.01"></path></svg>';
+                    fallback.appendChild(icon);
+                    parent.appendChild(fallback);
+                  }
+                }}
+              />
+            </div>
             <div className="absolute bottom-0 left-0 w-full bg-black bg-opacity-70 p-2 text-left">
               <h3 className="text-sm font-medium text-white">{card.title}</h3>
             </div>
