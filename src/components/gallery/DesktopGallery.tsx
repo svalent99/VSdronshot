@@ -5,6 +5,7 @@ import { cn } from "../../lib/utils";
 import { GalleryCard } from "../../utils/galleryUtils";
 import ImageComponent from "./ImageComponent";
 import SelectedCard from "./SelectedCard";
+import { X } from "lucide-react"; // Import X icon for close button
 
 type DesktopGalleryProps = {
   cards: GalleryCard[];
@@ -39,7 +40,21 @@ const DesktopGallery = ({
             layoutId={`card-${card.id}`}
             style={{ aspectRatio: "1/1" }}
           >
-            {selected?.id === card.id && <SelectedCard selected={selected} />}
+            {selected?.id === card.id && (
+              <>
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleOutsideClick();
+                  }}
+                  className="absolute top-2 right-2 z-[80] bg-white/20 hover:bg-white/40 rounded-full p-1.5 backdrop-blur-sm transition-colors"
+                  aria-label="Cerrar"
+                >
+                  <X className="w-5 h-5 text-white" />
+                </button>
+                <SelectedCard selected={selected} />
+              </>
+            )}
             <ImageComponent card={card} />
             <div className="absolute bottom-0 left-0 w-full bg-black bg-opacity-70 p-2 text-left">
               <h3 className="text-sm font-medium text-white">{card.title}</h3>

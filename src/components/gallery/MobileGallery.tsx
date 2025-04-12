@@ -3,6 +3,7 @@ import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "../ui/carousel";
 import { GalleryCard } from "../../utils/galleryUtils";
+import { X } from "lucide-react"; // Import X icon for close button
 
 type MobileGalleryProps = {
   cards: GalleryCard[];
@@ -57,10 +58,17 @@ const MobileGallery = ({ cards, selected, handleClick, handleOutsideClick }: Mob
               className="fixed inset-0 flex items-center justify-center z-50 p-4"
             >
               <div className="relative w-full max-w-lg rounded-lg overflow-hidden">
+                <button 
+                  onClick={handleOutsideClick}
+                  className="absolute top-2 right-2 z-[80] bg-white/20 hover:bg-white/40 rounded-full p-1.5 backdrop-blur-sm transition-colors"
+                  aria-label="Cerrar"
+                >
+                  <X className="w-5 h-5 text-white" />
+                </button>
                 <img 
                   src={selected.thumbnail} 
                   alt={selected.title} 
-                  className="w-full object-contain"
+                  className="w-full object-contain" 
                 />
                 <div className="absolute bottom-0 left-0 w-full bg-black bg-opacity-70 p-4">
                   <h3 className="text-xl font-bold text-white">{selected.title}</h3>

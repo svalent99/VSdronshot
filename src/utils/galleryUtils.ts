@@ -53,6 +53,9 @@ export const saveGalleryImages = (images: any[]): void => {
   try {
     localStorage.setItem('galleryImages', JSON.stringify(images));
     console.log("Imágenes guardadas en localStorage:", images);
+    
+    // Dispatch a storage event to notify other tabs/components about the change
+    window.dispatchEvent(new Event('storage'));
   } catch (error) {
     console.error("Error al guardar imágenes en localStorage:", error);
   }
