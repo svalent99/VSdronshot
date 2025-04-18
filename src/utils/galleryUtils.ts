@@ -5,13 +5,15 @@ export interface GalleryCard {
   id: string;
   title: string;
   thumbnail: string;
+  className?: string; // Added className as optional property
 }
 
 export const mapDronShotsToGalleryCards = (dronShots: DronShot[]): GalleryCard[] => {
   return dronShots.map(shot => ({
     id: shot.id,
     title: shot.titulo,
-    thumbnail: shot.archivo_url
+    thumbnail: shot.archivo_url,
+    className: "col-span-1 row-span-1" // Add default className
   }));
 };
 
