@@ -5,7 +5,7 @@ import { cn } from "../../lib/utils";
 import { GalleryCard } from "../../utils/galleryUtils";
 import ImageComponent from "./ImageComponent";
 import SelectedCard from "./SelectedCard";
-import { X } from "lucide-react"; // Import X icon for close button
+import { X } from "lucide-react";
 
 type DesktopGalleryProps = {
   cards: GalleryCard[];
@@ -27,10 +27,10 @@ const DesktopGallery = ({
       {cards.map((card, i) => (
         <div key={i} className={cn(card.className, "")}>
           <motion.div
-            onClick={() => handleClick(card)}
+            // Remove onClick handler to disable click functionality
             className={cn(
               card.className,
-              "relative overflow-hidden rounded-lg cursor-pointer",
+              "relative overflow-hidden rounded-lg",
               selected?.id === card.id
                 ? "absolute inset-0 h-full w-full md:w-3/4 m-auto z-50 flex justify-center items-center flex-wrap flex-col"
                 : lastSelected?.id === card.id
