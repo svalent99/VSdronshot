@@ -25,11 +25,11 @@ const DesktopGallery = ({
   return (
     <div className="w-full h-full p-4 md:p-10 grid grid-cols-1 md:grid-cols-3 max-w-7xl mx-auto gap-4 relative">
       {cards.map((card, i) => (
-        <div key={i} className={cn(card.className || "col-span-1 row-span-1", "")}>
+        <div key={i} className={cn(card.className, "")}>
           <motion.div
             // Remove onClick handler to disable click functionality
             className={cn(
-              card.className || "col-span-1 row-span-1",
+              card.className,
               "relative overflow-hidden rounded-lg",
               selected?.id === card.id
                 ? "absolute inset-0 h-full w-full md:w-3/4 m-auto z-50 flex justify-center items-center flex-wrap flex-col"
