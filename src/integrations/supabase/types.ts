@@ -9,7 +9,54 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      dron_shots: {
+        Row: {
+          archivo_url: string
+          created_at: string
+          descripcion: string | null
+          id: string
+          titulo: string
+        }
+        Insert: {
+          archivo_url: string
+          created_at?: string
+          descripcion?: string | null
+          id?: string
+          titulo: string
+        }
+        Update: {
+          archivo_url?: string
+          created_at?: string
+          descripcion?: string | null
+          id?: string
+          titulo?: string
+        }
+        Relationships: []
+      }
+      reviews: {
+        Row: {
+          contenido: string
+          created_at: string
+          id: string
+          nombre_cliente: string
+          puntaje: number
+        }
+        Insert: {
+          contenido: string
+          created_at?: string
+          id?: string
+          nombre_cliente: string
+          puntaje: number
+        }
+        Update: {
+          contenido?: string
+          created_at?: string
+          id?: string
+          nombre_cliente?: string
+          puntaje?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
