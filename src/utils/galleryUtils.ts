@@ -5,6 +5,7 @@ export interface GalleryCard {
   id: string;
   title: string;
   thumbnail: string;
+  className?: string; // Añadimos la propiedad className como opcional
 }
 
 export const mapDronShotsToGalleryCards = (dronShots: DronShot[]): GalleryCard[] => {
