@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useMediaQuery } from "../../hooks/use-media-query";
 import { GalleryCard } from "../../utils/galleryUtils";
@@ -10,15 +11,13 @@ type LayoutGridProps = {
 };
 
 export const LayoutGrid = ({ cards }: LayoutGridProps) => {
-  // We'll keep the state variables for compatibility, but won't use them
   const [selected, setSelected] = useState<GalleryCard | null>(null);
   const [lastSelected, setLastSelected] = useState<GalleryCard | null>(null);
   const isMobile = useMediaQuery("(max-width: 768px)");
 
-  // This function is now empty since we want to disable clicking behavior
   const handleClick = (card: GalleryCard) => {
-    // No longer setting the selected card
-    return;
+    setLastSelected(selected);
+    setSelected(card);
   };
 
   const handleOutsideClick = () => {
