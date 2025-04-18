@@ -8,20 +8,25 @@ export interface Review {
   contenido: string;
   puntaje: number;
   created_at: string;
-  aprobado: boolean; // Added the missing property
+  aprobado: boolean;
 }
 
 export const useReviews = () => {
-  return useQuery({
+  return useQuery<Review[]>({
     queryKey: ['reviews'],
-    queryFn: async (): Promise<Review[]> => {
+    queryFn: async () => {
       const { data, error } = await supabase
         .from('reviews')
         .select('*')
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return data || [];
+      
+      // Ensure each review has the aprobado property
+      return (data || []).map(review => ({
+        ...review,
+        aprobado: review.aprobado ?? false
+      }));
     }
   });
 };

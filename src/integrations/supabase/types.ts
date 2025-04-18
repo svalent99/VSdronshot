@@ -35,6 +35,7 @@ export type Database = {
       }
       reviews: {
         Row: {
+          aprobado: boolean
           contenido: string
           created_at: string
           id: string
@@ -42,6 +43,7 @@ export type Database = {
           puntaje: number
         }
         Insert: {
+          aprobado?: boolean
           contenido: string
           created_at?: string
           id?: string
@@ -49,6 +51,7 @@ export type Database = {
           puntaje: number
         }
         Update: {
+          aprobado?: boolean
           contenido?: string
           created_at?: string
           id?: string
