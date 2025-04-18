@@ -8,6 +8,7 @@ export interface Review {
   contenido: string;
   puntaje: number;
   created_at: string;
+  aprobado: boolean; // Added the missing property
 }
 
 export const useReviews = () => {

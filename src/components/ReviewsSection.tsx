@@ -1,9 +1,10 @@
+
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useReviews } from "../hooks/useReviews";
 
 interface ReviewsSectionProps {
-  isAdmin?: boolean; // Agregamos la propiedad isAdmin como opcional
+  isAdmin?: boolean;
 }
 
 const ReviewsSection: React.FC<ReviewsSectionProps> = ({ isAdmin = false }) => {
@@ -12,7 +13,7 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({ isAdmin = false }) => {
 
   useEffect(() => {
     if (reviews) {
-      // Filtrar las reseñas aprobadas
+      // Filter approved reviews using the new aprobado property
       const approved = reviews.filter(review => review.aprobado === true);
       setApprovedReviews(approved);
     }
