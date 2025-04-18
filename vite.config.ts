@@ -7,11 +7,11 @@ import { componentTagger } from "lovable-tagger";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
-    host: true, // Esto habilitará todos los hosts
+    host: true,
     port: 8080,
     strictPort: true,
     hmr: {
-      clientPort: 443 // Esto es importante para HTTPS
+      clientPort: 443
     }
   },
   plugins: [
