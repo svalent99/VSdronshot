@@ -14,7 +14,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { StarIcon } from "lucide-react";
+import { StarIcon, CheckCircle } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface FormValues {
   nombre: string;
@@ -26,6 +27,7 @@ export const ReviewForm: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   
   const form = useForm<FormValues>({
     defaultValues: {
@@ -58,6 +60,7 @@ export const ReviewForm: React.FC = () => {
       toast.success("¡Gracias por tu reseña! Será revisada y publicada pronto.");
       form.reset();
       setRating(0);
+      setIsSubmitted(true);
     } catch (error) {
       console.error("Error al enviar la reseña:", error);
       toast.error("Hubo un error al enviar tu reseña. Por favor intenta nuevamente.");
@@ -72,7 +75,7 @@ export const ReviewForm: React.FC = () => {
 
   const renderRatingStars = () => {
     return (
-      <div className="flex items-center space-x-1">
+      <div className="flex items-center space-x-1 justify-center">
         {[1, 2, 3, 4, 5].map((value) => (
           <button
             key={value}
@@ -97,20 +100,42 @@ export const ReviewForm: React.FC = () => {
     );
   };
 
+  if (isSubmitted) {
+    return (
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="text-center py-8 flex flex-col items-center"
+      >
+        <CheckCircle className="text-green-500 h-16 w-16 mb-4" />
+        <h3 className="text-xl font-semibold mb-2">¡Gracias por tu reseña!</h3>
+        <p className="text-gray-400">
+          Tu opinión ha sido recibida y será revisada por nuestro equipo antes de ser publicada.
+        </p>
+        <button 
+          onClick={() => setIsSubmitted(false)} 
+          className="mt-6 text-sky-400 hover:text-sky-300 text-sm underline"
+        >
+          Escribir otra reseña
+        </button>
+      </motion.div>
+    );
+  }
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-w-md mx-auto">
         <FormField
           control={form.control}
           name="nombre"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nombre Completo</FormLabel>
+              <FormLabel className="text-sm">Tu Nombre</FormLabel>
               <FormControl>
                 <Input 
                   placeholder="Ingresa tu nombre" 
                   {...field} 
-                  className="bg-zinc-700 border-zinc-600"
+                  className="bg-zinc-700/50 border-zinc-600 focus:border-sky-500 text-sm"
                 />
               </FormControl>
               <FormMessage />
@@ -119,7 +144,7 @@ export const ReviewForm: React.FC = () => {
         />
         
         <div className="space-y-2">
-          <FormLabel>Calificación</FormLabel>
+          <FormLabel className="text-sm block text-center">¿Cómo calificarías nuestro servicio?</FormLabel>
           <div>{renderRatingStars()}</div>
         </div>
         
@@ -128,13 +153,13 @@ export const ReviewForm: React.FC = () => {
           name="contenido"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Tu Reseña</FormLabel>
+              <FormLabel className="text-sm">Tu Experiencia</FormLabel>
               <FormControl>
                 <Textarea 
                   placeholder="Cuéntanos tu experiencia con nuestros servicios" 
                   {...field} 
-                  rows={4}
-                  className="bg-zinc-700 border-zinc-600 resize-none"
+                  rows={3}
+                  className="bg-zinc-700/50 border-zinc-600 focus:border-sky-500 resize-none text-sm"
                 />
               </FormControl>
               <FormMessage />
@@ -144,7 +169,7 @@ export const ReviewForm: React.FC = () => {
         
         <Button 
           type="submit" 
-          className="w-full bg-sky-600 hover:bg-sky-700"
+          className="w-full bg-sky-600 hover:bg-sky-700 text-sm"
           disabled={isSubmitting}
         >
           {isSubmitting ? "Enviando..." : "Enviar Reseña"}

@@ -91,9 +91,9 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({ isAdmin = false }) => {
       </div>
       
       <div className="mt-12 mb-6">
-        <div className="bg-zinc-800/50 rounded-lg p-6 border border-zinc-700">
-          <h3 className="text-xl font-semibold mb-4 text-center">¿Has usado nuestros servicios? ¡Déjanos tu reseña!</h3>
-          <p className="text-gray-400 mb-6 text-center">Tu opinión es muy importante para nosotros y para futuros clientes.</p>
+        <div className="bg-zinc-800/50 rounded-lg p-6 border border-zinc-700 max-w-md mx-auto">
+          <h3 className="text-xl font-semibold mb-3 text-center">¿Has usado nuestros servicios?</h3>
+          <p className="text-gray-400 mb-4 text-center text-sm">Tu opinión es muy importante para nosotros y para futuros clientes.</p>
           <ReviewForm />
         </div>
       </div>
