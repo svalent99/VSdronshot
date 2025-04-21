@@ -15,12 +15,19 @@ export const useReviews = () => {
   return useQuery<Review[]>({
     queryKey: ['reviews'],
     queryFn: async () => {
+      console.log("Fetching reviews...");
       const { data, error } = await supabase
         .from('reviews')
         .select('*')
         .order('created_at', { ascending: false });
       
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching reviews:", error);
+        throw error;
+      }
+      
+      // Log the raw data from Supabase
+      console.log("Raw reviews data:", data);
       
       // Ensure each review has the aprobado property
       return (data || []).map(review => ({
@@ -36,16 +43,22 @@ export const useApproveReview = () => {
   
   return useMutation({
     mutationFn: async ({ id, approve }: { id: string, approve: boolean }) => {
-      const { error } = await supabase
+      console.log(`Attempting to ${approve ? 'approve' : 'reject'} review ${id}`);
+      const { data, error } = await supabase
         .from('reviews')
         .update({ aprobado: approve })
         .eq('id', id);
       
-      if (error) throw error;
+      if (error) {
+        console.error("Error updating review:", error);
+        throw error;
+      }
       
+      console.log("Update result:", data);
       return { id, approve };
     },
     onSuccess: () => {
+      console.log("Invalidating reviews query cache");
       queryClient.invalidateQueries({ queryKey: ['reviews'] });
     }
   });

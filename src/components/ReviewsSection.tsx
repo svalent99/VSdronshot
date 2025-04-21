@@ -15,8 +15,9 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({ isAdmin = false }) => {
 
   useEffect(() => {
     if (reviews) {
-      // Filter approved reviews using the new aprobado property
+      // Filter approved reviews using the aprobado property
       const approved = reviews.filter(review => review.aprobado === true);
+      console.log("Approved reviews:", approved); // Debug log
       setApprovedReviews(approved);
     }
   }, [reviews]);

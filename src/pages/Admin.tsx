@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import ReviewsSection from "@/components/ReviewsSection";
 import { useReviews, useApproveReview, useDeleteReview, Review } from "@/hooks/useReviews";
 import { Check, X, MessageSquare, CheckCheck, Inbox } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Table,
   TableBody,
@@ -59,6 +60,7 @@ const Admin = () => {
   const { data: allReviews, isLoading: reviewsLoading } = useReviews();
   const { mutate: approveReview } = useApproveReview();
   const { mutate: deleteReview } = useDeleteReview();
+  const queryClient = useQueryClient();
   
   const pendingReviews = allReviews?.filter(review => !review.aprobado) || [];
   const approvedReviews = allReviews?.filter(review => review.aprobado) || [];
@@ -88,15 +90,21 @@ const Admin = () => {
 
   // Función para aprobar o rechazar una reseña
   const handleReviewAction = (id: string, approve: boolean) => {
+    console.log(`Processing review ${id}, approve=${approve}`);
     approveReview({ id, approve }, {
       onSuccess: () => {
         if (approve) {
           toast.success('Reseña aprobada y publicada');
+          // Force refresh to update the UI
+          setTimeout(() => {
+            queryClient.invalidateQueries({ queryKey: ['reviews'] });
+          }, 500);
         } else {
           toast.error('Reseña rechazada');
         }
       },
-      onError: () => {
+      onError: (error) => {
+        console.error("Error processing review:", error);
         toast.error('Hubo un error al procesar la reseña');
       }
     });
