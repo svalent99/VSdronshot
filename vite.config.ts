@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => ({
     hmr: {
       clientPort: 443,
       webSocketClient: {
-        random: () => '__WS_TOKEN__ || Math.random()'
+        random: () => Math.random()
       }
     }
   },
