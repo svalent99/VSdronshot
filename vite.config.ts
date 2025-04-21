@@ -11,7 +11,10 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
     strictPort: true,
     hmr: {
-      clientPort: 443
+      clientPort: 443,
+      webSocketClient: {
+        random: () => '__WS_TOKEN__ || Math.random()'
+      }
     }
   },
   plugins: [
