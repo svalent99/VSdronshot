@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useReviews } from "../hooks/useReviews";
+import { ReviewForm } from "./ReviewForm";
+import { Star, StarHalf } from "lucide-react";
 
 interface ReviewsSectionProps {
   isAdmin?: boolean;
@@ -19,6 +21,23 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({ isAdmin = false }) => {
     }
   }, [reviews]);
 
+  // Función para renderizar estrellas basado en puntaje
+  const renderStars = (puntaje: number) => {
+    const stars = [];
+    const fullStars = Math.floor(puntaje);
+    const hasHalfStar = puntaje % 1 >= 0.5;
+    
+    for (let i = 0; i < fullStars; i++) {
+      stars.push(<Star key={`star-${i}`} className="text-yellow-500 fill-yellow-500" size={16} />);
+    }
+    
+    if (hasHalfStar) {
+      stars.push(<StarHalf key="half-star" className="text-yellow-500 fill-yellow-500" size={16} />);
+    }
+    
+    return <div className="flex space-x-1">{stars}</div>;
+  };
+
   if (isLoading) {
     return <p>Cargando reseñas...</p>;
   }
@@ -28,44 +47,56 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({ isAdmin = false }) => {
   }
 
   return (
-    <div className="space-y-6">
-      {approvedReviews.length === 0 ? (
-        <div className="text-center py-12 bg-zinc-800/50 rounded-lg">
-          <p className="text-gray-400">No hay reseñas aprobadas para mostrar.</p>
-        </div>
-      ) : (
-        approvedReviews.map((review) => (
-          <motion.div
-            key={review.id}
-            className="bg-zinc-800 rounded-lg p-6 border border-zinc-700"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div className="flex items-start justify-between">
-              <div className="flex items-start">
-                <img src={review.img} alt={review.name} className="w-12 h-12 rounded-full mr-4" />
+    <div className="max-w-4xl mx-auto">
+      <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">Reseñas de Clientes</h2>
+      
+      <div className="space-y-6">
+        {approvedReviews.length === 0 ? (
+          <div className="text-center py-12 bg-zinc-800/50 rounded-lg">
+            <p className="text-gray-400">No hay reseñas aprobadas para mostrar.</p>
+          </div>
+        ) : (
+          approvedReviews.map((review) => (
+            <motion.div
+              key={review.id}
+              className="bg-zinc-800 rounded-lg p-6 border border-zinc-700"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="font-bold">{review.name}</h3>
-                  <p className="text-gray-400 text-sm">{review.username}</p>
+                  <div className="flex items-center space-x-2">
+                    <h3 className="font-bold text-lg">{review.nombre_cliente}</h3>
+                    {renderStars(review.puntaje)}
+                  </div>
+                  <p className="text-gray-400 text-sm">{new Date(review.created_at).toLocaleDateString()}</p>
                 </div>
+                {isAdmin && (
+                  <div className="flex space-x-2">
+                    <button
+                      className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-sm"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                )}
               </div>
-              {isAdmin && (
-                <div className="flex space-x-2">
-                  <button
-                    className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-sm"
-                  >
-                    Eliminar
-                  </button>
-                </div>
-              )}
-            </div>
-            <div className="mt-3 max-w-full overflow-hidden">
-              <p className="break-words whitespace-pre-wrap">{review.body}</p>
-            </div>
-          </motion.div>
-        ))
-      )}
+              <div className="mt-3 max-w-full overflow-hidden">
+                <p className="break-words whitespace-pre-wrap">{review.contenido}</p>
+              </div>
+            </motion.div>
+          ))
+        )}
+      </div>
+      
+      <div className="mt-12 mb-6">
+        <div className="bg-zinc-800/50 rounded-lg p-6 border border-zinc-700">
+          <h3 className="text-xl font-semibold mb-4 text-center">¿Has usado nuestros servicios? ¡Déjanos tu reseña!</h3>
+          <p className="text-gray-400 mb-6 text-center">Tu opinión es muy importante para nosotros y para futuros clientes.</p>
+          <ReviewForm />
+        </div>
+      </div>
     </div>
   );
 };

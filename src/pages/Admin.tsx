@@ -1,40 +1,20 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
 import ReviewsSection from "@/components/ReviewsSection";
-
-// Datos de prueba para reseñas pendientes
-const pendingReviews = [
-  {
-    id: 101,
-    name: "Roberto González",
-    username: "@robertogonzalez",
-    body: "Excelente servicio, las imágenes capturadas con el dron han ayudado mucho a promocionar mi propiedad.",
-    img: "https://i.pravatar.cc/150?img=10",
-    rating: 5,
-    pending: true
-  },
-  {
-    id: 102,
-    name: "Mariana López",
-    username: "@marianalopez",
-    body: "Impresionante la calidad de las tomas aéreas. Definitivamente recomendaré sus servicios.",
-    img: "https://i.pravatar.cc/150?img=11",
-    rating: 4,
-    pending: true
-  },
-  {
-    id: 103,
-    name: "Eduardo Ramírez",
-    username: "@eduardoramirez",
-    body: "Muy profesionales y puntuales. Las fotografías son de gran calidad.",
-    img: "https://i.pravatar.cc/150?img=12",
-    rating: 5,
-    pending: true
-  }
-];
+import { useReviews, useApproveReview, useDeleteReview, Review } from "@/hooks/useReviews";
+import { Check, X, MessageSquare, CheckCheck, Inbox } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 // Datos de prueba para imágenes de la galería
 const galleryImages = [
@@ -71,22 +51,19 @@ const Admin = () => {
   const [password, setPassword] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState('reviews');
-  const [reviews, setReviews] = useState(() => getStoredData('pendingReviews', pendingReviews));
   const [images, setImages] = useState(() => getStoredData('galleryImages', galleryImages));
   const [newImages, setNewImages] = useState([]);
   const [uploading, setUploading] = useState(false);
   const navigate = useNavigate();
+  
+  const { data: allReviews, isLoading: reviewsLoading } = useReviews();
+  const { mutate: approveReview } = useApproveReview();
+  const { mutate: deleteReview } = useDeleteReview();
+  
+  const pendingReviews = allReviews?.filter(review => !review.aprobado) || [];
+  const approvedReviews = allReviews?.filter(review => review.aprobado) || [];
 
   // Guardar datos en localStorage cuando cambian
-  useEffect(() => {
-    try {
-      localStorage.setItem('pendingReviews', JSON.stringify(reviews));
-      console.log('Guardadas reseñas pendientes:', reviews.length);
-    } catch (error) {
-      console.error('Error al guardar reseñas pendientes:', error);
-    }
-  }, [reviews]);
-
   useEffect(() => {
     try {
       localStorage.setItem('galleryImages', JSON.stringify(images));
@@ -110,32 +87,31 @@ const Admin = () => {
   };
 
   // Función para aprobar o rechazar una reseña
-  const handleReviewAction = (id: number, approve: boolean) => {
-    if (approve) {
-      // Buscar la reseña en la lista de pendientes
-      const reviewToApprove = reviews.find(review => review.id === id);
-      if (reviewToApprove) {
-        // Obtener las reseñas aprobadas actuales
-        const currentApprovedReviews = getStoredData('approvedReviews', []);
-        
-        // Agregar a la lista de aprobadas
-        const updatedApprovedReviews = [...currentApprovedReviews, reviewToApprove];
-        
-        // Guardar inmediatamente en localStorage para asegurar persistencia
-        localStorage.setItem('approvedReviews', JSON.stringify(updatedApprovedReviews));
-        
-        toast.success('Reseña aprobada y publicada');
+  const handleReviewAction = (id: string, approve: boolean) => {
+    approveReview({ id, approve }, {
+      onSuccess: () => {
+        if (approve) {
+          toast.success('Reseña aprobada y publicada');
+        } else {
+          toast.error('Reseña rechazada');
+        }
+      },
+      onError: () => {
+        toast.error('Hubo un error al procesar la reseña');
       }
-    } else {
-      toast.error('Reseña rechazada');
-    }
-    
-    // Eliminar la reseña de la lista de pendientes
-    const filteredReviews = reviews.filter(review => review.id !== id);
-    setReviews(filteredReviews);
-    
-    // Guardar inmediatamente en localStorage
-    localStorage.setItem('pendingReviews', JSON.stringify(filteredReviews));
+    });
+  };
+  
+  // Función para eliminar una reseña
+  const handleDeleteReview = (id: string) => {
+    deleteReview(id, {
+      onSuccess: () => {
+        toast.success('Reseña eliminada correctamente');
+      },
+      onError: () => {
+        toast.error('Error al eliminar la reseña');
+      }
+    });
   };
 
   // Función para subir una nueva imagen
@@ -189,6 +165,15 @@ const Admin = () => {
   const handleDeleteNewImage = (id: number) => {
     setNewImages(newImages.filter(img => img.id !== id));
     toast.success('Imagen eliminada');
+  };
+  
+  // Función para renderizar estrellas basado en puntaje
+  const renderStars = (puntaje: number) => {
+    const stars = [];
+    for (let i = 0; i < puntaje; i++) {
+      stars.push(<span key={i} className="text-yellow-500">★</span>);
+    }
+    return stars;
   };
 
   return (
@@ -261,7 +246,10 @@ const Admin = () => {
                       : 'border-transparent text-gray-400 hover:text-gray-200'
                   }`}
                 >
-                  Reseñas Pendientes ({reviews.length})
+                  <div className="flex items-center gap-2">
+                    <Inbox size={16} />
+                    Reseñas Pendientes ({pendingReviews.length})
+                  </div>
                 </button>
                 <button
                   onClick={() => setActiveTab('approved')}
@@ -271,7 +259,10 @@ const Admin = () => {
                       : 'border-transparent text-gray-400 hover:text-gray-200'
                   }`}
                 >
-                  Reseñas Aprobadas
+                  <div className="flex items-center gap-2">
+                    <CheckCheck size={16} />
+                    Reseñas Aprobadas ({approvedReviews.length})
+                  </div>
                 </button>
                 <button
                   onClick={() => setActiveTab('gallery')}
@@ -289,39 +280,41 @@ const Admin = () => {
             {activeTab === 'reviews' && (
               <div>
                 <h2 className="text-xl font-bold mb-6">Reseñas Pendientes de Aprobación</h2>
-                {reviews.length === 0 ? (
+                {reviewsLoading ? (
+                  <div className="text-center py-8">Cargando reseñas...</div>
+                ) : pendingReviews.length === 0 ? (
                   <div className="text-center py-12 bg-zinc-800/50 rounded-lg">
                     <p className="text-gray-400">No hay reseñas pendientes de aprobación.</p>
                   </div>
                 ) : (
                   <div className="space-y-6">
-                    {reviews.map((review) => (
+                    {pendingReviews.map((review) => (
                       <div key={review.id} className="bg-zinc-800 rounded-lg p-6 border border-zinc-700">
                         <div className="flex items-start justify-between">
-                          <div className="flex items-start">
-                            <img src={review.img} alt={review.name} className="w-12 h-12 rounded-full mr-4" />
-                            <div>
-                              <h3 className="font-bold">{review.name}</h3>
-                              <p className="text-gray-400 text-sm">{review.username}</p>
+                          <div>
+                            <div className="flex items-center space-x-2">
+                              <h3 className="font-bold">{review.nombre_cliente}</h3>
+                              <div className="flex">{renderStars(review.puntaje)}</div>
                             </div>
+                            <p className="text-gray-400 text-sm">{new Date(review.created_at).toLocaleDateString()}</p>
                           </div>
                           <div className="flex space-x-2">
                             <button
                               onClick={() => handleReviewAction(review.id, true)}
-                              className="px-3 py-1 bg-green-600 hover:bg-green-700 rounded text-sm"
+                              className="px-3 py-1 bg-green-600 hover:bg-green-700 rounded text-sm flex items-center gap-1"
                             >
-                              Aprobar
+                              <Check size={14} /> Aprobar
                             </button>
                             <button
                               onClick={() => handleReviewAction(review.id, false)}
-                              className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-sm"
+                              className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-sm flex items-center gap-1"
                             >
-                              Rechazar
+                              <X size={14} /> Rechazar
                             </button>
                           </div>
                         </div>
                         <div className="mt-3 max-w-full overflow-hidden">
-                          <p className="break-words whitespace-pre-wrap">{review.body}</p>
+                          <p className="break-words whitespace-pre-wrap">{review.contenido}</p>
                         </div>
                       </div>
                     ))}
@@ -333,7 +326,47 @@ const Admin = () => {
             {activeTab === 'approved' && (
               <div>
                 <h2 className="text-xl font-bold mb-6">Reseñas Aprobadas</h2>
-                <ReviewsSection isAdmin={true} />
+                {reviewsLoading ? (
+                  <div className="text-center py-8">Cargando reseñas...</div>
+                ) : approvedReviews.length === 0 ? (
+                  <div className="text-center py-12 bg-zinc-800/50 rounded-lg">
+                    <p className="text-gray-400">No hay reseñas aprobadas para mostrar.</p>
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Nombre</TableHead>
+                        <TableHead>Calificación</TableHead>
+                        <TableHead>Fecha</TableHead>
+                        <TableHead>Contenido</TableHead>
+                        <TableHead className="text-right">Acciones</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {approvedReviews.map((review) => (
+                        <TableRow key={review.id}>
+                          <TableCell className="font-medium">{review.nombre_cliente}</TableCell>
+                          <TableCell>
+                            <div className="flex">{renderStars(review.puntaje)}</div>
+                          </TableCell>
+                          <TableCell>{new Date(review.created_at).toLocaleDateString()}</TableCell>
+                          <TableCell>
+                            <div className="max-w-md truncate">{review.contenido}</div>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <button
+                              onClick={() => handleDeleteReview(review.id)}
+                              className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-sm"
+                            >
+                              Eliminar
+                            </button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
               </div>
             )}
             

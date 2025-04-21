@@ -1,5 +1,5 @@
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export interface Review {
@@ -27,6 +27,46 @@ export const useReviews = () => {
         ...review,
         aprobado: review.aprobado ?? false
       }));
+    }
+  });
+};
+
+export const useApproveReview = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ id, approve }: { id: string, approve: boolean }) => {
+      const { error } = await supabase
+        .from('reviews')
+        .update({ aprobado: approve })
+        .eq('id', id);
+      
+      if (error) throw error;
+      
+      return { id, approve };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['reviews'] });
+    }
+  });
+};
+
+export const useDeleteReview = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('reviews')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+      
+      return id;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['reviews'] });
     }
   });
 };
