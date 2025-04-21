@@ -10,6 +10,9 @@ export default defineConfig(({ mode }) => ({
     host: true,
     port: 8080,
     strictPort: true,
+    allowedHosts: [
+      "fdbb6de6-4f47-4c37-b791-d78665502467.lovableproject.com"
+    ],
     hmr: {
       clientPort: 443,
       webSocketClient: {
