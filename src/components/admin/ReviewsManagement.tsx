@@ -24,8 +24,8 @@ const renderStars = (puntaje: number) => {
 
 export const ReviewsManagement: React.FC<{ showPending?: boolean }> = ({ showPending = true }) => {
   const { data: allReviews, isLoading: reviewsLoading, error, refetch } = useReviews();
-  const { mutate: approveReview, isLoading: isApproving } = useApproveReview();
-  const { mutate: deleteReview, isLoading: isDeleting } = useDeleteReview();
+  const { mutate: approveReview, isPending: isApproving } = useApproveReview();
+  const { mutate: deleteReview, isPending: isDeleting } = useDeleteReview();
   const queryClient = useQueryClient();
   
   // Filtrar reseñas basado en el estado de aprobación
@@ -125,7 +125,7 @@ export const ReviewsManagement: React.FC<{ showPending?: boolean }> = ({ showPen
                 {showPending ? (
                   <div className="flex justify-end space-x-2">
                     <Button
-                      variant="success"
+                      variant="default"
                       onClick={() => handleReviewAction(review.id, true)}
                       disabled={isApproving}
                       className="px-3 py-1 bg-green-600 hover:bg-green-700 rounded text-sm flex items-center gap-1"
