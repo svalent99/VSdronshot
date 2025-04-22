@@ -30,12 +30,13 @@ export const useReviews = ({ approvedOnly = true }: { approvedOnly?: boolean } =
 
       if (error) {
         console.error("Error fetching reviews:", error);
+        // Muestra un toast visual si falla la consulta
+        toast.error('No se pudieron cargar las reseñas. Por favor, revisá la conexión o intentá más tarde.');
         throw error;
       }
 
       console.log("Raw reviews data:", data);
 
-      // Aseguramos que cada review tenga el campo aprobado
       return (data || []).map(review => ({
         ...review,
         aprobado: review.aprobado ?? false
@@ -103,3 +104,4 @@ export const useDeleteReview = () => {
     }
   });
 };
+

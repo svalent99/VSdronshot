@@ -122,3 +122,4 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({ isAdmin = false }) => {
 };
 
 export default ReviewsSection;
+

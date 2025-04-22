@@ -1,6 +1,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export interface DronShot {
   id: string;
@@ -22,6 +23,7 @@ export const useDronShots = () => {
       
       if (error) {
         console.error("Error fetching dron shots:", error);
+        toast.error("No se pudieron cargar las imágenes de la galería.");
         throw error;
       }
       
@@ -30,3 +32,4 @@ export const useDronShots = () => {
     }
   });
 };
+
