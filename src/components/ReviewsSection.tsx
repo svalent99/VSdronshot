@@ -4,23 +4,35 @@ import { motion } from "framer-motion";
 import { useReviews } from "../hooks/useReviews";
 import { ReviewForm } from "./ReviewForm";
 import { Star, StarHalf } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface ReviewsSectionProps {
   isAdmin?: boolean;
 }
 
 const ReviewsSection: React.FC<ReviewsSectionProps> = ({ isAdmin = false }) => {
-  const { data: reviews, isLoading, error } = useReviews();
+  const { data: reviews, isLoading, error, refetch } = useReviews();
   const [approvedReviews, setApprovedReviews] = useState<any[]>([]);
 
+  // Cargar y filtrar reseñas aprobadas cuando cambian los datos
   useEffect(() => {
     if (reviews) {
-      // Filter approved reviews using the aprobado property
       const approved = reviews.filter(review => review.aprobado === true);
-      console.log("Approved reviews:", approved); // Debug log
+      console.log("Approved reviews:", approved);
       setApprovedReviews(approved);
     }
   }, [reviews]);
+
+  // Cargar reseñas al montar el componente
+  useEffect(() => {
+    refetch();
+    // Configurar recarga periódica de reseñas (cada 30 segundos)
+    const interval = setInterval(() => {
+      refetch();
+    }, 30000);
+    
+    return () => clearInterval(interval);
+  }, [refetch]);
 
   // Función para renderizar estrellas basado en puntaje
   const renderStars = (puntaje: number) => {
@@ -40,11 +52,27 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({ isAdmin = false }) => {
   };
 
   if (isLoading) {
-    return <p>Cargando reseñas...</p>;
+    return (
+      <div className="text-center py-8">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white mx-auto"></div>
+        <p className="mt-4">Cargando reseñas...</p>
+      </div>
+    );
   }
 
   if (error) {
-    return <p>Error al cargar las reseñas.</p>;
+    return (
+      <div className="text-center py-8">
+        <p className="text-red-500">Error al cargar las reseñas.</p>
+        <Button 
+          variant="outline" 
+          className="mt-4"
+          onClick={() => refetch()}
+        >
+          Reintentar
+        </Button>
+      </div>
+    );
   }
 
   return (

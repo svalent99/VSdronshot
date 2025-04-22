@@ -14,12 +14,18 @@ export const useDronShots = () => {
   return useQuery({
     queryKey: ['dronShots'],
     queryFn: async (): Promise<DronShot[]> => {
+      console.log("Fetching dronShots from Supabase");
       const { data, error } = await supabase
         .from('dron_shots')
         .select('*')
         .order('created_at', { ascending: false });
       
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching dron shots:", error);
+        throw error;
+      }
+      
+      console.log("Retrieved dron shots:", data);
       return data || [];
     }
   });
