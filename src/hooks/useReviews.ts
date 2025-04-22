@@ -12,24 +12,30 @@ export interface Review {
   aprobado: boolean;
 }
 
-export const useReviews = () => {
+// Ahora acepta un parámetro para solicitar solo aprobadas (por defecto true)
+export const useReviews = ({ approvedOnly = true }: { approvedOnly?: boolean } = {}) => {
   return useQuery<Review[]>({
-    queryKey: ['reviews'],
+    queryKey: ['reviews', approvedOnly],
     queryFn: async () => {
       console.log("Fetching reviews from Supabase...");
-      const { data, error } = await supabase
+      let query = supabase
         .from('reviews')
         .select('*')
         .order('created_at', { ascending: false });
-      
+
+      if (approvedOnly) {
+        query = query.eq('aprobado', true);
+      }
+      const { data, error } = await query;
+
       if (error) {
         console.error("Error fetching reviews:", error);
         throw error;
       }
-      
+
       console.log("Raw reviews data:", data);
-      
-      // Ensure each review has the aprobado property
+
+      // Aseguramos que cada review tenga el campo aprobado
       return (data || []).map(review => ({
         ...review,
         aprobado: review.aprobado ?? false
@@ -47,17 +53,14 @@ export const useApproveReview = () => {
   return useMutation({
     mutationFn: async ({ id, approve }: { id: string, approve: boolean }) => {
       console.log(`Attempting to ${approve ? 'approve' : 'reject'} review ${id}`);
-      
       const { data, error } = await supabase
         .from('reviews')
         .update({ aprobado: approve })
         .eq('id', id);
-      
       if (error) {
         console.error("Error updating review:", error);
         throw error;
       }
-      
       console.log("Update result:", data);
       return { id, approve };
     },
@@ -79,17 +82,14 @@ export const useDeleteReview = () => {
   return useMutation({
     mutationFn: async (id: string) => {
       console.log(`Attempting to delete review ${id}`);
-      
       const { error } = await supabase
         .from('reviews')
         .delete()
         .eq('id', id);
-      
       if (error) {
         console.error("Error deleting review:", error);
         throw error;
       }
-      
       return id;
     },
     onSuccess: () => {

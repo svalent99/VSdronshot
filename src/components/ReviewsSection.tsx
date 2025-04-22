@@ -11,43 +11,36 @@ interface ReviewsSectionProps {
 }
 
 const ReviewsSection: React.FC<ReviewsSectionProps> = ({ isAdmin = false }) => {
-  const { data: reviews, isLoading, error, refetch } = useReviews();
+  // Usamos el hook para traer solo las aprobadas
+  const { data: reviews, isLoading, error, refetch } = useReviews({ approvedOnly: true });
   const [approvedReviews, setApprovedReviews] = useState<any[]>([]);
 
-  // Cargar y filtrar reseñas aprobadas cuando cambian los datos
   useEffect(() => {
     if (reviews) {
-      const approved = reviews.filter(review => review.aprobado === true);
-      console.log("Approved reviews:", approved);
-      setApprovedReviews(approved);
+      // Ahora solo llegan las aprobadas - no es necesario filtrar
+      setApprovedReviews(reviews);
+      console.log("Approved reviews:", reviews);
     }
   }, [reviews]);
 
-  // Cargar reseñas al montar el componente
   useEffect(() => {
     refetch();
-    // Configurar recarga periódica de reseñas (cada 30 segundos)
     const interval = setInterval(() => {
       refetch();
     }, 30000);
-    
     return () => clearInterval(interval);
   }, [refetch]);
 
-  // Función para renderizar estrellas basado en puntaje
   const renderStars = (puntaje: number) => {
     const stars = [];
     const fullStars = Math.floor(puntaje);
     const hasHalfStar = puntaje % 1 >= 0.5;
-    
     for (let i = 0; i < fullStars; i++) {
       stars.push(<Star key={`star-${i}`} className="text-yellow-500 fill-yellow-500" size={16} />);
     }
-    
     if (hasHalfStar) {
       stars.push(<StarHalf key="half-star" className="text-yellow-500 fill-yellow-500" size={16} />);
     }
-    
     return <div className="flex space-x-1">{stars}</div>;
   };
 
@@ -78,7 +71,6 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({ isAdmin = false }) => {
   return (
     <div className="max-w-4xl mx-auto">
       <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">Reseñas de Clientes</h2>
-      
       <div className="space-y-6">
         {approvedReviews.length === 0 ? (
           <div className="text-center py-12 bg-zinc-800/50 rounded-lg">
@@ -118,7 +110,6 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({ isAdmin = false }) => {
           ))
         )}
       </div>
-      
       <div className="mt-12 mb-6">
         <div className="bg-zinc-800/50 rounded-lg p-6 border border-zinc-700 max-w-md mx-auto">
           <h3 className="text-xl font-semibold mb-3 text-center">¿Has usado nuestros servicios?</h3>
