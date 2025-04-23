@@ -9,14 +9,14 @@ interface ReviewsManagementProps {
 }
 
 const ReviewsManagement = ({ showPending = true }: ReviewsManagementProps) => {
-  const { data: reviews, isLoading } = useReviews(true); // Obtener todas las reseñas
+  const { data: reviews, isLoading } = useReviews(true);
   const updateStatus = useUpdateReviewStatus();
   const deleteReview = useDeleteReview();
 
-  // Filtrar las reseñas según el estado que queremos mostrar
+  // Filter reviews based on the showPending prop
   const filteredReviews = reviews?.filter(review => 
     showPending ? !review.approved : review.approved
-  );
+  ) || [];
 
   if (isLoading) {
     return (
@@ -26,7 +26,7 @@ const ReviewsManagement = ({ showPending = true }: ReviewsManagementProps) => {
     );
   }
 
-  if (!filteredReviews || filteredReviews.length === 0) {
+  if (filteredReviews.length === 0) {
     return (
       <div className="text-center py-12 bg-zinc-800/50 rounded-lg">
         <p className="text-gray-400">No hay reseñas {showPending ? "pendientes" : "aprobadas"} para mostrar</p>
@@ -49,7 +49,7 @@ const ReviewsManagement = ({ showPending = true }: ReviewsManagementProps) => {
             <div>
               <h3 className="font-bold text-lg">{review.name}</h3>
               <p className="text-sm text-gray-500">
-                {new Date(review.created_at).toLocaleDateString()}
+                {new Date(review.created_at || '').toLocaleDateString()}
               </p>
             </div>
             <div className="flex gap-2">

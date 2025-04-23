@@ -8,7 +8,7 @@ export interface Review {
   name: string;
   comment: string;
   approved: boolean;
-  created_at: string;
+  created_at: string | null;
 }
 
 export const useReviews = (showAll: boolean = false) => {

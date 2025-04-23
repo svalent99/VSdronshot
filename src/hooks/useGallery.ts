@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -43,73 +42,65 @@ export const useUploadImage = () => {
       const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
       
-      // Check if the gallery bucket exists, if not create it
-      const { data: buckets } = await supabase
-        .storage
-        .listBuckets();
-        
-      const galleryBucketExists = buckets?.some(bucket => bucket.name === 'gallery');
-      
-      if (!galleryBucketExists) {
-        console.log("Gallery bucket does not exist, creating...");
-        // Create the bucket
-        const { error: bucketError } = await supabase
-          .storage
-          .createBucket('gallery', { public: true });
+      try {
+        // Create the bucket if it doesn't exist
+        const { data: buckets } = await supabase.storage.listBuckets();
+        if (!buckets?.some(bucket => bucket.name === 'gallery')) {
+          console.log("Creating gallery bucket...");
+          const { error: bucketError } = await supabase.storage.createBucket('gallery', {
+            public: true,
+            allowedMimeTypes: ['image/*'],
+            fileSizeLimit: 5242880 // 5MB
+          });
           
-        if (bucketError) {
-          console.error("Error creating gallery bucket:", bucketError);
-          throw bucketError;
+          if (bucketError) {
+            console.error("Error creating gallery bucket:", bucketError);
+            throw bucketError;
+          }
         }
+        
+        // Upload file to Supabase Storage
+        console.log("Uploading file to storage...");
+        const { error: uploadError, data: uploadData } = await supabase
+          .storage
+          .from('gallery')
+          .upload(fileName, file, {
+            cacheControl: '3600',
+            upsert: false
+          });
+        
+        if (uploadError) throw uploadError;
+        
+        console.log("File uploaded successfully:", uploadData);
+        
+        // Get public URL
+        const { data: urlData } = supabase
+          .storage
+          .from('gallery')
+          .getPublicUrl(fileName);
+        
+        if (!urlData.publicUrl) {
+          throw new Error("No se pudo obtener la URL pública");
+        }
+        
+        // Save record to database
+        console.log("Saving record to database...");
+        const { error: dbError } = await supabase
+          .from('gallery_images')
+          .insert({
+            title,
+            description: description || null,
+            file_path: urlData.publicUrl,
+            storage_path: fileName
+          });
+        
+        if (dbError) throw dbError;
+        
+        return { success: true };
+      } catch (error) {
+        console.error("Error in upload process:", error);
+        throw error;
       }
-      
-      // Upload file to Supabase Storage
-      console.log("Uploading file to storage...");
-      const { error: uploadError, data: uploadData } = await supabase
-        .storage
-        .from('gallery')
-        .upload(fileName, file);
-      
-      if (uploadError) {
-        console.error("Error uploading file:", uploadError);
-        throw uploadError;
-      }
-      
-      console.log("File uploaded successfully:", uploadData);
-      
-      // Get public URL
-      const { data: urlData } = await supabase
-        .storage
-        .from('gallery')
-        .getPublicUrl(fileName);
-      
-      if (!urlData.publicUrl) {
-        console.error("No public URL obtained");
-        throw new Error("No se pudo obtener la URL pública");
-      }
-      
-      console.log("Public URL obtained:", urlData.publicUrl);
-      
-      // Save record to database
-      console.log("Saving record to database...");
-      const { error: dbError, data: insertData } = await supabase
-        .from('gallery_images')
-        .insert({
-          title,
-          description: description || null,
-          file_path: urlData.publicUrl,
-          storage_path: fileName
-        })
-        .select();
-      
-      if (dbError) {
-        console.error("Error inserting record:", dbError);
-        throw dbError;
-      }
-      
-      console.log("Record saved successfully:", insertData);
-      
-      return { success: true };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['gallery-images'] });
