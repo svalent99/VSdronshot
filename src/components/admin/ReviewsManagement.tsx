@@ -4,10 +4,19 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Check, X, Trash2 } from "lucide-react";
 
-const ReviewsManagement = () => {
-  const { data: reviews, isLoading } = useReviews(true);
+interface ReviewsManagementProps {
+  showPending?: boolean;
+}
+
+const ReviewsManagement = ({ showPending = true }: ReviewsManagementProps) => {
+  const { data: reviews, isLoading } = useReviews(true); // Obtener todas las reseñas
   const updateStatus = useUpdateReviewStatus();
   const deleteReview = useDeleteReview();
+
+  // Filtrar las reseñas según el estado que queremos mostrar
+  const filteredReviews = reviews?.filter(review => 
+    showPending ? !review.approved : review.approved
+  );
 
   if (isLoading) {
     return (
@@ -17,17 +26,17 @@ const ReviewsManagement = () => {
     );
   }
 
-  if (!reviews || reviews.length === 0) {
+  if (!filteredReviews || filteredReviews.length === 0) {
     return (
       <div className="text-center py-12 bg-zinc-800/50 rounded-lg">
-        <p className="text-gray-400">No hay reseñas para mostrar</p>
+        <p className="text-gray-400">No hay reseñas {showPending ? "pendientes" : "aprobadas"} para mostrar</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      {reviews.map((review) => (
+      {filteredReviews.map((review) => (
         <motion.div
           key={review.id}
           initial={{ opacity: 0, y: 20 }}

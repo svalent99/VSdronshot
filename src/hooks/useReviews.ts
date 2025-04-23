@@ -15,6 +15,7 @@ export const useReviews = (showAll: boolean = false) => {
   return useQuery({
     queryKey: ['reviews', showAll],
     queryFn: async (): Promise<Review[]> => {
+      console.log("Fetching reviews, showAll:", showAll);
       let query = supabase.from('reviews').select('*');
       
       if (!showAll) {
@@ -29,6 +30,7 @@ export const useReviews = (showAll: boolean = false) => {
         throw error;
       }
 
+      console.log("Reviews fetched:", data);
       return data || [];
     }
   });
@@ -39,12 +41,19 @@ export const useSubmitReview = () => {
 
   return useMutation({
     mutationFn: async ({ name, comment }: { name: string; comment: string }) => {
-      const { error } = await supabase
+      console.log("Submitting review:", { name, comment });
+      
+      const { error, data } = await supabase
         .from('reviews')
-        .insert({ name, comment });
+        .insert({ name, comment, approved: false })
+        .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error submitting review:", error);
+        throw error;
+      }
 
+      console.log("Review submitted successfully:", data);
       return { success: true };
     },
     onSuccess: () => {
@@ -63,13 +72,20 @@ export const useUpdateReviewStatus = () => {
 
   return useMutation({
     mutationFn: async ({ id, approved }: { id: string; approved: boolean }) => {
-      const { error } = await supabase
+      console.log("Updating review status:", { id, approved });
+      
+      const { error, data } = await supabase
         .from('reviews')
         .update({ approved })
-        .eq('id', id);
+        .eq('id', id)
+        .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error updating review:", error);
+        throw error;
+      }
 
+      console.log("Review updated successfully:", data);
       return { success: true };
     },
     onSuccess: () => {
@@ -88,13 +104,19 @@ export const useDeleteReview = () => {
 
   return useMutation({
     mutationFn: async (id: string) => {
+      console.log("Deleting review:", id);
+      
       const { error } = await supabase
         .from('reviews')
         .delete()
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error deleting review:", error);
+        throw error;
+      }
 
+      console.log("Review deleted successfully");
       return { success: true };
     },
     onSuccess: () => {

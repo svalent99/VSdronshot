@@ -8,7 +8,7 @@ import GalleryManagement from '@/components/admin/GalleryManagement';
 
 const Admin = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [activeTab, setActiveTab] = useState('reviews');
+  const [activeTab, setActiveTab] = useState('pending');
   const navigate = useNavigate();
 
   return (
@@ -77,14 +77,14 @@ const Admin = () => {
             {activeTab === 'pending' && (
               <div>
                 <h2 className="text-xl font-bold mb-6">Reseñas Pendientes de Aprobación</h2>
-                <ReviewsManagement />
+                <ReviewsManagement showPending={true} />
               </div>
             )}
             
             {activeTab === 'approved' && (
               <div>
                 <h2 className="text-xl font-bold mb-6">Reseñas Aprobadas</h2>
-                <ReviewsManagement />
+                <ReviewsManagement showPending={false} />
               </div>
             )}
             

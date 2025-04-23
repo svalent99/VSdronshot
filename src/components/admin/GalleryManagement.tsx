@@ -32,6 +32,11 @@ const GalleryManagement = () => {
           setFile(null);
           setTitle("");
           setDescription("");
+          // Resetear el campo de archivo
+          const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+          if (fileInput) {
+            fileInput.value = '';
+          }
         }
       }
     );
@@ -80,7 +85,7 @@ const GalleryManagement = () => {
           <Button
             type="submit"
             className="w-full flex items-center justify-center gap-2"
-            disabled={uploadImage.isPending}
+            disabled={uploadImage.isPending || !file}
           >
             <Upload size={16} />
             {uploadImage.isPending ? "Subiendo..." : "Subir Imagen"}
@@ -107,6 +112,10 @@ const GalleryManagement = () => {
                   src={image.file_path}
                   alt={image.title}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    console.error(`Error loading image: ${image.file_path}`);
+                    (e.target as HTMLImageElement).src = "/placeholder.svg";
+                  }}
                 />
                 <button
                   onClick={() => deleteImage.mutate({ 

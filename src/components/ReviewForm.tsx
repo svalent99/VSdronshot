@@ -3,8 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { useSubmitReview } from "@/hooks/useReviews";
 
 interface ReviewFormProps {
   onSubmitSuccess?: () => void;
@@ -13,38 +12,27 @@ interface ReviewFormProps {
 const ReviewForm = ({ onSubmitSuccess }: ReviewFormProps) => {
   const [name, setName] = useState("");
   const [comment, setComment] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const submitReview = useSubmitReview();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !comment.trim()) {
-      toast.error("Por favor complete todos los campos");
       return;
     }
 
-    setIsSubmitting(true);
-
-    try {
-      const { error } = await supabase.from("reviews").insert({
-        name: name.trim(),
-        comment: comment.trim(),
-      });
-
-      if (error) throw error;
-
-      toast.success("¡Gracias por su reseña! Será revisada antes de ser publicada.");
-      setName("");
-      setComment("");
-      
-      if (onSubmitSuccess) {
-        onSubmitSuccess();
+    submitReview.mutate(
+      { name: name.trim(), comment: comment.trim() },
+      {
+        onSuccess: () => {
+          setName("");
+          setComment("");
+          
+          if (onSubmitSuccess) {
+            onSubmitSuccess();
+          }
+        }
       }
-    } catch (error) {
-      console.error("Error submitting review:", error);
-      toast.error("Hubo un error al enviar su reseña. Por favor intente nuevamente.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    );
   };
 
   return (
@@ -77,9 +65,9 @@ const ReviewForm = ({ onSubmitSuccess }: ReviewFormProps) => {
       <Button
         type="submit"
         className="w-full"
-        disabled={isSubmitting}
+        disabled={submitReview.isPending}
       >
-        {isSubmitting ? "Enviando..." : "Enviar Reseña"}
+        {submitReview.isPending ? "Enviando..." : "Enviar Reseña"}
       </Button>
     </form>
   );
