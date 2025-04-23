@@ -3,8 +3,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Inbox, CheckCheck, Image } from "lucide-react";
 import { LoginForm } from '@/components/admin/LoginForm';
-import { ReviewsManagement } from '@/components/admin/ReviewsManagement';
-import { GalleryManagement } from '@/components/admin/GalleryManagement';
+import ReviewsManagement from '@/components/admin/ReviewsManagement';
+import GalleryManagement from '@/components/admin/GalleryManagement';
 
 const Admin = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);

@@ -1,35 +1,43 @@
 
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 
 export interface DronShot {
   id: string;
-  titulo: string;
-  descripcion: string | null;
-  archivo_url: string;
+  title: string;
+  description?: string;
+  file_path: string;
+  storage_path: string;
   created_at: string;
 }
 
 export const useDronShots = () => {
   return useQuery({
-    queryKey: ['dronShots'],
+    queryKey: ['dron-shots'],
     queryFn: async (): Promise<DronShot[]> => {
-      console.log("Fetching dronShots from Supabase");
-      const { data, error } = await supabase
-        .from('dron_shots')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) {
-        console.error("Error fetching dron shots:", error);
-        toast.error("No se pudieron cargar las imágenes de la galería.");
-        throw error;
+      try {
+        const { data, error } = await supabase
+          .from('gallery_images')
+          .select('*')
+          .order('created_at', { ascending: false });
+          
+        if (error) {
+          console.error("Error fetching dron shots:", error);
+          throw error;
+        }
+
+        return data.map((item) => ({
+          id: item.id,
+          title: item.title,
+          description: item.description,
+          file_path: item.file_path,
+          storage_path: item.storage_path,
+          created_at: item.created_at
+        }));
+      } catch (err) {
+        console.error("Error in dron shots query:", err);
+        return [];
       }
-      
-      console.log("Retrieved dron shots:", data);
-      return data || [];
     }
   });
 };
-

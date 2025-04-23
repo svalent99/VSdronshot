@@ -6,7 +6,7 @@ import { toast } from "sonner";
 export interface GalleryImage {
   id: string;
   title: string;
-  description: string | null;
+  description?: string;
   file_path: string;
   storage_path: string;
   created_at: string;
@@ -14,19 +14,19 @@ export interface GalleryImage {
 
 export const useGalleryImages = () => {
   return useQuery({
-    queryKey: ['gallery'],
+    queryKey: ['gallery-images'],
     queryFn: async (): Promise<GalleryImage[]> => {
       const { data, error } = await supabase
         .from('gallery_images')
         .select('*')
         .order('created_at', { ascending: false });
-
+      
       if (error) {
         console.error("Error fetching gallery images:", error);
-        toast.error("No se pudieron cargar las imágenes");
+        toast.error("Error al cargar la galería de imágenes");
         throw error;
       }
-
+      
       return data || [];
     }
   });
@@ -34,41 +34,52 @@ export const useGalleryImages = () => {
 
 export const useUploadImage = () => {
   const queryClient = useQueryClient();
-
+  
   return useMutation({
-    mutationFn: async ({ file, title, description }: { 
+    mutationFn: async ({ 
+      file, 
+      title, 
+      description 
+    }: { 
       file: File; 
       title: string; 
       description?: string;
     }) => {
-      const fileName = `${Date.now()}-${file.name}`;
-      const filePath = `gallery/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+      
+      // Upload file to Supabase Storage
+      const { error: uploadError } = await supabase
+        .storage
         .from('gallery')
-        .upload(filePath, file);
-
+        .upload(fileName, file);
+      
       if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
+      
+      // Get public URL
+      const { data: urlData } = await supabase
+        .storage
         .from('gallery')
-        .getPublicUrl(filePath);
-
+        .getPublicUrl(fileName);
+      
+      if (!urlData.publicUrl) throw new Error("No se pudo obtener la URL pública");
+      
+      // Save record to database
       const { error: dbError } = await supabase
         .from('gallery_images')
         .insert({
           title,
-          description,
-          file_path: publicUrl,
-          storage_path: filePath
+          description: description || null,
+          file_path: urlData.publicUrl,
+          storage_path: fileName
         });
-
+      
       if (dbError) throw dbError;
-
+      
       return { success: true };
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['gallery'] });
+      queryClient.invalidateQueries({ queryKey: ['gallery-images'] });
       toast.success("Imagen subida exitosamente");
     },
     onError: (error) => {
@@ -80,26 +91,38 @@ export const useUploadImage = () => {
 
 export const useDeleteImage = () => {
   const queryClient = useQueryClient();
-
+  
   return useMutation({
-    mutationFn: async ({ id, storagePath }: { id: string; storagePath: string }) => {
-      const { error: storageError } = await supabase.storage
+    mutationFn: async ({ 
+      id, 
+      storagePath 
+    }: { 
+      id: string; 
+      storagePath: string;
+    }) => {
+      // Delete file from Storage
+      const { error: storageError } = await supabase
+        .storage
         .from('gallery')
         .remove([storagePath]);
-
-      if (storageError) throw storageError;
-
+      
+      if (storageError) {
+        console.warn("Error removing file from storage:", storageError);
+        // Continue anyway to delete the database record
+      }
+      
+      // Delete record from database
       const { error: dbError } = await supabase
         .from('gallery_images')
         .delete()
         .eq('id', id);
-
+      
       if (dbError) throw dbError;
-
+      
       return { success: true };
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['gallery'] });
+      queryClient.invalidateQueries({ queryKey: ['gallery-images'] });
       toast.success("Imagen eliminada exitosamente");
     },
     onError: (error) => {

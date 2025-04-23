@@ -31,7 +31,7 @@ export const uploadImageToSupabase = async (file: File, title: string, descripti
     // Subir archivo a Supabase Storage
     const { data: fileData, error: uploadError } = await supabase
       .storage
-      .from('dron-shots')
+      .from('gallery')
       .upload(fileName, file);
     
     if (uploadError) throw uploadError;
@@ -39,18 +39,19 @@ export const uploadImageToSupabase = async (file: File, title: string, descripti
     // Obtener URL pública del archivo
     const { data: urlData } = await supabase
       .storage
-      .from('dron-shots')
+      .from('gallery')
       .getPublicUrl(fileName);
     
     if (!urlData.publicUrl) throw new Error("No se pudo obtener la URL pública");
     
-    // Guardar registro en la tabla dron_shots
+    // Guardar registro en la tabla gallery_images
     const { error: dbError } = await supabase
-      .from('dron_shots')
+      .from('gallery_images')
       .insert({
-        titulo: title,
-        descripcion: description || null,
-        archivo_url: urlData.publicUrl
+        title: title,
+        description: description || null,
+        file_path: urlData.publicUrl,
+        storage_path: fileName
       });
     
     if (dbError) throw dbError;
