@@ -13,11 +13,22 @@ const GalleryManagement = () => {
   const [file, setFile] = useState<File | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
       setFile(selectedFile);
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result as string);
+      };
+      reader.readAsDataURL(selectedFile);
+    } else {
+      setFile(null);
+      setPreviewUrl(null);
     }
   };
 
@@ -29,10 +40,13 @@ const GalleryManagement = () => {
       { file, title, description },
       {
         onSuccess: () => {
+          // Reset form
           setFile(null);
           setTitle("");
           setDescription("");
-          // Resetear el campo de archivo
+          setPreviewUrl(null);
+          
+          // Reset file input
           const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
           if (fileInput) {
             fileInput.value = '';
@@ -58,6 +72,15 @@ const GalleryManagement = () => {
               required
               className="bg-zinc-700/50 border-zinc-600"
             />
+            {previewUrl && (
+              <div className="mt-4 relative aspect-video w-full max-w-sm mx-auto">
+                <img 
+                  src={previewUrl} 
+                  alt="Vista previa" 
+                  className="w-full h-full object-contain rounded-md border border-zinc-600"
+                />
+              </div>
+            )}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1">
@@ -87,8 +110,17 @@ const GalleryManagement = () => {
             className="w-full flex items-center justify-center gap-2"
             disabled={uploadImage.isPending || !file}
           >
-            <Upload size={16} />
-            {uploadImage.isPending ? "Subiendo..." : "Subir Imagen"}
+            {uploadImage.isPending ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                Subiendo...
+              </>
+            ) : (
+              <>
+                <Upload size={16} />
+                Subir Imagen
+              </>
+            )}
           </Button>
         </form>
       </div>

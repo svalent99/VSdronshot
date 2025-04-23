@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -25,6 +26,42 @@ export const useGalleryImages = () => {
   });
 };
 
+const checkAndCreateBucket = async () => {
+  try {
+    // First check if bucket exists
+    const { data: buckets, error: listError } = await supabase.storage.listBuckets();
+    
+    if (listError) {
+      console.error("Error checking buckets:", listError);
+      return false;
+    }
+    
+    // If gallery bucket doesn't exist, create it
+    if (!buckets?.some(bucket => bucket.name === 'gallery')) {
+      console.log("Gallery bucket doesn't exist, creating it...");
+      const { error: createError } = await supabase.storage.createBucket('gallery', {
+        public: true,
+        allowedMimeTypes: ['image/*'],
+        fileSizeLimit: 10485760 // 10MB
+      });
+      
+      if (createError) {
+        console.error("Error creating gallery bucket:", createError);
+        return false;
+      }
+      
+      console.log("Gallery bucket created successfully");
+    } else {
+      console.log("Gallery bucket already exists");
+    }
+    
+    return true;
+  } catch (error) {
+    console.error("Error in checkAndCreateBucket:", error);
+    return false;
+  }
+};
+
 export const useUploadImage = () => {
   const queryClient = useQueryClient();
   
@@ -39,26 +76,17 @@ export const useUploadImage = () => {
       description?: string;
     }) => {
       console.log("Starting upload for file:", file.name);
+      
+      // First make sure bucket exists
+      const bucketReady = await checkAndCreateBucket();
+      if (!bucketReady) {
+        throw new Error("No se pudo preparar el bucket para subir imágenes");
+      }
+      
       const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
       
       try {
-        // Create the bucket if it doesn't exist
-        const { data: buckets } = await supabase.storage.listBuckets();
-        if (!buckets?.some(bucket => bucket.name === 'gallery')) {
-          console.log("Creating gallery bucket...");
-          const { error: bucketError } = await supabase.storage.createBucket('gallery', {
-            public: true,
-            allowedMimeTypes: ['image/*'],
-            fileSizeLimit: 5242880 // 5MB
-          });
-          
-          if (bucketError) {
-            console.error("Error creating gallery bucket:", bucketError);
-            throw bucketError;
-          }
-        }
-        
         // Upload file to Supabase Storage
         console.log("Uploading file to storage...");
         const { error: uploadError, data: uploadData } = await supabase
@@ -69,7 +97,10 @@ export const useUploadImage = () => {
             upsert: false
           });
         
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+          console.error("Upload error:", uploadError);
+          throw uploadError;
+        }
         
         console.log("File uploaded successfully:", uploadData);
         
@@ -79,7 +110,7 @@ export const useUploadImage = () => {
           .from('gallery')
           .getPublicUrl(fileName);
         
-        if (!urlData.publicUrl) {
+        if (!urlData?.publicUrl) {
           throw new Error("No se pudo obtener la URL pública");
         }
         
@@ -94,7 +125,10 @@ export const useUploadImage = () => {
             storage_path: fileName
           });
         
-        if (dbError) throw dbError;
+        if (dbError) {
+          console.error("Database error:", dbError);
+          throw dbError;
+        }
         
         return { success: true };
       } catch (error) {
@@ -106,9 +140,9 @@ export const useUploadImage = () => {
       queryClient.invalidateQueries({ queryKey: ['gallery-images'] });
       toast.success("Imagen subida exitosamente");
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error("Error uploading image:", error);
-      toast.error("Error al subir la imagen");
+      toast.error(`Error al subir la imagen: ${error?.message || "Error desconocido"}`);
     }
   });
 };

@@ -1,28 +1,17 @@
 
-import { useReviews, useSubmitReview } from "@/hooks/useReviews";
+import { useReviews } from "@/hooks/useReviews";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import ReviewForm from "@/components/ReviewForm";
 import { useState } from "react";
 import { motion } from "framer-motion";
 
 const ReviewsSection = () => {
-  const { data: reviews, isLoading } = useReviews();
-  const submitReview = useSubmitReview();
-  const [name, setName] = useState("");
-  const [comment, setComment] = useState("");
+  const { data: reviews, isLoading, refetch } = useReviews();
+  const [showForm, setShowForm] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    submitReview.mutate(
-      { name, comment },
-      {
-        onSuccess: () => {
-          setName("");
-          setComment("");
-        }
-      }
-    );
+  const handleSubmitSuccess = () => {
+    setShowForm(false);
+    // Refetch will happen automatically via queryClient.invalidateQueries
   };
 
   return (
@@ -52,7 +41,7 @@ const ReviewsSection = () => {
                 <h3 className="font-bold text-lg mb-2">{review.name}</h3>
                 <p className="text-gray-300">{review.comment}</p>
                 <p className="text-sm text-gray-500 mt-2">
-                  {new Date(review.created_at).toLocaleDateString()}
+                  {new Date(review.created_at || '').toLocaleDateString()}
                 </p>
               </motion.div>
             ))
@@ -60,45 +49,32 @@ const ReviewsSection = () => {
         </div>
       )}
 
-      <div className="bg-zinc-800/50 rounded-lg p-6 max-w-md mx-auto">
-        <h3 className="text-xl font-semibold mb-4 text-center">
-          Dejar una Reseña
-        </h3>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">
-              Nombre
-            </label>
-            <Input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="bg-zinc-700/50 border-zinc-600"
-              placeholder="Tu nombre"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">
-              Comentario
-            </label>
-            <Textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              required
-              className="bg-zinc-700/50 border-zinc-600"
-              placeholder="Escribe tu experiencia"
-              rows={4}
-            />
-          </div>
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={submitReview.isPending}
+      {!showForm ? (
+        <div className="text-center mb-12">
+          <Button 
+            onClick={() => setShowForm(true)}
+            className="px-8"
           >
-            {submitReview.isPending ? "Enviando..." : "Enviar Reseña"}
+            Dejar una Reseña
           </Button>
-        </form>
-      </div>
+        </div>
+      ) : (
+        <div className="bg-zinc-800/50 rounded-lg p-6 max-w-md mx-auto">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-semibold">
+              Dejar una Reseña
+            </h3>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setShowForm(false)}
+            >
+              Cancelar
+            </Button>
+          </div>
+          <ReviewForm onSubmitSuccess={handleSubmitSuccess} />
+        </div>
+      )}
     </div>
   );
 };

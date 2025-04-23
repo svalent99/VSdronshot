@@ -67,7 +67,14 @@ const ReviewForm = ({ onSubmitSuccess }: ReviewFormProps) => {
         className="w-full"
         disabled={submitReview.isPending}
       >
-        {submitReview.isPending ? "Enviando..." : "Enviar Reseña"}
+        {submitReview.isPending ? (
+          <>
+            <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2 inline-block"></div>
+            Enviando...
+          </>
+        ) : (
+          "Enviar Reseña"
+        )}
       </Button>
     </form>
   );

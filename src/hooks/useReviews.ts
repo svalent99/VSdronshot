@@ -45,7 +45,11 @@ export const useSubmitReview = () => {
       
       const { error, data } = await supabase
         .from('reviews')
-        .insert({ name, comment, approved: false })
+        .insert([{ 
+          name: name.trim(), 
+          comment: comment.trim(), 
+          approved: false 
+        }])
         .select();
 
       if (error) {
