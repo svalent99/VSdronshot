@@ -1,16 +1,7 @@
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-
-export interface GalleryImage {
-  id: string;
-  title: string;
-  description?: string;
-  file_path: string;
-  storage_path: string;
-  created_at: string;
-}
+import type { GalleryImage } from "@/types/gallery";
 
 export const useGalleryImages = () => {
   return useQuery({

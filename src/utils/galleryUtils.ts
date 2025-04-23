@@ -1,18 +1,18 @@
 
-import type { DronShot } from "@/hooks/useDronShots";
+import type { GalleryImage } from "@/types/gallery";
 
 export interface GalleryCard {
   id: string;
   title: string;
   thumbnail: string;
-  className?: string; // Añadimos la propiedad className como opcional
+  className?: string;
 }
 
-export const mapDronShotsToGalleryCards = (dronShots: DronShot[]): GalleryCard[] => {
-  return dronShots.map(shot => ({
-    id: shot.id,
-    title: shot.titulo,
-    thumbnail: shot.archivo_url
+export const mapImagesToGalleryCards = (images: GalleryImage[]): GalleryCard[] => {
+  return images.map(image => ({
+    id: image.id,
+    title: image.title,
+    thumbnail: image.file_path
   }));
 };
 
