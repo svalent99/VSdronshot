@@ -9,54 +9,57 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      dron_shots: {
+      gallery_images: {
         Row: {
-          archivo_url: string
-          created_at: string
-          descripcion: string | null
+          created_at: string | null
+          description: string | null
+          file_path: string
           id: string
-          titulo: string
+          storage_path: string
+          title: string
+          updated_at: string | null
         }
         Insert: {
-          archivo_url: string
-          created_at?: string
-          descripcion?: string | null
+          created_at?: string | null
+          description?: string | null
+          file_path: string
           id?: string
-          titulo: string
+          storage_path: string
+          title: string
+          updated_at?: string | null
         }
         Update: {
-          archivo_url?: string
-          created_at?: string
-          descripcion?: string | null
+          created_at?: string | null
+          description?: string | null
+          file_path?: string
           id?: string
-          titulo?: string
+          storage_path?: string
+          title?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
       reviews: {
         Row: {
-          aprobado: boolean
-          contenido: string
-          created_at: string
+          approved: boolean | null
+          comment: string
+          created_at: string | null
           id: string
-          nombre_cliente: string
-          puntaje: number
+          name: string
         }
         Insert: {
-          aprobado?: boolean
-          contenido: string
-          created_at?: string
+          approved?: boolean | null
+          comment: string
+          created_at?: string | null
           id?: string
-          nombre_cliente: string
-          puntaje: number
+          name: string
         }
         Update: {
-          aprobado?: boolean
-          contenido?: string
-          created_at?: string
+          approved?: boolean | null
+          comment?: string
+          created_at?: string | null
           id?: string
-          nombre_cliente?: string
-          puntaje?: number
+          name?: string
         }
         Relationships: []
       }

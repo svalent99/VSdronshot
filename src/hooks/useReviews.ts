@@ -5,103 +5,105 @@ import { toast } from "sonner";
 
 export interface Review {
   id: string;
-  nombre_cliente: string;
-  contenido: string;
-  puntaje: number;
+  name: string;
+  comment: string;
+  approved: boolean;
   created_at: string;
-  aprobado: boolean;
 }
 
-// Ahora acepta un parámetro para solicitar solo aprobadas (por defecto true)
-export const useReviews = ({ approvedOnly = true }: { approvedOnly?: boolean } = {}) => {
-  return useQuery<Review[]>({
-    queryKey: ['reviews', approvedOnly],
-    queryFn: async () => {
-      console.log("Fetching reviews from Supabase...");
-      let query = supabase
-        .from('reviews')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (approvedOnly) {
-        query = query.eq('aprobado', true);
+export const useReviews = (showAll: boolean = false) => {
+  return useQuery({
+    queryKey: ['reviews', showAll],
+    queryFn: async (): Promise<Review[]> => {
+      let query = supabase.from('reviews').select('*');
+      
+      if (!showAll) {
+        query = query.eq('approved', true);
       }
-      const { data, error } = await query;
+      
+      const { data, error } = await query.order('created_at', { ascending: false });
 
       if (error) {
         console.error("Error fetching reviews:", error);
-        // Muestra un toast visual si falla la consulta
-        toast.error('No se pudieron cargar las reseñas. Por favor, revisá la conexión o intentá más tarde.');
+        toast.error("No se pudieron cargar las reseñas");
         throw error;
       }
 
-      console.log("Raw reviews data:", data);
-
-      return (data || []).map(review => ({
-        ...review,
-        aprobado: review.aprobado ?? false
-      }));
-    },
-    refetchInterval: false,
-    refetchOnMount: true,
-    refetchOnWindowFocus: true
+      return data || [];
+    }
   });
 };
 
-export const useApproveReview = () => {
+export const useSubmitReview = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: async ({ id, approve }: { id: string, approve: boolean }) => {
-      console.log(`Attempting to ${approve ? 'approve' : 'reject'} review ${id}`);
-      const { data, error } = await supabase
+    mutationFn: async ({ name, comment }: { name: string; comment: string }) => {
+      const { error } = await supabase
         .from('reviews')
-        .update({ aprobado: approve })
-        .eq('id', id);
-      if (error) {
-        console.error("Error updating review:", error);
-        throw error;
-      }
-      console.log("Update result:", data);
-      return { id, approve };
+        .insert({ name, comment });
+
+      if (error) throw error;
+
+      return { success: true };
     },
-    onSuccess: (result) => {
-      console.log("Invalidating reviews query cache");
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reviews'] });
-      toast.success(result.approve ? 'Reseña aprobada correctamente' : 'Reseña rechazada');
+      toast.success("Reseña enviada exitosamente. Será revisada antes de publicarse.");
     },
     onError: (error) => {
-      console.error("Error in approve/reject mutation:", error);
-      toast.error('Error al procesar la reseña');
+      console.error("Error submitting review:", error);
+      toast.error("Error al enviar la reseña");
+    }
+  });
+};
+
+export const useUpdateReviewStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, approved }: { id: string; approved: boolean }) => {
+      const { error } = await supabase
+        .from('reviews')
+        .update({ approved })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      return { success: true };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['reviews'] });
+      toast.success("Estado de la reseña actualizado");
+    },
+    onError: (error) => {
+      console.error("Error updating review:", error);
+      toast.error("Error al actualizar la reseña");
     }
   });
 };
 
 export const useDeleteReview = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (id: string) => {
-      console.log(`Attempting to delete review ${id}`);
       const { error } = await supabase
         .from('reviews')
         .delete()
         .eq('id', id);
-      if (error) {
-        console.error("Error deleting review:", error);
-        throw error;
-      }
-      return id;
+
+      if (error) throw error;
+
+      return { success: true };
     },
     onSuccess: () => {
-      console.log("Invalidating reviews query cache after deletion");
       queryClient.invalidateQueries({ queryKey: ['reviews'] });
-      toast.success('Reseña eliminada correctamente');
+      toast.success("Reseña eliminada exitosamente");
     },
     onError: (error) => {
-      console.error("Error in delete mutation:", error);
-      toast.error('Error al eliminar la reseña');
+      console.error("Error deleting review:", error);
+      toast.error("Error al eliminar la reseña");
     }
   });
 };
-

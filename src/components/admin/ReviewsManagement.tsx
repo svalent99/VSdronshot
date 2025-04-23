@@ -1,161 +1,90 @@
 
-import React, { useEffect } from 'react';
-import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
-import { Check, X, Trash2 } from "lucide-react";
-import { useReviews, useApproveReview, useDeleteReview } from "@/hooks/useReviews";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { useReviews, useUpdateReviewStatus, useDeleteReview } from "@/hooks/useReviews";
 import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+import { Check, X, Trash2 } from "lucide-react";
 
-const renderStars = (puntaje: number) => {
-  const stars = [];
-  for (let i = 0; i < puntaje; i++) {
-    stars.push(<span key={i} className="text-yellow-500">★</span>);
-  }
-  return stars;
-};
+const ReviewsManagement = () => {
+  const { data: reviews, isLoading } = useReviews(true);
+  const updateStatus = useUpdateReviewStatus();
+  const deleteReview = useDeleteReview();
 
-export const ReviewsManagement: React.FC<{ showPending?: boolean }> = ({ showPending = true }) => {
-  const { data: allReviews, isLoading: reviewsLoading, error, refetch } = useReviews();
-  const { mutate: approveReview, isPending: isApproving } = useApproveReview();
-  const { mutate: deleteReview, isPending: isDeleting } = useDeleteReview();
-  const queryClient = useQueryClient();
-  
-  // Filtrar reseñas basado en el estado de aprobación
-  const reviews = showPending 
-    ? allReviews?.filter(review => !review.aprobado) || []
-    : allReviews?.filter(review => review.aprobado) || [];
-
-  useEffect(() => {
-    // Recargar reseñas cuando el componente se monta
-    refetch();
-  }, [refetch]);
-
-  useEffect(() => {
-    if (error) {
-      console.error("Error al cargar reseñas:", error);
-      toast.error("Error al cargar las reseñas");
-    }
-  }, [error]);
-
-  const handleReviewAction = (id: string, approve: boolean) => {
-    console.log(`Processing review ${id}, approve=${approve}`);
-    approveReview({ id, approve }, {
-      onSuccess: () => {
-        // Invalidar la caché y recargar los datos después de la acción
-        setTimeout(() => {
-          queryClient.invalidateQueries({ queryKey: ['reviews'] });
-          refetch();
-        }, 500);
-      }
-    });
-  };
-
-  const handleDeleteReview = (id: string) => {
-    deleteReview(id, {
-      onSuccess: () => {
-        // Invalidar la caché y recargar los datos después de eliminar
-        setTimeout(() => {
-          queryClient.invalidateQueries({ queryKey: ['reviews'] });
-          refetch();
-        }, 500);
-      }
-    });
-  };
-
-  if (reviewsLoading) {
+  if (isLoading) {
     return (
-      <div className="text-center py-8">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white mx-auto"></div>
-        <p className="mt-4 text-gray-400">Cargando reseñas...</p>
+      <div className="flex justify-center py-8">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
       </div>
     );
   }
 
-  if (reviews.length === 0) {
+  if (!reviews || reviews.length === 0) {
     return (
       <div className="text-center py-12 bg-zinc-800/50 rounded-lg">
-        <p className="text-gray-400">
-          {showPending 
-            ? 'No hay reseñas pendientes de aprobación.'
-            : 'No hay reseñas aprobadas para mostrar.'}
-        </p>
-        <Button 
-          variant="outline" 
-          className="mt-4 border-zinc-600 text-gray-300 hover:bg-zinc-700"
-          onClick={() => refetch()}
-        >
-          Recargar
-        </Button>
+        <p className="text-gray-400">No hay reseñas para mostrar</p>
       </div>
     );
   }
 
   return (
-    <div className="overflow-x-auto">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Nombre</TableHead>
-            <TableHead>Calificación</TableHead>
-            <TableHead>Fecha</TableHead>
-            <TableHead>Contenido</TableHead>
-            <TableHead className="text-right">Acciones</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {reviews.map((review) => (
-            <TableRow key={review.id}>
-              <TableCell className="font-medium">{review.nombre_cliente}</TableCell>
-              <TableCell>
-                <div className="flex">{renderStars(review.puntaje)}</div>
-              </TableCell>
-              <TableCell>{new Date(review.created_at).toLocaleDateString()}</TableCell>
-              <TableCell>
-                <div className="max-w-md truncate">{review.contenido}</div>
-              </TableCell>
-              <TableCell className="text-right">
-                {showPending ? (
-                  <div className="flex justify-end space-x-2">
-                    <Button
-                      variant="default"
-                      onClick={() => handleReviewAction(review.id, true)}
-                      disabled={isApproving}
-                      className="px-3 py-1 bg-green-600 hover:bg-green-700 rounded text-sm flex items-center gap-1"
-                    >
-                      <Check size={14} /> Aprobar
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      onClick={() => handleReviewAction(review.id, false)}
-                      disabled={isApproving}
-                      className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-sm flex items-center gap-1"
-                    >
-                      <X size={14} /> Rechazar
-                    </Button>
-                  </div>
-                ) : (
+    <div className="space-y-6">
+      {reviews.map((review) => (
+        <motion.div
+          key={review.id}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={`bg-zinc-800/50 rounded-lg p-6 ${
+            !review.approved ? "border-l-4 border-yellow-500" : ""
+          }`}
+        >
+          <div className="flex justify-between items-start">
+            <div>
+              <h3 className="font-bold text-lg">{review.name}</h3>
+              <p className="text-sm text-gray-500">
+                {new Date(review.created_at).toLocaleDateString()}
+              </p>
+            </div>
+            <div className="flex gap-2">
+              {!review.approved ? (
+                <>
                   <Button
-                    variant="destructive"
-                    onClick={() => handleDeleteReview(review.id)}
-                    disabled={isDeleting}
-                    className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-sm flex items-center gap-1"
+                    onClick={() => updateStatus.mutate({ 
+                      id: review.id, 
+                      approved: true 
+                    })}
+                    className="bg-green-600 hover:bg-green-700"
+                    size="sm"
                   >
-                    <Trash2 size={14} /> Eliminar
+                    <Check size={16} className="mr-1" /> Aprobar
                   </Button>
-                )}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+                  <Button
+                    onClick={() => deleteReview.mutate(review.id)}
+                    className="bg-red-600 hover:bg-red-700"
+                    size="sm"
+                  >
+                    <X size={16} className="mr-1" /> Rechazar
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  onClick={() => deleteReview.mutate(review.id)}
+                  variant="destructive"
+                  size="sm"
+                >
+                  <Trash2 size={16} className="mr-1" /> Eliminar
+                </Button>
+              )}
+            </div>
+          </div>
+          <p className="mt-4 text-gray-300">{review.comment}</p>
+          {!review.approved && (
+            <div className="mt-2 text-sm text-yellow-500">
+              Pendiente de aprobación
+            </div>
+          )}
+        </motion.div>
+      ))}
     </div>
   );
 };
+
+export default ReviewsManagement;

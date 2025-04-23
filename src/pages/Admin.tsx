@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Inbox, CheckCheck } from "lucide-react";
+import { Inbox, CheckCheck, Image } from "lucide-react";
 import { LoginForm } from '@/components/admin/LoginForm';
 import { ReviewsManagement } from '@/components/admin/ReviewsManagement';
 import { GalleryManagement } from '@/components/admin/GalleryManagement';
@@ -33,9 +33,9 @@ const Admin = () => {
             <div className="border-b border-zinc-700 mb-8">
               <nav className="flex space-x-8">
                 <button
-                  onClick={() => setActiveTab('reviews')}
+                  onClick={() => setActiveTab('pending')}
                   className={`py-4 px-1 font-medium text-sm border-b-2 ${
-                    activeTab === 'reviews' 
+                    activeTab === 'pending' 
                       ? 'border-sky-500 text-sky-500' 
                       : 'border-transparent text-gray-400 hover:text-gray-200'
                   }`}
@@ -66,22 +66,25 @@ const Admin = () => {
                       : 'border-transparent text-gray-400 hover:text-gray-200'
                   }`}
                 >
-                  Gestionar Galería
+                  <div className="flex items-center gap-2">
+                    <Image size={16} />
+                    Gestionar Galería
+                  </div>
                 </button>
               </nav>
             </div>
             
-            {activeTab === 'reviews' && (
+            {activeTab === 'pending' && (
               <div>
                 <h2 className="text-xl font-bold mb-6">Reseñas Pendientes de Aprobación</h2>
-                <ReviewsManagement showPending={true} />
+                <ReviewsManagement />
               </div>
             )}
             
             {activeTab === 'approved' && (
               <div>
                 <h2 className="text-xl font-bold mb-6">Reseñas Aprobadas</h2>
-                <ReviewsManagement showPending={false} />
+                <ReviewsManagement />
               </div>
             )}
             
