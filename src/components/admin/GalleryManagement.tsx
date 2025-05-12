@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import { Upload, ImageOff, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 const GalleryManagement = () => {
   const { data: images, isLoading } = useGalleryImages();
@@ -14,6 +15,7 @@ const GalleryManagement = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -32,28 +34,39 @@ const GalleryManagement = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file || !title) return;
+    if (!file || !title) {
+      toast.error("Por favor seleccione una imagen y agregue un título");
+      return;
+    }
 
-    uploadImage.mutate(
-      { file, title, description },
-      {
-        onSuccess: () => {
-          // Reset form
-          setFile(null);
-          setTitle("");
-          setDescription("");
-          setPreviewUrl(null);
-          
-          // Reset file input
-          const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-          if (fileInput) {
-            fileInput.value = '';
+    setIsUploading(true);
+    
+    try {
+      await uploadImage.mutateAsync(
+        { file, title, description },
+        {
+          onSuccess: () => {
+            // Reset form
+            setFile(null);
+            setTitle("");
+            setDescription("");
+            setPreviewUrl(null);
+            
+            // Reset file input
+            const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+            if (fileInput) {
+              fileInput.value = '';
+            }
           }
         }
-      }
-    );
+      );
+    } catch (error) {
+      console.error("Upload failed:", error);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -108,9 +121,9 @@ const GalleryManagement = () => {
           <Button
             type="submit"
             className="w-full flex items-center justify-center gap-2"
-            disabled={uploadImage.isPending || !file}
+            disabled={isUploading || !file}
           >
-            {uploadImage.isPending ? (
+            {isUploading ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
                 Subiendo...

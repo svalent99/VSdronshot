@@ -28,6 +28,8 @@ export const useGalleryImages = () => {
 
 const checkAndCreateBucket = async () => {
   try {
+    console.log("Checking if gallery bucket exists...");
+    
     // First check if bucket exists
     const { data: buckets, error: listError } = await supabase.storage.listBuckets();
     
@@ -37,17 +39,17 @@ const checkAndCreateBucket = async () => {
     }
     
     // If gallery bucket doesn't exist, create it
-    if (!buckets?.some(bucket => bucket.name === 'gallery')) {
+    const galleryBucketExists = buckets?.some(bucket => bucket.name === 'gallery');
+    
+    if (!galleryBucketExists) {
       console.log("Gallery bucket doesn't exist, creating it...");
       const { error: createError } = await supabase.storage.createBucket('gallery', {
-        public: true,
-        allowedMimeTypes: ['image/*'],
-        fileSizeLimit: 10485760 // 10MB
+        public: true
       });
       
       if (createError) {
         console.error("Error creating gallery bucket:", createError);
-        return false;
+        throw createError;
       }
       
       console.log("Gallery bucket created successfully");
@@ -58,7 +60,7 @@ const checkAndCreateBucket = async () => {
     return true;
   } catch (error) {
     console.error("Error in checkAndCreateBucket:", error);
-    return false;
+    throw new Error("No se pudo preparar el bucket para subir imágenes");
   }
 };
 
@@ -77,16 +79,13 @@ export const useUploadImage = () => {
     }) => {
       console.log("Starting upload for file:", file.name);
       
-      // First make sure bucket exists
-      const bucketReady = await checkAndCreateBucket();
-      if (!bucketReady) {
-        throw new Error("No se pudo preparar el bucket para subir imágenes");
-      }
-      
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
-      
       try {
+        // First make sure bucket exists
+        await checkAndCreateBucket();
+        
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+        
         // Upload file to Supabase Storage
         console.log("Uploading file to storage...");
         const { error: uploadError, data: uploadData } = await supabase
@@ -131,7 +130,7 @@ export const useUploadImage = () => {
         }
         
         return { success: true };
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error in upload process:", error);
         throw error;
       }

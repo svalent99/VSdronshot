@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useSubmitReview } from "@/hooks/useReviews";
+import { toast } from "sonner";
 
 interface ReviewFormProps {
   onSubmitSuccess?: () => void;
@@ -14,25 +15,31 @@ const ReviewForm = ({ onSubmitSuccess }: ReviewFormProps) => {
   const [comment, setComment] = useState("");
   const submitReview = useSubmitReview();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !comment.trim()) {
-      return;
-    }
+    
+    try {
+      if (!name.trim() || !comment.trim()) {
+        toast.error("Por favor complete todos los campos");
+        return;
+      }
 
-    submitReview.mutate(
-      { name: name.trim(), comment: comment.trim() },
-      {
-        onSuccess: () => {
-          setName("");
-          setComment("");
-          
-          if (onSubmitSuccess) {
-            onSubmitSuccess();
+      await submitReview.mutateAsync(
+        { name: name.trim(), comment: comment.trim() },
+        {
+          onSuccess: () => {
+            setName("");
+            setComment("");
+            
+            if (onSubmitSuccess) {
+              onSubmitSuccess();
+            }
           }
         }
-      }
-    );
+      );
+    } catch (error) {
+      console.error("Error submitting review:", error);
+    }
   };
 
   return (
