@@ -35,7 +35,7 @@ const checkAndCreateBucket = async () => {
     
     if (listError) {
       console.error("Error checking buckets:", listError);
-      return false;
+      throw new Error("No se pudo verificar los buckets de almacenamiento");
     }
     
     // If gallery bucket doesn't exist, create it
@@ -43,16 +43,22 @@ const checkAndCreateBucket = async () => {
     
     if (!galleryBucketExists) {
       console.log("Gallery bucket doesn't exist, creating it...");
-      const { error: createError } = await supabase.storage.createBucket('gallery', {
-        public: true
-      });
       
-      if (createError) {
-        console.error("Error creating gallery bucket:", createError);
-        throw createError;
+      try {
+        const { error: createError } = await supabase.storage.createBucket('gallery', {
+          public: true
+        });
+        
+        if (createError) {
+          console.error("Error creating gallery bucket:", createError);
+          throw createError;
+        }
+        
+        console.log("Gallery bucket created successfully");
+      } catch (createError) {
+        console.error("Error creating bucket:", createError);
+        throw new Error("No se pudo crear el bucket para almacenar imágenes");
       }
-      
-      console.log("Gallery bucket created successfully");
     } else {
       console.log("Gallery bucket already exists");
     }
@@ -60,7 +66,7 @@ const checkAndCreateBucket = async () => {
     return true;
   } catch (error) {
     console.error("Error in checkAndCreateBucket:", error);
-    throw new Error("No se pudo preparar el bucket para subir imágenes");
+    throw error;
   }
 };
 
