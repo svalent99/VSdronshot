@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import ReviewForm from "@/components/ReviewForm";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { X } from "lucide-react";
 
 const ReviewsSection = () => {
   const { data: reviews, isLoading, refetch } = useReviews();
@@ -65,11 +66,13 @@ const ReviewsSection = () => {
               Dejar una Reseña
             </h3>
             <Button 
-              variant="outline" 
-              size="sm" 
+              size="icon"
+              variant="destructive"
+              className="rounded-full h-8 w-8 p-0 flex items-center justify-center"
               onClick={() => setShowForm(false)}
             >
-              Cancelar
+              <X className="h-4 w-4" />
+              <span className="sr-only">Cancelar</span>
             </Button>
           </div>
           <ReviewForm onSubmitSuccess={handleSubmitSuccess} />
