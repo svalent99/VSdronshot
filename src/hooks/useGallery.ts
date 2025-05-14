@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -58,7 +57,7 @@ const checkAndCreateBucket = async () => {
           console.error("Error creating gallery bucket:", createError);
           
           // If error is about permissions, show specific message
-          if (createError.message?.includes('permission') || createError.code === '42501') {
+          if (createError.message?.includes('permission')) {
             throw new Error("Error de permisos al crear el bucket. Verifica las políticas RLS en Supabase");
           }
           
