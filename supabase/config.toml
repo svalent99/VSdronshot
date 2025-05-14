@@ -1,1 +1,10 @@
+
 project_id = "jpdrjoqpsynbuqjdazst"
+
+[auth]
+# Habilitar acceso anónimo para poder utilizar funcionalidades sin iniciar sesión
+enable_signup = true
+
+[storage]
+# Configuración para permitir almacenamiento público
+public_buckets = ["gallery"]

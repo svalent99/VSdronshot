@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -43,11 +44,8 @@ const checkAndCreateBucket = async () => {
     if (!galleryBucketExists) {
       console.log("Gallery bucket doesn't exist, creating it...");
       
-      // Add a short delay before creating the bucket to ensure any previous operations have completed
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
       try {
-        // Use service_role or apikey role if available to create bucket
+        // Try creating the bucket with public access
         const { error: createError } = await supabase.storage.createBucket('gallery', {
           public: true,
           fileSizeLimit: 10485760 // 10MB limit
@@ -56,9 +54,25 @@ const checkAndCreateBucket = async () => {
         if (createError) {
           console.error("Error creating gallery bucket:", createError);
           
-          // If error is about permissions, show specific message
-          if (createError.message?.includes('permission')) {
-            throw new Error("Error de permisos al crear el bucket. Verifica las políticas RLS en Supabase");
+          // Intenta otra estrategia si hay error de permisos
+          if (createError.message?.toLowerCase().includes('permission') || 
+              createError.message?.toLowerCase().includes('policy')) {
+            
+            console.log("Trying alternative approach to create bucket...");
+            
+            // Intenta acceder al bucket directamente, lo que podría crearlo automáticamente
+            const { data: publicUrl } = supabase.storage.from('gallery').getPublicUrl('test.txt');
+            console.log("Bucket might be created implicitly:", publicUrl);
+            
+            // Espera un momento para que se procese
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Verifica si el bucket existe ahora
+            const { data: checkBuckets } = await supabase.storage.listBuckets();
+            if (checkBuckets?.some(bucket => bucket.name === 'gallery')) {
+              console.log("Gallery bucket exists now");
+              return true;
+            }
           }
           
           throw createError;
@@ -75,7 +89,7 @@ const checkAndCreateBucket = async () => {
           return true;
         }
         
-        throw new Error("No se pudo crear el bucket para almacenar imágenes: " + (createError?.message || "Error desconocido"));
+        throw new Error("No se pudo crear el bucket para almacenar imágenes. Por favor, configura manualmente el bucket 'gallery' en la consola de Supabase.");
       }
     } else {
       console.log("Gallery bucket already exists");
