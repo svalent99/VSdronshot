@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "../ui/carousel";
 import { GalleryCard } from "../../utils/galleryUtils";
 import { X, ImageOff } from "lucide-react";
+import { AspectRatio } from "../ui/aspect-ratio";
 
 type MobileGalleryProps = {
   cards: GalleryCard[];
@@ -20,12 +21,12 @@ const MobileGallery = ({ cards, selected, handleClick, handleOutsideClick }: Mob
           <CarouselContent>
             {cards.map((card, i) => (
               <CarouselItem key={i} className="basis-full">
-                <div className="relative rounded-lg overflow-hidden" style={{ aspectRatio: "1/1" }}>
-                  <div className="w-full h-full bg-zinc-900 flex items-center justify-center">
+                <div className="relative rounded-lg overflow-hidden shadow-md">
+                  <AspectRatio ratio={1/1} className="bg-zinc-900 w-full">
                     <img 
                       src={card.thumbnail} 
                       alt={card.title} 
-                      className="object-contain w-full h-full" 
+                      className="object-cover w-full h-full" 
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.onerror = null;
@@ -41,9 +42,9 @@ const MobileGallery = ({ cards, selected, handleClick, handleOutsideClick }: Mob
                         }
                       }}
                     />
-                  </div>
+                  </AspectRatio>
                   <div className="absolute bottom-0 left-0 w-full bg-black bg-opacity-70 p-2 text-left">
-                    <h3 className="text-sm font-medium text-white">{card.title}</h3>
+                    <h3 className="text-sm font-medium text-white truncate">{card.title}</h3>
                   </div>
                 </div>
               </CarouselItem>
@@ -80,19 +81,21 @@ const MobileGallery = ({ cards, selected, handleClick, handleOutsideClick }: Mob
                 >
                   <X className="w-5 h-5 text-white" />
                 </button>
-                <img 
-                  src={selected.thumbnail} 
-                  alt={selected.title} 
-                  className="w-full h-auto max-h-[80vh] object-contain" 
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.onerror = null;
-                    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMiIgZmlsbD0iIzJEMzQ0OCIvPjxwYXRoIGQ9Ik0xNyA4TDcgMThNNyA4TDE3IDE4IiBzdHJva2U9IiM4ODk1QjAiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+';
-                    target.className = 'w-24 h-24 mx-auto';
-                  }}
-                />
+                <AspectRatio ratio={1/1} className="bg-zinc-900 w-full">
+                  <img 
+                    src={selected.thumbnail} 
+                    alt={selected.title} 
+                    className="w-full h-full object-cover" 
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.onerror = null;
+                      target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMiIgZmlsbD0iIzJEMzQ0OCIvPjxwYXRoIGQ9Ik0xNyA4TDcgMThNNyA4TDE3IDE4IiBzdHJva2U9IiM4ODk1QjAiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+';
+                      target.className = 'w-24 h-24 mx-auto';
+                    }}
+                  />
+                </AspectRatio>
                 <div className="absolute bottom-0 left-0 w-full bg-black bg-opacity-70 p-4">
-                  <h3 className="text-xl font-bold text-white">{selected.title}</h3>
+                  <h3 className="text-xl font-bold text-white truncate">{selected.title}</h3>
                 </div>
               </div>
             </motion.div>
