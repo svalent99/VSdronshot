@@ -44,27 +44,46 @@ const checkAndCreateBucket = async () => {
     if (!galleryBucketExists) {
       console.log("Gallery bucket doesn't exist, creating it...");
       
+      // Add a short delay before creating the bucket to ensure any previous operations have completed
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       try {
+        // Use service_role or apikey role if available to create bucket
         const { error: createError } = await supabase.storage.createBucket('gallery', {
-          public: true
+          public: true,
+          fileSizeLimit: 10485760 // 10MB limit
         });
         
         if (createError) {
           console.error("Error creating gallery bucket:", createError);
+          
+          // If error is about permissions, show specific message
+          if (createError.message?.includes('permission') || createError.code === '42501') {
+            throw new Error("Error de permisos al crear el bucket. Verifica las políticas RLS en Supabase");
+          }
+          
           throw createError;
         }
         
         console.log("Gallery bucket created successfully");
-      } catch (createError) {
+      } catch (createError: any) {
         console.error("Error creating bucket:", createError);
-        throw new Error("No se pudo crear el bucket para almacenar imágenes");
+        
+        // Check if bucket might already exist despite the error
+        const { data: checkAgain } = await supabase.storage.listBuckets();
+        if (checkAgain?.some(bucket => bucket.name === 'gallery')) {
+          console.log("Gallery bucket exists after all, continuing...");
+          return true;
+        }
+        
+        throw new Error("No se pudo crear el bucket para almacenar imágenes: " + (createError?.message || "Error desconocido"));
       }
     } else {
       console.log("Gallery bucket already exists");
     }
     
     return true;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error in checkAndCreateBucket:", error);
     throw error;
   }

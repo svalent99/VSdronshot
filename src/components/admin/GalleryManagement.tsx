@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
-import { Upload, ImageOff, Trash2 } from "lucide-react";
+import { Upload, ImageOff, Trash2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const GalleryManagement = () => {
   const { data: images, isLoading } = useGalleryImages();
@@ -16,11 +17,13 @@ const GalleryManagement = () => {
   const [description, setDescription] = useState("");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
       setFile(selectedFile);
+      setUploadError(null);
       
       // Create preview
       const reader = new FileReader();
@@ -36,6 +39,8 @@ const GalleryManagement = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setUploadError(null);
+    
     if (!file || !title) {
       toast.error("Por favor seleccione una imagen y agregue un título");
       return;
@@ -59,11 +64,15 @@ const GalleryManagement = () => {
             if (fileInput) {
               fileInput.value = '';
             }
+          },
+          onError: (error: any) => {
+            setUploadError(error?.message || "Error desconocido al subir la imagen");
           }
         }
       );
-    } catch (error) {
+    } catch (error: any) {
       console.error("Upload failed:", error);
+      setUploadError(error?.message || "Error desconocido al subir la imagen");
     } finally {
       setIsUploading(false);
     }
@@ -73,6 +82,16 @@ const GalleryManagement = () => {
     <div>
       <div className="bg-zinc-800/50 rounded-lg p-6 mb-8">
         <h2 className="text-xl font-bold mb-6">Subir Nueva Imagen</h2>
+        
+        {uploadError && (
+          <Alert variant="destructive" className="mb-4 bg-red-900/30 text-white border-red-800">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              {uploadError}
+            </AlertDescription>
+          </Alert>
+        )}
+        
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1">
