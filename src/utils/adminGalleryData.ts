@@ -31,7 +31,7 @@ export const uploadImageToSupabase = async (file: File, title: string, descripti
     // Subir archivo a Supabase Storage
     const { data: fileData, error: uploadError } = await supabase
       .storage
-      .from('gallery')
+      .from('galeriavs')
       .upload(fileName, file);
     
     if (uploadError) throw uploadError;
@@ -39,7 +39,7 @@ export const uploadImageToSupabase = async (file: File, title: string, descripti
     // Obtener URL pública del archivo
     const { data: urlData } = await supabase
       .storage
-      .from('gallery')
+      .from('galeriavs')
       .getPublicUrl(fileName);
     
     if (!urlData.publicUrl) throw new Error("No se pudo obtener la URL pública");

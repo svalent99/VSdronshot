@@ -28,7 +28,7 @@ export const useGalleryImages = () => {
 
 const checkAndCreateBucket = async () => {
   try {
-    console.log("Checking if gallery bucket exists...");
+    console.log("Checking if galeriavs bucket exists...");
     
     // First check if bucket exists
     const { data: buckets, error: listError } = await supabase.storage.listBuckets();
@@ -38,21 +38,21 @@ const checkAndCreateBucket = async () => {
       throw new Error("No se pudo verificar los buckets de almacenamiento");
     }
     
-    // If gallery bucket doesn't exist, create it
-    const galleryBucketExists = buckets?.some(bucket => bucket.name === 'gallery');
+    // If galeriavs bucket doesn't exist, create it
+    const galeriavsBucketExists = buckets?.some(bucket => bucket.name === 'galeriavs');
     
-    if (!galleryBucketExists) {
-      console.log("Gallery bucket doesn't exist, creating it...");
+    if (!galeriavsBucketExists) {
+      console.log("galeriavs bucket doesn't exist, creating it...");
       
       try {
         // Try creating the bucket with public access
-        const { error: createError } = await supabase.storage.createBucket('gallery', {
+        const { error: createError } = await supabase.storage.createBucket('galeriavs', {
           public: true,
           fileSizeLimit: 10485760 // 10MB limit
         });
         
         if (createError) {
-          console.error("Error creating gallery bucket:", createError);
+          console.error("Error creating galeriavs bucket:", createError);
           
           // Intenta otra estrategia si hay error de permisos
           if (createError.message?.toLowerCase().includes('permission') || 
@@ -61,7 +61,7 @@ const checkAndCreateBucket = async () => {
             console.log("Trying alternative approach to create bucket...");
             
             // Intenta acceder al bucket directamente, lo que podría crearlo automáticamente
-            const { data: publicUrl } = supabase.storage.from('gallery').getPublicUrl('test.txt');
+            const { data: publicUrl } = supabase.storage.from('galeriavs').getPublicUrl('test.txt');
             console.log("Bucket might be created implicitly:", publicUrl);
             
             // Espera un momento para que se procese
@@ -69,8 +69,8 @@ const checkAndCreateBucket = async () => {
             
             // Verifica si el bucket existe ahora
             const { data: checkBuckets } = await supabase.storage.listBuckets();
-            if (checkBuckets?.some(bucket => bucket.name === 'gallery')) {
-              console.log("Gallery bucket exists now");
+            if (checkBuckets?.some(bucket => bucket.name === 'galeriavs')) {
+              console.log("galeriavs bucket exists now");
               return true;
             }
           }
@@ -78,21 +78,21 @@ const checkAndCreateBucket = async () => {
           throw createError;
         }
         
-        console.log("Gallery bucket created successfully");
+        console.log("galeriavs bucket created successfully");
       } catch (createError: any) {
         console.error("Error creating bucket:", createError);
         
         // Check if bucket might already exist despite the error
         const { data: checkAgain } = await supabase.storage.listBuckets();
-        if (checkAgain?.some(bucket => bucket.name === 'gallery')) {
-          console.log("Gallery bucket exists after all, continuing...");
+        if (checkAgain?.some(bucket => bucket.name === 'galeriavs')) {
+          console.log("galeriavs bucket exists after all, continuing...");
           return true;
         }
         
-        throw new Error("No se pudo crear el bucket para almacenar imágenes. Por favor, configura manualmente el bucket 'gallery' en la consola de Supabase.");
+        throw new Error("No se pudo crear el bucket para almacenar imágenes. Por favor, configura manualmente el bucket 'galeriavs' en la consola de Supabase.");
       }
     } else {
-      console.log("Gallery bucket already exists");
+      console.log("galeriavs bucket already exists");
     }
     
     return true;
@@ -128,7 +128,7 @@ export const useUploadImage = () => {
         console.log("Uploading file to storage...");
         const { error: uploadError, data: uploadData } = await supabase
           .storage
-          .from('gallery')
+          .from('galeriavs')
           .upload(fileName, file, {
             cacheControl: '3600',
             upsert: false
@@ -144,7 +144,7 @@ export const useUploadImage = () => {
         // Get public URL
         const { data: urlData } = supabase
           .storage
-          .from('gallery')
+          .from('galeriavs')
           .getPublicUrl(fileName);
         
         if (!urlData?.publicUrl) {
@@ -200,7 +200,7 @@ export const useDeleteImage = () => {
       // Delete file from Storage
       const { error: storageError } = await supabase
         .storage
-        .from('gallery')
+        .from('galeriavs')
         .remove([storagePath]);
       
       if (storageError) {

@@ -7,4 +7,4 @@ enable_signup = true
 
 [storage]
 # Configuración para permitir almacenamiento público
-public_buckets = ["gallery"]
+public_buckets = ["galeriavs"]
