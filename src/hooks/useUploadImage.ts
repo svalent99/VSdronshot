@@ -2,7 +2,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { checkAndCreateBucket } from "@/integrations/supabase/bucketUtils";
+import { checkBucketExists } from "@/integrations/supabase/bucketUtils";
 
 const BUCKET_NAME = 'galeriavs';
 
@@ -25,9 +25,15 @@ export const useUploadImage = () => {
     }) => {
       console.log("Starting upload for file:", file.name);
       
+      // First check if user is authenticated
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error("Debe iniciar sesión para subir imágenes");
+      }
+      
       try {
-        // First make sure bucket exists
-        await checkAndCreateBucket(BUCKET_NAME);
+        // Check if bucket exists (no longer creating it)
+        await checkBucketExists(BUCKET_NAME);
         
         const fileExt = file.name.split('.').pop();
         const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;

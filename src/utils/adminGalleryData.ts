@@ -1,5 +1,5 @@
 
-import { checkAndCreateBucket } from "@/integrations/supabase/bucketUtils";
+import { checkBucketExists } from "@/integrations/supabase/bucketUtils";
 
 // Datos de prueba para imágenes de la galería (solo se usan cuando no hay datos en Supabase)
 export const galleryImages = [
@@ -32,8 +32,14 @@ export const uploadImageToSupabase = async (file: File, title: string, descripti
     // Importación local para evitar problemas de circular dependency
     const { supabase } = await import('@/integrations/supabase/client');
     
+    // First check if user is authenticated
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      throw new Error("Debe iniciar sesión para subir imágenes");
+    }
+    
     // Asegúrate de que el bucket existe
-    await checkAndCreateBucket(BUCKET_NAME);
+    await checkBucketExists(BUCKET_NAME);
     
     // Subir archivo a Supabase Storage
     const { data: fileData, error: uploadError } = await supabase

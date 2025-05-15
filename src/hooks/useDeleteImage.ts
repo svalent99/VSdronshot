@@ -22,6 +22,12 @@ export const useDeleteImage = () => {
     }) => {
       console.log("Starting delete for image:", id, storagePath);
       
+      // First check if user is authenticated
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error("Debe iniciar sesión para eliminar imágenes");
+      }
+      
       // Delete file from Storage
       const { error: storageError } = await supabase
         .storage
