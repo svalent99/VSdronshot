@@ -1,4 +1,6 @@
 
+import { checkAndCreateBucket } from "@/integrations/supabase/bucketUtils";
+
 // Datos de prueba para imágenes de la galería (solo se usan cuando no hay datos en Supabase)
 export const galleryImages = [
   {
@@ -18,6 +20,8 @@ export const galleryImages = [
   }
 ];
 
+const BUCKET_NAME = 'galeriavs';
+
 // Función para subir una imagen a Supabase
 export const uploadImageToSupabase = async (file: File, title: string, description?: string) => {
   try {
@@ -28,10 +32,13 @@ export const uploadImageToSupabase = async (file: File, title: string, descripti
     // Importación local para evitar problemas de circular dependency
     const { supabase } = await import('@/integrations/supabase/client');
     
+    // Asegúrate de que el bucket existe
+    await checkAndCreateBucket(BUCKET_NAME);
+    
     // Subir archivo a Supabase Storage
     const { data: fileData, error: uploadError } = await supabase
       .storage
-      .from('galeriavs')
+      .from(BUCKET_NAME)
       .upload(fileName, file);
     
     if (uploadError) throw uploadError;
@@ -39,7 +46,7 @@ export const uploadImageToSupabase = async (file: File, title: string, descripti
     // Obtener URL pública del archivo
     const { data: urlData } = await supabase
       .storage
-      .from('galeriavs')
+      .from(BUCKET_NAME)
       .getPublicUrl(fileName);
     
     if (!urlData.publicUrl) throw new Error("No se pudo obtener la URL pública");
