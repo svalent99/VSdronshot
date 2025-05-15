@@ -1,3 +1,4 @@
+
 import { supabase } from "./client";
 
 /**
@@ -7,24 +8,37 @@ import { supabase } from "./client";
  */
 export const checkBucketExists = async (bucketName: string): Promise<boolean> => {
   try {
-    console.log(`Checking if ${bucketName} bucket exists...`);
+    console.log(`Checking if bucket '${bucketName}' exists...`);
     
-    // Check if bucket exists
+    // Verify user authentication before checking bucket
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      console.warn("User not authenticated when checking bucket existence");
+      throw new Error("Debe iniciar sesión para acceder a la galería");
+    }
+    
+    // Get list of all buckets
     const { data: buckets, error: listError } = await supabase.storage.listBuckets();
     
     if (listError) {
-      console.error("Error checking buckets:", listError);
-      throw new Error("No se pudo verificar los buckets de almacenamiento");
+      console.error("Error listing buckets:", listError);
+      
+      // Check if error is permission related
+      if (listError.message.includes("Permission") || listError.message.includes("JWT")) {
+        throw new Error("No tiene permisos para acceder al almacenamiento");
+      }
+      
+      throw new Error("Error al verificar el almacenamiento");
     }
     
-    // Return if bucket exists
+    // Verify the bucket exists
     const bucketExists = buckets?.some(bucket => bucket.name === bucketName);
     
     if (bucketExists) {
-      console.log(`${bucketName} bucket exists`);
+      console.log(`✓ Bucket '${bucketName}' exists`);
       return true;
     } else {
-      console.error(`${bucketName} bucket does not exist. Please create it manually in the Supabase console.`);
+      console.error(`✗ Bucket '${bucketName}' does not exist. Available buckets:`, buckets?.map(b => b.name));
       throw new Error(`El bucket '${bucketName}' no existe. Por favor, créelo manualmente en la consola de Supabase.`);
     }
   } catch (error: any) {

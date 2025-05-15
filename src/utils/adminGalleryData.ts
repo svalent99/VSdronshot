@@ -20,6 +20,7 @@ export const galleryImages = [
   }
 ];
 
+// Ensure the bucket name is consistently defined and spelled correctly
 const BUCKET_NAME = 'galeriavs';
 
 // Función para subir una imagen a Supabase
@@ -31,6 +32,7 @@ export const uploadImageToSupabase = async (file: File, title: string, descripti
     // First check if user is authenticated
     const { data: { session } } = await supabase.auth.getSession();
     console.log("Current session status:", session ? "Authenticated" : "Not authenticated");
+    console.log("Session details:", JSON.stringify(session, null, 2));
     
     if (!session) {
       console.error("Session not found. User is not authenticated.");
@@ -51,7 +53,7 @@ export const uploadImageToSupabase = async (file: File, title: string, descripti
     const fileExt = file.name.split('.').pop();
     const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
     
-    // Asegúrate de que el bucket existe
+    // Asegúrate de que el bucket existe - this will throw an error if it doesn't
     await checkBucketExists(BUCKET_NAME);
     
     // Subir archivo a Supabase Storage

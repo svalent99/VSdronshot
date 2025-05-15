@@ -12,6 +12,7 @@ const Admin = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState('pending');
   const [isLoading, setIsLoading] = useState(true);
+  const [sessionChecked, setSessionChecked] = useState(false);
   const navigate = useNavigate();
 
   // Check for existing session on component mount
@@ -19,15 +20,28 @@ const Admin = () => {
     const checkSession = async () => {
       try {
         const { data } = await supabase.auth.getSession();
-        console.log("Current session:", data.session);
+        console.log("Initial session check:", data.session ? "Session found" : "No session");
         
         if (data.session) {
-          setIsLoggedIn(true);
+          // Verify the session is valid by getting the user
+          const { data: userData, error: userError } = await supabase.auth.getUser();
+          
+          if (userError || !userData.user) {
+            console.error("Error verifying user:", userError);
+            setIsLoggedIn(false);
+          } else {
+            console.log("User verified:", userData.user.id);
+            setIsLoggedIn(true);
+          }
+        } else {
+          setIsLoggedIn(false);
         }
       } catch (error) {
         console.error("Error checking session:", error);
+        setIsLoggedIn(false);
       } finally {
         setIsLoading(false);
+        setSessionChecked(true);
       }
     };
 
@@ -35,8 +49,21 @@ const Admin = () => {
 
     // Setup auth listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Auth state changed:", event, session);
-      setIsLoggedIn(!!session);
+      console.log("Auth state changed:", event);
+      
+      if (event === 'SIGNED_IN') {
+        console.log("User signed in:", session?.user?.id);
+        setIsLoggedIn(true);
+      } else if (event === 'SIGNED_OUT') {
+        console.log("User signed out");
+        setIsLoggedIn(false);
+      } else if (event === 'TOKEN_REFRESHED') {
+        console.log("Token refreshed");
+        setIsLoggedIn(!!session);
+      } else if (event === 'USER_UPDATED') {
+        console.log("User updated");
+        setIsLoggedIn(!!session);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -86,7 +113,16 @@ const Admin = () => {
       
       <main className="max-w-6xl mx-auto p-6">
         {!isLoggedIn ? (
-          <LoginForm onLogin={() => setIsLoggedIn(true)} />
+          <>
+            <LoginForm onLogin={() => setIsLoggedIn(true)} />
+            {sessionChecked && (
+              <div className="mt-4 p-4 bg-blue-900/30 border border-blue-800 rounded-md">
+                <p className="text-sm text-blue-200">
+                  Nota: Si estás viendo problemas de autenticación, intenta cerrar sesión y volver a iniciarla.
+                </p>
+              </div>
+            )}
+          </>
         ) : (
           <div className="mt-8">
             <div className="border-b border-zinc-700 mb-8">

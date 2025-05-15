@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { checkBucketExists } from "@/integrations/supabase/bucketUtils";
 
+// Ensure the bucket name is consistently defined and spelled correctly
 const BUCKET_NAME = 'galeriavs';
 
 /**
@@ -23,7 +24,7 @@ export const useUploadImage = () => {
       title: string; 
       description?: string;
     }) => {
-      console.log("Starting upload for file:", file.name);
+      console.log(`Starting upload for file: ${file.name} to bucket: ${BUCKET_NAME}`);
       
       // First check if user is authenticated
       const { data: { session } } = await supabase.auth.getSession();
@@ -45,7 +46,7 @@ export const useUploadImage = () => {
         
         console.log("User authenticated successfully:", user.id);
         
-        // Check if bucket exists (no longer creating it)
+        // Check if bucket exists - will throw an error if it doesn't
         await checkBucketExists(BUCKET_NAME);
         
         const fileExt = file.name.split('.').pop();

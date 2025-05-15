@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+// Ensure the bucket name is consistently defined and spelled correctly
 const BUCKET_NAME = 'galeriavs';
 
 /**
@@ -20,7 +21,7 @@ export const useDeleteImage = () => {
       id: string; 
       storagePath: string;
     }) => {
-      console.log("Starting delete for image:", id, storagePath);
+      console.log(`Starting delete for image: ${id}, storage path: ${storagePath}, bucket: ${BUCKET_NAME}`);
       
       // First check if user is authenticated
       const { data: { session } } = await supabase.auth.getSession();
