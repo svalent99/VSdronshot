@@ -25,18 +25,31 @@ const BUCKET_NAME = 'galeriavs';
 // Función para subir una imagen a Supabase
 export const uploadImageToSupabase = async (file: File, title: string, description?: string) => {
   try {
-    // Generar un nombre único para el archivo
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
-    
     // Importación local para evitar problemas de circular dependency
     const { supabase } = await import('@/integrations/supabase/client');
     
     // First check if user is authenticated
     const { data: { session } } = await supabase.auth.getSession();
+    console.log("Current session status:", session ? "Authenticated" : "Not authenticated");
+    
     if (!session) {
+      console.error("Session not found. User is not authenticated.");
       throw new Error("Debe iniciar sesión para subir imágenes");
     }
+    
+    // Verify session token is still valid
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    
+    if (userError || !user) {
+      console.error("Failed to verify user:", userError);
+      throw new Error("La sesión ha expirado. Por favor, inicie sesión nuevamente.");
+    }
+    
+    console.log("User authenticated successfully:", user.id);
+    
+    // Generar un nombre único para el archivo
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
     
     // Asegúrate de que el bucket existe
     await checkBucketExists(BUCKET_NAME);

@@ -24,44 +24,62 @@ export const useDeleteImage = () => {
       
       // First check if user is authenticated
       const { data: { session } } = await supabase.auth.getSession();
+      console.log("Current session status:", session ? "Authenticated" : "Not authenticated");
+      
       if (!session) {
+        console.error("Session not found. User is not authenticated.");
         throw new Error("Debe iniciar sesión para eliminar imágenes");
       }
       
-      // Delete file from Storage
-      const { error: storageError } = await supabase
-        .storage
-        .from(BUCKET_NAME)
-        .remove([storagePath]);
-      
-      if (storageError) {
-        console.warn("Error removing file from storage:", storageError);
-        // Continue anyway to delete the database record
+      try {
+        // Verify session token is still valid
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        
+        if (userError || !user) {
+          console.error("Failed to verify user:", userError);
+          throw new Error("La sesión ha expirado. Por favor, inicie sesión nuevamente.");
+        }
+        
+        console.log("User authenticated successfully:", user.id);
+        
+        // Delete file from Storage
+        const { error: storageError } = await supabase
+          .storage
+          .from(BUCKET_NAME)
+          .remove([storagePath]);
+        
+        if (storageError) {
+          console.warn("Error removing file from storage:", storageError);
+          // Continue anyway to delete the database record
+        }
+        
+        // Delete record from database
+        console.log("Deleting database record...");
+        const { error: dbError } = await supabase
+          .from('gallery_images')
+          .delete()
+          .eq('id', id);
+        
+        if (dbError) {
+          console.error("Error deleting record:", dbError);
+          throw dbError;
+        }
+        
+        console.log("Record deleted successfully");
+        
+        return { success: true };
+      } catch (error: any) {
+        console.error("Error in delete process:", error);
+        throw error;
       }
-      
-      // Delete record from database
-      console.log("Deleting database record...");
-      const { error: dbError } = await supabase
-        .from('gallery_images')
-        .delete()
-        .eq('id', id);
-      
-      if (dbError) {
-        console.error("Error deleting record:", dbError);
-        throw dbError;
-      }
-      
-      console.log("Record deleted successfully");
-      
-      return { success: true };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['gallery-images'] });
       toast.success("Imagen eliminada exitosamente");
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error("Error deleting image:", error);
-      toast.error("Error al eliminar la imagen");
+      toast.error(`Error al eliminar la imagen: ${error?.message || "Error desconocido"}`);
     }
   });
 };

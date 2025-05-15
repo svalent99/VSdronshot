@@ -1,27 +1,86 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Inbox, CheckCheck, Image } from "lucide-react";
+import { Inbox, CheckCheck, Image, LogOut } from "lucide-react";
 import { LoginForm } from '@/components/admin/LoginForm';
 import ReviewsManagement from '@/components/admin/ReviewsManagement';
 import GalleryManagement from '@/components/admin/GalleryManagement';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from "sonner";
 
 const Admin = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState('pending');
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+
+  // Check for existing session on component mount
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        console.log("Current session:", data.session);
+        
+        if (data.session) {
+          setIsLoggedIn(true);
+        }
+      } catch (error) {
+        console.error("Error checking session:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkSession();
+
+    // Setup auth listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth state changed:", event, session);
+      setIsLoggedIn(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast.success("Sesión cerrada exitosamente");
+      setIsLoggedIn(false);
+    } catch (error) {
+      console.error("Error signing out:", error);
+      toast.error("Error al cerrar la sesión");
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-zinc-900 text-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-zinc-900 text-white">
       <header className="bg-black py-4 px-6 flex justify-between items-center">
         <h1 className="text-2xl font-bold">VS Dron Shot - Panel de Administración</h1>
         {isLoggedIn && (
-          <button 
-            onClick={() => navigate('/')}
-            className="px-4 py-2 border border-white/20 rounded hover:bg-white/10 transition"
-          >
-            Volver al sitio
-          </button>
+          <div className="flex space-x-4">
+            <button 
+              onClick={() => navigate('/')}
+              className="px-4 py-2 border border-white/20 rounded hover:bg-white/10 transition"
+            >
+              Volver al sitio
+            </button>
+            <button 
+              onClick={handleLogout}
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded flex items-center space-x-2 transition"
+            >
+              <LogOut size={16} />
+              <span>Cerrar sesión</span>
+            </button>
+          </div>
         )}
       </header>
       

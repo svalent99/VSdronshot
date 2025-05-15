@@ -27,11 +27,24 @@ export const useUploadImage = () => {
       
       // First check if user is authenticated
       const { data: { session } } = await supabase.auth.getSession();
+      console.log("Current session status:", session ? "Authenticated" : "Not authenticated");
+      
       if (!session) {
+        console.error("Session not found. User is not authenticated.");
         throw new Error("Debe iniciar sesión para subir imágenes");
       }
       
       try {
+        // Verify session token is still valid
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        
+        if (userError || !user) {
+          console.error("Failed to verify user:", userError);
+          throw new Error("La sesión ha expirado. Por favor, inicie sesión nuevamente.");
+        }
+        
+        console.log("User authenticated successfully:", user.id);
+        
         // Check if bucket exists (no longer creating it)
         await checkBucketExists(BUCKET_NAME);
         
