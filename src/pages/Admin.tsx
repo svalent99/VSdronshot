@@ -5,7 +5,7 @@ import { Inbox, CheckCheck, Image, LogOut } from "lucide-react";
 import { LoginForm } from '@/components/admin/LoginForm';
 import ReviewsManagement from '@/components/admin/ReviewsManagement';
 import GalleryManagement from '@/components/admin/GalleryManagement';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, debugStorageBuckets } from '@/integrations/supabase/client';
 import { toast } from "sonner";
 
 const Admin = () => {
@@ -69,6 +69,20 @@ const Admin = () => {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Debug storage buckets when switching to gallery tab
+  const handleTabChange = async (tab: string) => {
+    setActiveTab(tab);
+    
+    if (tab === 'gallery' && isLoggedIn) {
+      try {
+        // Check if we can access the buckets when switching to gallery tab
+        await debugStorageBuckets();
+      } catch (error) {
+        console.error("Failed to debug storage buckets:", error);
+      }
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
@@ -128,7 +142,7 @@ const Admin = () => {
             <div className="border-b border-zinc-700 mb-8">
               <nav className="flex space-x-8">
                 <button
-                  onClick={() => setActiveTab('pending')}
+                  onClick={() => handleTabChange('pending')}
                   className={`py-4 px-1 font-medium text-sm border-b-2 ${
                     activeTab === 'pending' 
                       ? 'border-sky-500 text-sky-500' 
@@ -141,7 +155,7 @@ const Admin = () => {
                   </div>
                 </button>
                 <button
-                  onClick={() => setActiveTab('approved')}
+                  onClick={() => handleTabChange('approved')}
                   className={`py-4 px-1 font-medium text-sm border-b-2 ${
                     activeTab === 'approved' 
                       ? 'border-sky-500 text-sky-500' 
@@ -154,7 +168,7 @@ const Admin = () => {
                   </div>
                 </button>
                 <button
-                  onClick={() => setActiveTab('gallery')}
+                  onClick={() => handleTabChange('gallery')}
                   className={`py-4 px-1 font-medium text-sm border-b-2 ${
                     activeTab === 'gallery' 
                       ? 'border-sky-500 text-sky-500' 
@@ -183,7 +197,29 @@ const Admin = () => {
               </div>
             )}
             
-            {activeTab === 'gallery' && <GalleryManagement />}
+            {activeTab === 'gallery' && (
+              <>
+                <div className="bg-blue-900/30 border border-blue-800 rounded-md p-4 mb-6">
+                  <h3 className="text-lg font-semibold mb-2">Información de depuración</h3>
+                  <p className="text-sm text-blue-200 mb-2">
+                    Si estás viendo problemas con el bucket de almacenamiento 'galeriavs', verifica:
+                  </p>
+                  <ul className="list-disc list-inside text-sm text-blue-200 space-y-1">
+                    <li>Que el bucket existe en este proyecto de Supabase</li>
+                    <li>Que el nombre sea exactamente 'galeriavs' (sensible a mayúsculas/minúsculas)</li>
+                    <li>Que tu usuario tenga permisos para acceder al bucket</li>
+                    <li>Que estés iniciado sesión correctamente</li>
+                  </ul>
+                  <button 
+                    onClick={() => debugStorageBuckets()}
+                    className="mt-3 px-3 py-1 bg-blue-700 hover:bg-blue-800 rounded text-sm"
+                  >
+                    Diagnosticar acceso a buckets
+                  </button>
+                </div>
+                <GalleryManagement />
+              </>
+            )}
           </div>
         )}
       </main>
