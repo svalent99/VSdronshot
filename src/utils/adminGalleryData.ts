@@ -32,7 +32,7 @@ export const uploadImageToSupabase = async (file: File, title: string, descripti
     // First check if user is authenticated
     const { data: { session } } = await supabase.auth.getSession();
     console.log("Current session status:", session ? "Authenticated" : "Not authenticated");
-    console.log("Session details:", JSON.stringify(session, null, 2));
+    console.log("Session details:", session ? `User ID: ${session.user.id}` : "No session");
     
     if (!session) {
       console.error("Session not found. User is not authenticated.");
@@ -53,16 +53,25 @@ export const uploadImageToSupabase = async (file: File, title: string, descripti
     const fileExt = file.name.split('.').pop();
     const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
     
-    // Asegúrate de que el bucket existe - this will throw an error if it doesn't
-    await checkBucketExists(BUCKET_NAME);
+    // Check if bucket exists - will throw an error if it doesn't
+    const bucketExists = await checkBucketExists(BUCKET_NAME);
+    console.log(`Bucket check result: ${bucketExists ? "Exists" : "Does not exist"}`);
+    
+    if (!bucketExists) {
+      throw new Error(`El bucket '${BUCKET_NAME}' no existe o no es accesible.`);
+    }
     
     // Subir archivo a Supabase Storage
+    console.log(`Uploading file to storage bucket '${BUCKET_NAME}'...`);
     const { data: fileData, error: uploadError } = await supabase
       .storage
       .from(BUCKET_NAME)
       .upload(fileName, file);
     
-    if (uploadError) throw uploadError;
+    if (uploadError) {
+      console.error("Upload error:", uploadError);
+      throw uploadError;
+    }
     
     // Obtener URL pública del archivo
     const { data: urlData } = await supabase
@@ -85,7 +94,7 @@ export const uploadImageToSupabase = async (file: File, title: string, descripti
     if (dbError) throw dbError;
     
     return { success: true, url: urlData.publicUrl };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error al subir imagen:", error);
     return { success: false, error };
   }

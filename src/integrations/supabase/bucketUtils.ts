@@ -1,4 +1,3 @@
-
 import { supabase } from "./client";
 
 /**
@@ -20,47 +19,57 @@ export const checkBucketExists = async (bucketName: string): Promise<boolean> =>
     console.log("User authenticated:", session.user.id);
     
     try {
-      // Try to get bucket details directly - this is more reliable
+      // First attempt: direct bucket check
+      console.log(`Attempting direct getBucket check for '${bucketName}'...`);
       const { data, error } = await supabase.storage.getBucket(bucketName);
       
       if (error) {
-        console.error(`Error getting bucket '${bucketName}':`, error);
-        throw error;
-      }
-      
-      if (data) {
-        console.log(`✓ Bucket '${bucketName}' exists and is accessible:`, data);
+        console.error(`Error in direct bucket check for '${bucketName}':`, error);
+        // Don't throw here, try the fallback method
+      } else if (data) {
+        console.log(`✓ Bucket '${bucketName}' exists and is accessible via direct check:`, data);
         return true;
       }
       
-      console.error(`✗ Bucket '${bucketName}' not found`);
-      return false;
-    } catch (bucketError) {
-      // If direct bucket check fails, try listing buckets as fallback
-      console.log("Falling back to bucket listing method");
+      // Second attempt: list all buckets and check if our bucket is in the list
+      console.log("Attempting fallback: listing all buckets...");
       const { data: buckets, error: listError } = await supabase.storage.listBuckets();
       
       if (listError) {
         console.error("Error listing buckets:", listError);
-        
-        // Check if error is permission related
-        if (listError.message.includes("Permission") || listError.message.includes("JWT")) {
-          throw new Error("No tiene permisos para acceder al almacenamiento");
-        }
-        
-        throw new Error("Error al verificar el almacenamiento");
+        throw new Error(`No se pudieron listar los buckets: ${listError.message}`);
       }
       
-      // Verify the bucket exists in the list
-      const bucketExists = buckets?.some(bucket => bucket.name === bucketName);
+      if (!buckets || buckets.length === 0) {
+        console.error("No buckets found in the project");
+        throw new Error("No se encontraron buckets en el proyecto. Por favor, cree el bucket 'galeriavs' en la consola de Supabase.");
+      }
+      
+      console.log("Available buckets:", buckets.map(b => b.name));
+      
+      // Check if our bucket exists in the list
+      const bucketExists = buckets.some(bucket => bucket.name === bucketName);
       
       if (bucketExists) {
         console.log(`✓ Bucket '${bucketName}' exists (found in bucket list)`);
         return true;
       } else {
-        console.error(`✗ Bucket '${bucketName}' does not exist. Available buckets:`, buckets?.map(b => b.name));
-        throw new Error(`El bucket '${bucketName}' no existe. Por favor, verifique que esté creado correctamente en la consola de Supabase.`);
+        console.error(`✗ Bucket '${bucketName}' does not exist. Available buckets:`, buckets.map(b => b.name));
+        throw new Error(`El bucket '${bucketName}' no existe. Buckets disponibles: ${buckets.map(b => b.name).join(", ")}`);
       }
+    } catch (bucketError: any) {
+      console.error("Error checking bucket:", bucketError);
+      
+      // If there's an issue with permissions, provide a clearer error message
+      if (bucketError.message && 
+          (bucketError.message.includes("Permission") || 
+           bucketError.message.includes("JWT") || 
+           bucketError.message.includes("token"))) {
+        throw new Error("No tiene permisos para acceder al almacenamiento. Por favor, verifique su sesión.");
+      }
+      
+      // Re-throw the original error
+      throw bucketError;
     }
   } catch (error: any) {
     console.error("Error in checkBucketExists:", error);

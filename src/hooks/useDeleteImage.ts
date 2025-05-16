@@ -27,7 +27,7 @@ export const useDeleteImage = () => {
       // First check if user is authenticated
       const { data: { session } } = await supabase.auth.getSession();
       console.log("Current session status:", session ? "Authenticated" : "Not authenticated");
-      console.log("Session details:", session ? session.user.id : "No session");
+      console.log("Session details:", session ? `User ID: ${session.user.id}` : "No session");
       
       if (!session) {
         console.error("Session not found. User is not authenticated.");
@@ -46,7 +46,12 @@ export const useDeleteImage = () => {
         console.log("User authenticated successfully:", user.id);
         
         // Check if bucket exists - will throw an error if it doesn't
-        await checkBucketExists(BUCKET_NAME);
+        const bucketExists = await checkBucketExists(BUCKET_NAME);
+        console.log(`Bucket check result: ${bucketExists ? "Exists" : "Does not exist"}`);
+        
+        if (!bucketExists) {
+          throw new Error(`El bucket '${BUCKET_NAME}' no existe o no es accesible.`);
+        }
         
         // Delete file from Storage
         const { error: storageError } = await supabase
