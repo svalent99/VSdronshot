@@ -1,11 +1,14 @@
 import { supabase, debugStorageBuckets } from "./client";
 
+// Constant for the bucket name for consistency
+export const GALLERY_BUCKET_NAME = 'galeriavs';
+
 /**
  * Checks if a storage bucket exists and is accessible
  * @param bucketName Name of the bucket to check
  * @returns Promise<boolean> true if bucket exists and is accessible
  */
-export const checkBucketExists = async (bucketName: string): Promise<boolean> => {
+export const checkBucketExists = async (bucketName: string = GALLERY_BUCKET_NAME): Promise<boolean> => {
   try {
     console.log(`🔍 Checking if bucket '${bucketName}' exists...`);
     
@@ -18,7 +21,7 @@ export const checkBucketExists = async (bucketName: string): Promise<boolean> =>
     
     console.log("✅ User authenticated:", session.user.id);
     
-    // Attempt to list all buckets and debug storage state 
+    // Get all available buckets using the debug function
     const buckets = await debugStorageBuckets();
     
     // Check if our bucket exists in the list
@@ -28,8 +31,27 @@ export const checkBucketExists = async (bucketName: string): Promise<boolean> =>
       console.log(`✅ Bucket '${bucketName}' exists (found in bucket list)`);
       return true;
     } else {
-      console.error(`❌ Bucket '${bucketName}' does not exist. Available buckets:`, buckets.map(b => b.name));
-      throw new Error(`El bucket '${bucketName}' no existe o no es accesible con las credenciales actuales. Por favor, verifique que existe en el proyecto de Supabase correcto y que el usuario tiene permisos para acceder.`);
+      console.error(`❌ Bucket '${bucketName}' not found in the list of accessible buckets`);
+      
+      // As a fallback, try a direct bucket operation to verify access
+      // Sometimes listBuckets might not show all buckets but we could still have access
+      console.log(`🔍 Attempting to verify bucket '${bucketName}' existence through direct access...`);
+      
+      try {
+        // Try to list files in the bucket to verify access
+        const { data, error } = await supabase.storage.from(bucketName).list();
+        
+        if (!error) {
+          console.log(`✅ Bucket '${bucketName}' exists (verified through direct access)`);
+          return true;
+        } else {
+          console.error(`❌ Failed direct access verification for bucket '${bucketName}':`, error);
+          throw new Error(`El bucket '${bucketName}' parece no existir o no es accesible con sus credenciales actuales.`);
+        }
+      } catch (directAccessError) {
+        console.error(`❌ Error during direct access verification:`, directAccessError);
+        throw new Error(`El bucket '${bucketName}' no pudo ser verificado: ${(directAccessError as Error).message}`);
+      }
     }
   } catch (error: any) {
     console.error("❌ Error in checkBucketExists:", error);
@@ -38,7 +60,7 @@ export const checkBucketExists = async (bucketName: string): Promise<boolean> =>
 };
 
 // Keep this function for backward compatibility but modify it to use checkBucketExists
-export const checkAndCreateBucket = async (bucketName: string): Promise<boolean> => {
+export const checkAndCreateBucket = async (bucketName: string = GALLERY_BUCKET_NAME): Promise<boolean> => {
   // Just verify the bucket exists, don't try to create it
   return await checkBucketExists(bucketName);
 };
