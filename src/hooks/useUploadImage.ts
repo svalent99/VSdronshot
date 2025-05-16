@@ -29,6 +29,7 @@ export const useUploadImage = () => {
       // First check if user is authenticated
       const { data: { session } } = await supabase.auth.getSession();
       console.log("Current session status:", session ? "Authenticated" : "Not authenticated");
+      console.log("Session details:", session ? session.user.id : "No session");
       
       if (!session) {
         console.error("Session not found. User is not authenticated.");
