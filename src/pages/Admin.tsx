@@ -197,29 +197,7 @@ const Admin = () => {
               </div>
             )}
             
-            {activeTab === 'gallery' && (
-              <>
-                <div className="bg-blue-900/30 border border-blue-800 rounded-md p-4 mb-6">
-                  <h3 className="text-lg font-semibold mb-2">Información de depuración</h3>
-                  <p className="text-sm text-blue-200 mb-2">
-                    Si estás viendo problemas con el bucket de almacenamiento 'galeriavs', verifica:
-                  </p>
-                  <ul className="list-disc list-inside text-sm text-blue-200 space-y-1">
-                    <li>Que el bucket existe en este proyecto de Supabase</li>
-                    <li>Que el nombre sea exactamente 'galeriavs' (sensible a mayúsculas/minúsculas)</li>
-                    <li>Que tu usuario tenga permisos para acceder al bucket</li>
-                    <li>Que estés iniciado sesión correctamente</li>
-                  </ul>
-                  <button 
-                    onClick={() => debugStorageBuckets()}
-                    className="mt-3 px-3 py-1 bg-blue-700 hover:bg-blue-800 rounded text-sm"
-                  >
-                    Diagnosticar acceso a buckets
-                  </button>
-                </div>
-                <GalleryManagement />
-              </>
-            )}
+            {activeTab === 'gallery' && <GalleryManagement />}
           </div>
         )}
       </main>
