@@ -23,19 +23,19 @@ const DesktopGallery = ({
   handleOutsideClick 
 }: DesktopGalleryProps) => {
   return (
-    <div className="w-full h-full p-4 md:p-10 grid grid-cols-1 md:grid-cols-3 max-w-7xl mx-auto gap-6 relative">
+    <div className="w-full h-full p-4 md:p-10 grid grid-cols-1 md:grid-cols-3 max-w-7xl mx-auto gap-4 relative">
       {cards.map((card, i) => (
         <div key={i} className={cn(card.className, "")}>
           <motion.div
             // Remove onClick handler to disable click functionality
             className={cn(
               card.className,
-              "relative overflow-hidden rounded-xl glass-card shadow-lg shadow-purple-500/10 border border-purple-500/10",
+              "relative overflow-hidden rounded-lg",
               selected?.id === card.id
                 ? "absolute inset-0 h-full w-full md:w-3/4 m-auto z-50 flex justify-center items-center flex-wrap flex-col"
                 : lastSelected?.id === card.id
-                ? "z-40 h-full w-full"
-                : "h-full w-full"
+                ? "z-40 bg-white h-full w-full"
+                : "bg-black h-full w-full"
             )}
             layoutId={`card-${card.id}`}
             style={{ aspectRatio: "1/1" }}
@@ -55,7 +55,7 @@ const DesktopGallery = ({
                 <SelectedCard selected={selected} />
               </>
             )}
-            <div className="relative w-full h-full bg-gradient-to-br from-purple-900/20 to-black/60">
+            <div className="relative w-full h-full bg-zinc-900">
               <img 
                 src={card.thumbnail} 
                 alt={card.title} 
@@ -76,7 +76,7 @@ const DesktopGallery = ({
                 }}
               />
             </div>
-            <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-3 text-left">
+            <div className="absolute bottom-0 left-0 w-full bg-black bg-opacity-70 p-2 text-left">
               <h3 className="text-sm font-medium text-white">{card.title}</h3>
             </div>
           </motion.div>

@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -85,17 +84,11 @@ export default {
 					to: {
 						height: '0'
 					}
-				},
-				'aurora': {
-					'0%': { transform: 'rotate(0deg) translate(0%, 0%) scale(1)', opacity: '0.5' },
-					'50%': { transform: 'rotate(180deg) translate(2%, 2%) scale(1.1)', opacity: '0.7' },
-					'100%': { transform: 'rotate(360deg) translate(0%, 0%) scale(1)', opacity: '0.5' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out',
-				'aurora': 'aurora 15s ease infinite'
+				'accordion-up': 'accordion-up 0.2s ease-out'
 			}
 		}
 	},

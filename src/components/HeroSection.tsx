@@ -28,7 +28,7 @@ const HeroSection = () => {
         >
           <source src="/video hero.mp4" type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80"></div>
+        <div className="absolute inset-0 bg-black bg-opacity-60"></div>
       </div>
       
       <div className="flex flex-col items-center justify-center flex-grow space-y-8 pt-28 pb-20 z-10 relative">
@@ -36,7 +36,7 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.8 }}
-          className="text-sm font-light tracking-widest uppercase text-purple-300"
+          className="text-sm font-light tracking-widest uppercase"
         >
           Bienvenido a
         </motion.span>
@@ -52,21 +52,18 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.9, duration: 0.8 }}
-          className="text-lg md:text-xl text-gray-300 max-w-md text-center"
+          className="text-lg md:text-xl text-gray-400 max-w-md text-center"
         >
           Descubre un nuevo mundo desde las alturas
         </motion.p>
         <motion.button
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          whileHover={{ scale: 1.05, boxShadow: "0 0 15px rgba(124, 58, 237, 0.5)" }}
-          transition={{ delay: 1.1, duration: 0.3 }}
-          className="mt-8 px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-md font-semibold text-lg transition-all duration-300 relative overflow-hidden group"
+          transition={{ delay: 1.1, duration: 0.8 }}
+          className="mt-8 px-8 py-3 bg-[#0EA5E9] text-white rounded-md font-semibold text-lg hover:bg-[#0284C7] transition-colors duration-300 transform hover:scale-105"
           onClick={scrollToCertificationSection}
         >
-          <span className="relative z-10">Conocenos</span>
-          <span className="absolute inset-0 bg-gradient-to-r from-purple-700 to-blue-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-          <span className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-blue-600/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></span>
+          Conocenos
         </motion.button>
       </div>
     </div>

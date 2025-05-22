@@ -20,8 +20,8 @@ const MobileGallery = ({ cards, selected, handleClick, handleOutsideClick }: Mob
           <CarouselContent>
             {cards.map((card, i) => (
               <CarouselItem key={i} className="basis-full">
-                <div className="relative rounded-xl overflow-hidden glass-card shadow-lg shadow-purple-500/10 border border-purple-500/10" style={{ aspectRatio: "1/1" }}>
-                  <div className="w-full h-full bg-gradient-to-br from-purple-900/20 to-black/60 flex items-center justify-center">
+                <div className="relative rounded-lg overflow-hidden" style={{ aspectRatio: "1/1" }}>
+                  <div className="w-full h-full bg-zinc-900 flex items-center justify-center">
                     <img 
                       src={card.thumbnail} 
                       alt={card.title} 
@@ -42,7 +42,7 @@ const MobileGallery = ({ cards, selected, handleClick, handleOutsideClick }: Mob
                       }}
                     />
                   </div>
-                  <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-3 text-left">
+                  <div className="absolute bottom-0 left-0 w-full bg-black bg-opacity-70 p-2 text-left">
                     <h3 className="text-sm font-medium text-white">{card.title}</h3>
                   </div>
                 </div>
@@ -50,10 +50,10 @@ const MobileGallery = ({ cards, selected, handleClick, handleOutsideClick }: Mob
             ))}
           </CarouselContent>
           <div className="absolute top-1/2 -translate-y-1/2 left-2 flex items-center">
-            <CarouselPrevious className="relative h-8 w-8 translate-x-0 translate-y-0 bg-black/50 hover:bg-purple-900/70 border-purple-800/30" />
+            <CarouselPrevious className="relative h-8 w-8 translate-x-0 translate-y-0 bg-black/50 hover:bg-black/70 border-0" />
           </div>
           <div className="absolute top-1/2 -translate-y-1/2 right-2 flex items-center">
-            <CarouselNext className="relative h-8 w-8 translate-x-0 translate-y-0 bg-black/50 hover:bg-purple-900/70 border-purple-800/30" />
+            <CarouselNext className="relative h-8 w-8 translate-x-0 translate-y-0 bg-black/50 hover:bg-black/70 border-0" />
           </div>
         </div>
       </Carousel>
@@ -72,7 +72,7 @@ const MobileGallery = ({ cards, selected, handleClick, handleOutsideClick }: Mob
               layoutId={`card-${selected.id}`}
               className="fixed inset-0 flex items-center justify-center z-50 p-4"
             >
-              <div className="relative w-full max-w-lg rounded-lg overflow-hidden glass-card">
+              <div className="relative w-full max-w-lg rounded-lg overflow-hidden">
                 <button 
                   onClick={handleOutsideClick}
                   className="absolute top-2 right-2 z-[80] bg-white/20 hover:bg-white/40 rounded-full p-1.5 backdrop-blur-sm transition-colors"
@@ -91,7 +91,7 @@ const MobileGallery = ({ cards, selected, handleClick, handleOutsideClick }: Mob
                     target.className = 'w-24 h-24 mx-auto';
                   }}
                 />
-                <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-4">
+                <div className="absolute bottom-0 left-0 w-full bg-black bg-opacity-70 p-4">
                   <h3 className="text-xl font-bold text-white">{selected.title}</h3>
                 </div>
               </div>
