@@ -1,3 +1,4 @@
+
 import { useGalleryImages } from "@/hooks/useGallery";
 import { motion } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -24,7 +25,7 @@ const GallerySection = () => {
       </div>
       
       <div className="relative z-10 max-w-7xl mx-auto">
-        {/* Only keeping the title outside the purple container */}
+        {/* Title is now only here, removed from inside the container */}
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-white">
           Galería de Imágenes
         </h2>
