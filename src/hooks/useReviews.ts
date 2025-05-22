@@ -9,6 +9,7 @@ export interface Review {
   comment: string;
   approved: boolean;
   created_at: string | null;
+  company?: string; // Añadimos la propiedad company como opcional
 }
 
 export const useReviews = (showAll: boolean = false) => {
