@@ -29,17 +29,17 @@ const DroneSection = () => {
             className="flex flex-col space-y-6"
           >
             <h2 className="text-3xl md:text-4xl font-bold text-white">
-              Nuestro dron capta las mejores imágenes y videos de tu propiedad
+              ¿Querés ver tu propiedad desde otra perspectiva?
             </h2>
             <div className="space-y-4 text-gray-300">
               <p>
-                En el mundo inmobiliario, la primera impresión lo es todo. Por eso, utilizamos un dron de última generación, diseñado para capturar imágenes y videos en alta resolución, asegurando tomas cinemáticas, fluidas y detalladas de cada propiedad.
+                Nuestro dron lo hace posible: calidad 4K, estabilidad aérea y un ojo experto detrás del control.
               </p>
               <p>
-                Gracias a su tecnología avanzada, este dron permite vuelos estables y seguros, incluso en espacios reducidos, logrando ángulos únicos que realzan la arquitectura y el entorno. Su sistema de detección de obstáculos y vuelo inteligente garantiza capturas precisas y sin interrupciones, brindando contenido visual de máxima calidad para potenciar la presentación de cada inmueble.
+                En el mercado inmobiliario, la primera impresión es crucial. Por eso utilizamos tecnología de punta que captura cada detalle de tu propiedad desde ángulos únicos que realzan su arquitectura y entorno.
               </p>
               <p>
-                Con esta herramienta, cada toma aérea se convierte en una experiencia envolvente, ayudando a destacar propiedades de una manera impactante y profesional.
+                Con nuestro equipo, cada toma aérea se convierte en una experiencia visual impactante, ayudándote a destacar tu propiedad de manera profesional y memorable.
               </p>
             </div>
           </motion.div>
