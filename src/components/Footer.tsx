@@ -13,6 +13,12 @@ const Footer = () => {
             <p className="text-gray-400 text-sm">
               Descubre un nuevo mundo desde las alturas con nuestros servicios de filmación aérea.
             </p>
+            <Link
+              to="/admin"
+              className="mt-4 inline-block text-xs text-zinc-500 hover:text-zinc-400 transition-colors"
+            >
+              Admin
+            </Link>
           </div>
           
           <div className="col-span-1 md:col-span-2">

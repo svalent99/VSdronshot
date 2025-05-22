@@ -58,18 +58,6 @@ const NavHeader = () => {
         <span className="text-xl font-bold text-white">VS Dron Shot</span>
       </div>
       
-      {/* Admin Button - Right Side */}
-      <div className="flex justify-end">
-        <div className="hidden md:block">
-          <Link
-            to="/admin"
-            className="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white font-medium rounded-full transition-colors duration-200"
-          >
-            Admin
-          </Link>
-        </div>
-      </div>
-      
       {/* Mobile Menu Button */}
       <div className="md:hidden flex items-center">
         <button 
@@ -97,7 +85,6 @@ const NavHeader = () => {
             <MobileTab onClick={() => scrollToSection('services-section')}>Servicios</MobileTab>
             <MobileTab onClick={() => scrollToSection('drone-section')}>Nosotros</MobileTab>
             <MobileTab onClick={() => scrollToSection('footer-section')}>Contacto</MobileTab>
-            <MobileTab to="/admin" isAdmin={true}>Admin</MobileTab>
           </ul>
         </motion.div>
       )}
