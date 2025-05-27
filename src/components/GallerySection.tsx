@@ -31,7 +31,7 @@ const GallerySection = () => {
 
   if (!images || images.length === 0) {
     return (
-      <div className="text-center py-12 bg-gradient-to-br from-black via-purple-900/20 to-black rounded-lg backdrop-blur-sm border border-purple-500/20">
+      <div className="text-center py-12">
         <ImageOff className="mx-auto h-12 w-12 text-gray-400 mb-4" />
         <p className="text-gray-400">No hay imágenes en la galería</p>
       </div>
@@ -40,13 +40,13 @@ const GallerySection = () => {
 
   return (
     <div className="relative w-full">
-      <div className="relative bg-gradient-to-br from-black via-purple-900/20 to-black rounded-2xl backdrop-blur-sm border border-purple-500/20 p-8 overflow-hidden">
+      <div className="relative p-8 overflow-hidden">
         {/* Carousel container */}
         <div className="relative flex justify-center items-center min-h-[400px]">
           {/* Previous button */}
           <button
             onClick={prevSlide}
-            className="absolute left-4 z-10 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-300 backdrop-blur-sm border border-purple-500/30"
+            className="absolute left-4 z-10 bg-black/70 hover:bg-black/90 text-white p-3 rounded-full transition-all duration-300"
             disabled={images.length <= 1}
           >
             <ChevronLeft className="w-6 h-6" />
@@ -65,7 +65,7 @@ const GallerySection = () => {
               <img
                 src={images[currentIndex].file_path}
                 alt={images[currentIndex].title}
-                className="max-w-full max-h-full object-contain rounded-lg shadow-2xl shadow-purple-500/20"
+                className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
                 style={{ 
                   width: 'auto', 
                   height: 'auto',
@@ -87,7 +87,7 @@ const GallerySection = () => {
           {/* Next button */}
           <button
             onClick={nextSlide}
-            className="absolute right-4 z-10 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-300 backdrop-blur-sm border border-purple-500/30"
+            className="absolute right-4 z-10 bg-black/70 hover:bg-black/90 text-white p-3 rounded-full transition-all duration-300"
             disabled={images.length <= 1}
           >
             <ChevronRight className="w-6 h-6" />
@@ -103,7 +103,7 @@ const GallerySection = () => {
                 onClick={() => setCurrentIndex(index)}
                 className={`w-3 h-3 rounded-full transition-all duration-300 ${
                   index === currentIndex
-                    ? 'bg-purple-500 scale-125'
+                    ? 'bg-white scale-125'
                     : 'bg-white/30 hover:bg-white/50'
                 }`}
               />
